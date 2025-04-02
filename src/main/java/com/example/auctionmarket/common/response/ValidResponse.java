@@ -1,4 +1,4 @@
-package com.example.auctionmarket.domain.exception.response;
+package com.example.auctionmarket.common.response;
 
 import lombok.Builder;
 import lombok.Getter;
