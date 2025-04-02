@@ -1,4 +1,4 @@
-package com.example.auctionmarket.domain.exception;
+package com.example.auctionmarket.common.exception;
 
 import org.springframework.http.HttpStatus;
 
