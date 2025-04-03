@@ -3,6 +3,7 @@ package com.example.auctionmarket.domain.product.entity;
 import com.example.auctionmarket.domain.product.enums.ProductCategory;
 import com.example.auctionmarket.domain.product.enums.SoldStatus;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -35,6 +36,17 @@ public class Product {
     @Column(name = "sold_status")
     private SoldStatus soldStatus;
 
+    public Product(String productName, String productContent, ProductCategory category) {
+        this.productName = productName;
+        this.productContent = productContent;
+        this.category = category;
+        this.soldStatus = SoldStatus.UNSOLD;
+    }
 
+    public void update(String productName, String productContent, ProductCategory category) {
+        this.productName = productName;
+        this.productContent = productContent;
+        this.category = category;
+    }
 }
 
