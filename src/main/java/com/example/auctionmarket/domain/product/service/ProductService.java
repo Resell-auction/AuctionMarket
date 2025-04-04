@@ -73,7 +73,7 @@ public class ProductService {
 
         // 제품 판매 상태가 SOLD일 경우 수정 불가 로직
         if (product.getSoldStatus().equals(SoldStatus.SOLD)) {
-            throw new IllegalStateException("이미 판매된 상품이라 수정이 불가합니다.");
+            throw new IllegalStateException("이미 판매된 제품이라 수정이 불가합니다.");
         }
 
         ProductCategory category = ProductCategory.of(request.getCategory());
@@ -94,7 +94,7 @@ public class ProductService {
 
         // 제품 판매 상태가 SOLD일 경우 삭제 불가 로직
         if (product.getSoldStatus().equals(SoldStatus.SOLD)) {
-            throw new IllegalStateException("이미 판매된 상품이라 삭제가 불가합니다.");
+            throw new IllegalStateException("이미 판매된 제품이라 삭제가 불가합니다.");
         }
 
         productRepository.deleteById(productId);
