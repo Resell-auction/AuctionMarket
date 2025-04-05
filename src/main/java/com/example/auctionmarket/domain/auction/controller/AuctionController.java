@@ -1,8 +1,11 @@
 package com.example.auctionmarket.domain.auction.controller;
 
 import com.example.auctionmarket.common.response.Response;
+import com.example.auctionmarket.domain.auction.dto.request.AuctionIncreasePriceRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionSaveRequest;
+import com.example.auctionmarket.domain.auction.dto.response.AuctionIncreasePriceResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionResponse;
+import com.example.auctionmarket.domain.auction.dto.response.AuctionSaveResponse;
 import com.example.auctionmarket.domain.auction.entity.Auction;
 import com.example.auctionmarket.domain.auction.service.AuctionService;
 import lombok.RequiredArgsConstructor;
@@ -22,13 +25,13 @@ public class AuctionController {
 
     //경매 생성
     @PostMapping("/{productId}")
-    public ResponseEntity<AuctionResponse> createAuction(
+    public ResponseEntity<AuctionSaveResponse> createAuction(
             @AuthenticationPrincipal AuthUser authUser,
             @PathVariable Long productId,
             @RequestBody AuctionSaveRequest request
             ){
-        AuctionResponse auctionResponse = auctionService.createAuction(authUser, productId, request);
-        return ResponseEntity.ok(auctionResponse);
+        AuctionSaveResponse auctionSaveResponse = auctionService.createAuction(authUser, productId, request);
+        return ResponseEntity.ok(auctionSaveResponse);
     }
 
     //경매 전체 조회
@@ -38,6 +41,7 @@ public class AuctionController {
             @RequestParam(defaultValue = "10") int size
     ){
         Page<AuctionResponse> result = auctionService.getAuctions(page, size);
+
         return ResponseEntity.ok(result);
     }
 
@@ -56,6 +60,18 @@ public class AuctionController {
         );
 
         return ResponseEntity.ok(result);
+    }
+
+    //경매 참여
+    @PutMapping("/{auctionId}/auction")
+    public ResponseEntity<AuctionIncreasePriceResponse> increaseAuction(
+            @PathVariable Long auctionId,
+            @RequestBody AuctionIncreasePriceRequest request,
+            @AuthenticationPrincipal AuthUser authUser
+    ){
+        AuctionIncreasePriceResponse response = auctionService.increasePrice(authUser, auctionId, request.getIncreasePrice());
+
+        return ResponseEntity.ok(response);
     }
 
     //경매 삭제
