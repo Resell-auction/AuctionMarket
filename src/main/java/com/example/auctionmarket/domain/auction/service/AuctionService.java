@@ -1,6 +1,8 @@
 package com.example.auctionmarket.domain.auction.service;
 
 import com.example.auctionmarket.domain.auction.dto.request.AuctionSaveRequest;
+import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateMinPriceRequest;
+import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateTimeRequest;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionIncreasePriceResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionSaveResponse;
@@ -153,19 +155,109 @@ public class AuctionService {
         );
     }
 
+    //경매 수정(시작 시간)
+    @Transactional
+    public AuctionResponse updateAuctionStartTime(AuthUser authUser, Long auctionId, AuctionUpdateTimeRequest request){
+        //유저 예외처리
+        User user = userRepository.findById(authUser.getUserId)
+                .orElseThrow(()->new IllegalStateException("해당 유저는 존재하지 않습니다."));
+
+        //경매 예외처리
+        Auction auction = auctionRepository.findById(auctionId)
+                .orElseThrow(()->new IllegalStateException("해당 경매는 존재하지 않습니다."));
+
+        //경매를 올린 사용자가 아닌 경우 불가
+        if(authUser.getUserId() != auction.getProduct().getUserId()){
+            //에외 처리
+        }
+
+        if(auction.getStatus() == AuctionStatus.ONGOING){
+            throw new IllegalStateException("경매가 진행 중일 때에는 수정이 불가합니다!");
+        }
+
+        //입력 받은 수정할 시작 시간 저장
+        auction.updateStartTime(request.getUpdateTime());
+
+        String auctionMessage = remainingTimeOfAuctionStatus(auction.getStatus(), auction.getEndTime());
+
+        //수정한 후의 경매 내용 출력
+        return new AuctionResponse(
+                auction.getId(),
+                auction.getProduct().getId(),
+                auction.getProduct().getUserId(),
+                auction.getProduct().getProductName(),
+                auction.getProduct().getCategory(),
+                auction.getMinPrice(),
+                auction.getMaxPrice(),
+                auction.getStartTime(),
+                auction.getEndTime(),
+                auction.getStatus(),
+                auctionMessage
+        );
+    }
+
+    //경매 수정(초기 가격)
+    @Transactional
+    public AuctionResponse updateMinPrice(AuthUser authUser, Long auctionId, AuctionUpdateMinPriceRequest request){
+        User user = userRepository.findById(authUser.getUserId)
+                .orElseThrow(()->new IllegalStateException("해당 유저는 존재하지 않습니다."));
+
+        //경매 예외처리
+        Auction auction = auctionRepository.findById(auctionId)
+                .orElseThrow(()->new IllegalStateException("해당 경매는 존재하지 않습니다."));
+
+        //경매를 올린 사용자가 아닌 경우 불가
+        if(authUser.getUserId() != auction.getProduct().getUserId()){
+            //에외 처리
+        }
+
+        if(auction.getStatus() == AuctionStatus.ONGOING){
+            throw new IllegalStateException("경매가 진행 중일 때에는 수정이 불가합니다!");
+        }
+
+        //입력 받은 최소가 저장
+        auction.updateMinPrice(request.getMinPrice());
+
+        String auctionMessage = remainingTimeOfAuctionStatus(auction.getStatus(), auction.getEndTime());
+
+        //수정한 후의 경매 내용 출력
+        return new AuctionResponse(
+                auction.getId(),
+                auction.getProduct().getId(),
+                auction.getProduct().getUserId(),
+                auction.getProduct().getProductName(),
+                auction.getProduct().getCategory(),
+                auction.getMinPrice(),
+                auction.getMaxPrice(),
+                auction.getStartTime(),
+                auction.getEndTime(),
+                auction.getStatus(),
+                auctionMessage
+        );
+    }
+
     //경매 삭제
     @Transactional
-    public void deleteAuction(AuthUser authUser, Long auctionId, Long productId){
-        //로그인 유저인지 확인
-        User user = User.fromAuthUser(authUser);
+    public void deleteAuction(AuthUser authUser, Long auctionId){
+        User user = userRepository.findById(authUser.getUserId)
+                .orElseThrow(()->new IllegalStateException("해당 유저는 존재하지 않습니다."));
 
-        //해당 물품이 존재하는지 확인
-        Product product = productRepository.findById(productId)
-                .orElseThrow(()->/*예외처리 코드*/);
-
-        //해당 경매가 존재하는지 확인
+        //경매 예외처리
         Auction auction = auctionRepository.findById(auctionId)
-                .orElseThrow(()->/*예외처리 코드*/);
+                .orElseThrow(()->new IllegalStateException("해당 경매는 존재하지 않습니다."));
+
+        //경매를 올린 사용자가 아닌 경우 불가
+        if(authUser.getUserId() != auction.getProduct().getUserId()){
+            //에외 처리
+        }
+
+        //경매 상태 확인
+        if(auction.getStatus() == AuctionStatus.ONGOING){
+            throw new IllegalStateException("대기 중이거나 완료된 경매만 삭제할 수 있습니다!");
+        }
+
+        //경매 삭제
+        auctionRepository.delete(auction);
     }
 
     /*함수 구현*/
