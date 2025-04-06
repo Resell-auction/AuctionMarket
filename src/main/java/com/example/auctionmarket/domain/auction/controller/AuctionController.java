@@ -3,6 +3,8 @@ package com.example.auctionmarket.domain.auction.controller;
 import com.example.auctionmarket.common.response.Response;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionIncreasePriceRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionSaveRequest;
+import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateMinPriceRequest;
+import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateTimeRequest;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionIncreasePriceResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionSaveResponse;
@@ -63,7 +65,7 @@ public class AuctionController {
     }
 
     //경매 참여
-    @PutMapping("/{auctionId}/auction")
+    @PutMapping("/participation/{auctionId}")
     public ResponseEntity<AuctionIncreasePriceResponse> increaseAuction(
             @PathVariable Long auctionId,
             @RequestBody AuctionIncreasePriceRequest request,
@@ -74,13 +76,36 @@ public class AuctionController {
         return ResponseEntity.ok(response);
     }
 
+    //경매 수정(시작 시간)
+    @PutMapping("/updateStartTime/{auctionId}")
+    public ResponseEntity<AuctionResponse> updateAuctionStartTime(
+            @PathVariable Long auctionId,
+            @RequestBody AuctionUpdateTimeRequest request,
+            @AuthenticationPrincipal AuthUser authUser
+            ){
+        AuctionResponse response = auctionService.updateAuctionStartTime(authUser, auctionId, request);
+
+        return ResponseEntity.ok(response);
+    }
+
+    //경매 수정(초기 가격)
+    @PutMapping("/updateMinPrice/{auctionId}")
+    public ResponseEntity<AuctionResponse> updateMinPrice(
+            @PathVariable Long auctionId,
+            @RequestBody AuctionUpdateMinPriceRequest request,
+            @AuthenticationPrincipal AuthUser authUser
+            ){
+        AuctionResponse response = auctionService.updateMinPrice(authUser, auctionId, request);
+
+        return ResponseEntity.ok(response);
+    }
+
     //경매 삭제
-    @DeleteMapping("/{auctionId}/product/{productId}")
+    @DeleteMapping("/{auctionId}")
     public void deleteAuction(
             @AuthenticationPrincipal AuthUser authUser,
-            @PathVariable Long auctionId,
-            @PathVariable Long productId
+            @PathVariable Long auctionId
     ){
-        auctionService.deleteAuction(authUser, auctionId, productId);
+        auctionService.deleteAuction(authUser, auctionId);
     }
 }
