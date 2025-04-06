@@ -74,4 +74,16 @@ public class Auction extends BaseEntity {
             this.maxPrice = increasePrice;
         }
     }
+
+    //시작 시간 수정 함수
+    public void updateStartTime(LocalDateTime newStartTime) {
+        this.startTime = newStartTime;
+        this.endTime = newStartTime.plus(this.duration);
+    }
+
+    //최소 가격 수정 함수
+    public void updateMinPrice(Long updateMinPrice) {
+        this.minPrice = updateMinPrice;
+        this.maxPrice = updateMinPrice;
+    }
 }
