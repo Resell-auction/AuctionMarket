@@ -1,16 +1,23 @@
 package com.example.auctionmarket.domain.auction.repository;
 
 import com.example.auctionmarket.domain.auction.entity.Auction;
+import com.example.auctionmarket.domain.auction.entity.QAuction;
+import com.example.auctionmarket.domain.product.entity.QProduct;
+import com.example.auctionmarket.domain.product.enums.ProductCategory;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
 
-public class AuctionRespositoryImpl implements AuctionRepositoryCustom{
+@Repository
+@RequiredArgsConstructor
+public class AuctionRepositoryImpl implements AuctionRepositoryCustom{
 
     private final JPAQueryFactory queryFactory;
 
@@ -31,7 +38,7 @@ public class AuctionRespositoryImpl implements AuctionRepositoryCustom{
         }
 
         if(StringUtils.hasText(category)) {
-            query.where(product.category.eq(category));
+            query.where(product.category.eq(ProductCategory.valueOf(category)));
         }
 
         //페이징 적용
@@ -51,7 +58,7 @@ public class AuctionRespositoryImpl implements AuctionRepositoryCustom{
         }
 
         if(StringUtils.hasText(category)) {
-            query.where(product.category.eq(category));
+            query.where(product.category.eq(ProductCategory.valueOf(category)));
         }
 
         long total = countQuery.fetchOne();
