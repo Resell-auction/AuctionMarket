@@ -100,15 +100,12 @@ jobs:
           FULL_IMAGE_NAME=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "이미지 빌드: $FULL_IMAGE_NAME"
           docker build -t $FULL_IMAGE_NAME .
-          if [ "${{ github.event_name }}" == "push" ]; then
-            echo "이미지 PUSH: $FULL_IMAGE_NAME"
-            docker push $FULL_IMAGE_NAME
-          else
-            echo "이미지 PUSH 스킵: ${{ github.event_name }} event."
+          echo "이미지 PUSH: $FULL_IMAGE_NAME"
+          docker push $FULL_IMAGE_NAME
           fi
           echo "image=$FULL_IMAGE_NAME" >> $GITHUB_OUTPUT
 
-      - name: 빌드 디버깅용 고정 아웃풋
+      - name: 빌드 디버깅용 123456789 아웃풋
         id: build-image-123456789
         if: github.event_name == 'push'
         run: echo "image=123456789" >> $GITHUB_OUTPUT
@@ -124,7 +121,7 @@ jobs:
     # 의존성 설정 => build-and-push-image 완료 후 실행
     needs: build-and-push-image
     # push 일 때만 실행 => PR 시에는 실행 안 함
-    # if: github.event_name == 'push'
+    if: github.event_name == 'push'
 
     steps:
       - name: 도커 이미지 빌드 결과 디버깅 (deploy-app-to-ec2 작업)
