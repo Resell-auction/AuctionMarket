@@ -1,5 +1,6 @@
 package com.example.auctionmarket.domain.auction.controller;
 
+import com.example.auctionmarket.common.auth.AuthUser;
 import com.example.auctionmarket.common.response.Response;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionIncreasePriceRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionSaveRequest;
