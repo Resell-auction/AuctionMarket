@@ -14,7 +14,7 @@ on:
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
   ECR_REPOSITORY: ${{ secrets.AWS_ECR_REPOSITORY_URI }}
-  CONTAINER_NAME: auction-market-app
+  APP_CONTAINER_NAME: auction-market-app
 
 jobs:
   build-and-push-image:
@@ -91,6 +91,7 @@ jobs:
 
       - name: Docker 이미지 빌드 + 태그 + ECR 에 푸시
         id: build-image
+        if: github.event_name == 'push'
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
@@ -150,17 +151,24 @@ jobs:
           username: ${{ secrets.EC2_SSH_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            echo "with 확인 디버깅"
+            echo "host 직접 할당 값= '$host'"
+            echo "username 직접 할당 값= '$username'"
+            echo "key 직접 할당 값= '$key'"
+            
+            echo "====================="  
+            
             echo "변수 할당 값 확인 디버깅"
-            echo "SPRING_PROFILES_ACTIVE 직접 할당 값= '$SPRING_PROFILES_ACTIVE'"
-            echo "ECR_REGISTRY 직접 할당 값= '$ECR_REGISTRY'"
-            echo "APP_IMAGE_URI 직접 할당 값= '$APP_IMAGE_URI'"
-            echo "AWS_REGION 직접 할당 값= '$AWS_REGION'"
-            echo "APP_CONTAINER_NAME 직접 할당 값= '$APP_CONTAINER_NAME'"
-            echo "SPRING_DATASOURCE_URL 직접 할당 값= '$SPRING_DATASOURCE_URL'"
-            echo "SPRING_DATASOURCE_USERNAME 직접 할당 값= '$SPRING_DATASOURCE_USERNAME'"
-            echo "SPRING_DATASOURCE_PASSWORD 직접 할당 값= '$SPRING_DATASOURCE_PASSWORD'"
-            echo "SPRING_DATA_REDIS_HOST 직접 할당 값= '$SPRING_DATA_REDIS_HOST'"
-            echo "SPRING_DATA_REDIS_PORT 직접 할당 값= '$SPRING_DATA_REDIS_PORT'"
+            echo "SPRING_PROFILES_ACTIVE 변수 할당 값= '$SPRING_PROFILES_ACTIVE'"
+            echo "ECR_REGISTRY 변수 할당 값= '$ECR_REGISTRY'"
+            echo "APP_IMAGE_URI 변수 할당 값= '$APP_IMAGE_URI'"
+            echo "AWS_REGION 변수 할당 값= '$AWS_REGION'"
+            echo "APP_CONTAINER_NAME 변수 할당 값= '$APP_CONTAINER_NAME'"
+            echo "SPRING_DATASOURCE_URL 변수 할당 값= '$SPRING_DATASOURCE_URL'"
+            echo "SPRING_DATASOURCE_USERNAME 변수 할당 값= '$SPRING_DATASOURCE_USERNAME'"
+            echo "SPRING_DATASOURCE_PASSWORD 변수 할당 값= '$SPRING_DATASOURCE_PASSWORD'"
+            echo "SPRING_DATA_REDIS_HOST 변수 할당 값= '$SPRING_DATA_REDIS_HOST'"
+            echo "SPRING_DATA_REDIS_PORT 변수 할당 값= '$SPRING_DATA_REDIS_PORT'"
             
             echo "====================="  
         
@@ -192,16 +200,16 @@ jobs:
             echo "=====================" 
             
             echo "변수에 직접 할당한 후, 변수 할당 값 확인 디버깅"
-            echo "SPRING_PROFILES_ACTIVE 직접 할당 값= '$SPRING_PROFILES_ACTIVE'"
-            echo "ECR_REGISTRY 직접 할당 값= '$ECR_REGISTRY'"
-            echo "APP_IMAGE_URI 직접 할당 값= '$APP_IMAGE_URI'"
-            echo "AWS_REGION 직접 할당 값= '$AWS_REGION'"
-            echo "APP_CONTAINER_NAME 직접 할당 값= '$APP_CONTAINER_NAME'"
-            echo "SPRING_DATASOURCE_URL 직접 할당 값= '$SPRING_DATASOURCE_URL'"
-            echo "SPRING_DATASOURCE_USERNAME 직접 할당 값= '$SPRING_DATASOURCE_USERNAME'"
-            echo "SPRING_DATASOURCE_PASSWORD 직접 할당 값= '$SPRING_DATASOURCE_PASSWORD'"
-            echo "SPRING_DATA_REDIS_HOST 직접 할당 값= '$SPRING_DATA_REDIS_HOST'"
-            echo "SPRING_DATA_REDIS_PORT 직접 할당 값= '$SPRING_DATA_REDIS_PORT'"
+            echo "SPRING_PROFILES_ACTIVE 변수 할당 값= '$SPRING_PROFILES_ACTIVE'"
+            echo "ECR_REGISTRY 변수 할당 값= '$ECR_REGISTRY'"
+            echo "APP_IMAGE_URI 변수 할당 값= '$APP_IMAGE_URI'"
+            echo "AWS_REGION 변수 할당 값= '$AWS_REGION'"
+            echo "APP_CONTAINER_NAME 변수 할당 값= '$APP_CONTAINER_NAME'"
+            echo "SPRING_DATASOURCE_URL 변수 할당 값= '$SPRING_DATASOURCE_URL'"
+            echo "SPRING_DATASOURCE_USERNAME 변수 할당 값= '$SPRING_DATASOURCE_USERNAME'"
+            echo "SPRING_DATASOURCE_PASSWORD 변수 할당 값= '$SPRING_DATASOURCE_PASSWORD'"
+            echo "SPRING_DATA_REDIS_HOST 변수 할당 값= '$SPRING_DATA_REDIS_HOST'"
+            echo "SPRING_DATA_REDIS_PORT 변수 할당 값= '$SPRING_DATA_REDIS_PORT'"
             
             echo "=====================" 
             
