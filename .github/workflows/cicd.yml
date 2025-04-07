@@ -150,7 +150,7 @@ jobs:
           username: ${{ secrets.EC2_SSH_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            echo "변수 할당 값 확인 디버깅'"
+            echo "변수 할당 값 확인 디버깅"
             echo "SPRING_PROFILES_ACTIVE 직접 할당 값= '$SPRING_PROFILES_ACTIVE'"
             echo "ECR_REGISTRY 직접 할당 값= '$ECR_REGISTRY'"
             echo "APP_IMAGE_URI 직접 할당 값= '$APP_IMAGE_URI'"
@@ -174,6 +174,34 @@ jobs:
             echo "SPRING_DATASOURCE_PASSWORD 직접 할당 값= '${{ secrets.RDS_PASSWORD }}'"
             echo "SPRING_DATA_REDIS_HOST 직접 할당 값= '${{ secrets.ELASTICACHE_HOST }}'"
             echo "SPRING_DATA_REDIS_PORT 직접 할당 값= '${{ secrets.ELASTICACHE_PORT }}'"
+            
+            echo "=====================" 
+            
+            echo "변수에 직접 할당 시작"
+            ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
+            APP_IMAGE_URI=${{ needs.build-and-push-image.outputs.image_uri }}
+            AWS_REGION=${{ env.AWS_REGION }}
+            APP_CONTAINER_NAME=${{ env.APP_CONTAINER_NAME }}
+            SPRING_PROFILES_ACTIVE=prod
+            SPRING_DATASOURCE_URL=${{ secrets.RDS_URL }}
+            SPRING_DATASOURCE_USERNAME=${{ secrets.RDS_USERNAME }}
+            SPRING_DATASOURCE_PASSWORD=${{ secrets.RDS_PASSWORD }}
+            SPRING_DATA_REDIS_HOST=${{ secrets.ELASTICACHE_HOST }}
+            SPRING_DATA_REDIS_PORT=${{ secrets.ELASTICACHE_PORT }}
+          
+            echo "=====================" 
+            
+            echo "변수에 직접 할당한 후, 변수 할당 값 확인 디버깅"
+            echo "SPRING_PROFILES_ACTIVE 직접 할당 값= '$SPRING_PROFILES_ACTIVE'"
+            echo "ECR_REGISTRY 직접 할당 값= '$ECR_REGISTRY'"
+            echo "APP_IMAGE_URI 직접 할당 값= '$APP_IMAGE_URI'"
+            echo "AWS_REGION 직접 할당 값= '$AWS_REGION'"
+            echo "APP_CONTAINER_NAME 직접 할당 값= '$APP_CONTAINER_NAME'"
+            echo "SPRING_DATASOURCE_URL 직접 할당 값= '$SPRING_DATASOURCE_URL'"
+            echo "SPRING_DATASOURCE_USERNAME 직접 할당 값= '$SPRING_DATASOURCE_USERNAME'"
+            echo "SPRING_DATASOURCE_PASSWORD 직접 할당 값= '$SPRING_DATASOURCE_PASSWORD'"
+            echo "SPRING_DATA_REDIS_HOST 직접 할당 값= '$SPRING_DATA_REDIS_HOST'"
+            echo "SPRING_DATA_REDIS_PORT 직접 할당 값= '$SPRING_DATA_REDIS_PORT'"
             
             echo "=====================" 
             
