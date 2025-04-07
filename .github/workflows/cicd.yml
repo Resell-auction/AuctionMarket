@@ -66,7 +66,8 @@ jobs:
 #          SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/auction_market
 #          SPRING_DATASOURCE_USERNAME: root
 #          SPRING_DATASOURCE_PASSWORD: 1234
-        run: ./gradlew test
+#        run: ./gradlew test
+        run: ./gradlew test -Dspring.profiles.active=test
 
       - name: AWS IAM 설정
         uses: aws-actions/configure-aws-credentials@v4
