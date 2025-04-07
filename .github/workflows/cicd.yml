@@ -136,6 +136,19 @@ jobs:
               exit 1
             fi
             
+            # docker-compose.yml 디버깅용
+            echo "현재 작업 디렉토리: $(pwd)"
+            echo "$APP_DIR 디렉토리 내용 확인:"
+            ls -al
+            echo "docker-compose.yml 파일 존재 확인 시도:"
+            if [ -f "docker-compose.yml" ]; then
+              echo "성공: docker-compose.yml 파일을 현재 디렉토리에서 찾았습니다."
+            else
+              echo "실패: docker-compose.yml 파일을 현재 디렉토리에서 찾을 수 없습니다!"
+              echo "SCP 단계가 성공했는지, 파일 이름이 정확한지 확인하세요."
+              exit 1 # 파일을 못 찾으면 더 진행할 수 없으므로 여기서 종료
+            fi
+            
             # 디버깅용
             # echo "DEBUG: AWS_REGION_ENV 변수 값 확인: '$AWS_REGION_ENV'"
             echo "DEBUG: AWS_REGION_ENV 변수 값 확인: '$AWS_REGION_FOR_SCRIPT'"
