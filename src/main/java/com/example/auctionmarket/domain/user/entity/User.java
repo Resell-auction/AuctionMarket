@@ -49,8 +49,6 @@ public class User extends TimeStamped{
 	private String phoneNumber;
 
 	@Nullable
-	private LocalDateTime createdAt;
-	private LocalDateTime updatedAt;
 	private LocalDateTime deletedAt;
 
 	public User() {
@@ -84,13 +82,9 @@ public class User extends TimeStamped{
 	}
 
 	public String getNickname(){
-		this.nickname = nickname;
-		return null;
+		return  this.nickname = nickname;
 	}
 
-	public void updateModifiedAt(){
-		this.updatedAt = LocalDateTime.now();
-	}
 
 
 }
