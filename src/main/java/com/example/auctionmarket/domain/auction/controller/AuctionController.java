@@ -58,7 +58,7 @@ public class AuctionController {
     ){
 
         Page<AuctionResponse> result = auctionService.SearchAuctions(
-                keyword, category, page, size
+                keyword, category, /*authUser,*/ page, size
         );
 
         return ResponseEntity.ok(result);
