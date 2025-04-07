@@ -35,6 +35,3 @@ out/
 
 ### VS Code ###
 .vscode/
-
-### 추가 깃 이그노어 ###
-.env
