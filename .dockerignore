@@ -1,0 +1,32 @@
+# Git 관련 파일
+.git/
+.gitignore
+.gitattributes
+
+# 빌드 결과물
+build/
+
+# IDE 설정 파일
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+nbproject/
+
+# 운영체제 생성 파일
+.DS_Store
+Thumbs.db
+
+# 로그 파일
+*.log
+logs/
+
+# 임시 파일
+*~
+*.tmp
+*.bak
+
+# 도커 파일
+Dockerfile
+.dockerignore
