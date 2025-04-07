@@ -152,6 +152,9 @@ jobs:
           username: ${{ secrets.EC2_SSH_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            # 값 강제 할당
+            APP_DIR="/home/ec2-user/app"
+            
             # docker-compose.yml 파일이 있는 디렉토리로 이동
             echo "$APP_DIR 디렉토리로 이동 중..."
             # cd $APP_DIR
