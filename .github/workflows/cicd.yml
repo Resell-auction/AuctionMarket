@@ -102,9 +102,8 @@ jobs:
           docker build -t $FULL_IMAGE_NAME .
           echo "이미지 PUSH: $FULL_IMAGE_NAME"
           docker push $FULL_IMAGE_NAME
-          # echo "image=$FULL_IMAGE_NAME" >> $GITHUB_OUTPUT
-          echo "image=$FULL_IMAGE_NAME"
-          # echo "GITHUB_OUTPUT 값 = $GITHUB_OUTPUT"
+          echo "image=$FULL_IMAGE_NAME" >> $GITHUB_OUTPUT
+          echo "GITHUB_OUTPUT 값 = $GITHUB_OUTPUT"
 
       - name: 빌드 디버깅용 123456789 아웃풋
         id: build-image-123456789
@@ -112,7 +111,6 @@ jobs:
         run: |
           echo "image=123456789" >> $GITHUB_OUTPUT
           echo "123456789의 GITHUB_OUTPUT 값 = $GITHUB_OUTPUT"
-        
 
       - name: 도커 이미지 빌드 결과 디버깅
         run: |
