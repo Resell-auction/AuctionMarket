@@ -173,6 +173,7 @@ jobs:
             echo "DEBUG: ECR_REGISTRY 직접 할당 = '${{ steps.login-ecr.outputs.registry }}'"
             echo "DEBUG: AWS_REGION 직접 할당 = '${{ env.AWS_REGION }}'"
             echo "DEBUG: APP_IMAGE_URI 직접 할당 = '${{ needs.build-and-push-image.outputs.image_uri }}'"
+            echo "DEBUG: APP_IMAGE_URI 직접 할당2 = '${{ steps.build-image.outputs.image }}'"
             
             
             # docker-compose.yml 파일이 있는 디렉토리로 이동
@@ -219,8 +220,8 @@ jobs:
             # Docker Compose 를 사용하여 최신 이미지 Pull
             echo "docker-compose.yml 최신 이미지를 가져오는 중..."
             # export APP_IMAGE_URI=$APP_IMAGE_URI # 환경 변수 export
-            # export APP_IMAGE_URI=${{ needs.build-and-push-image.outputs.image_uri }} # 환경 변수 export
-            export APP_IMAGE_URI=967103305191.dkr.ecr.ap-northeast-2.amazonaws.com/auction-market:latest # 환경 변수 export
+            export APP_IMAGE_URI=${{ needs.build-and-push-image.outputs.image_uri }} # 환경 변수 export
+            # export APP_IMAGE_URI=967103305191.dkr.ecr.ap-northeast-2.amazonaws.com/auction-market:latest # 환경 변수 export
             docker-compose pull
             if [ $? -ne 0 ]; then
               echo "Docker Compose pull 실패"

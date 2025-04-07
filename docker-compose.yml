@@ -1,7 +1,7 @@
 services:
   app:
-    image: 967103305191.dkr.ecr.ap-northeast-2.amazonaws.com/auction-market:latest
-#    image: ${APP_IMAGE_URI}
+#    image: 967103305191.dkr.ecr.ap-northeast-2.amazonaws.com/auction-market:latest
+    image: ${APP_IMAGE_URI}
     container_name: auction-market
     ports:
       - "8080:8080"
