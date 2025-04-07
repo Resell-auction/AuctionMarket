@@ -105,11 +105,14 @@ jobs:
           else
             echo "이미지 PUSH 스킵: ${{ github.event_name }} event."
           fi
-          echo "image=$FULL_IMAGE_NAME" >> $GITHUB_OUTPUT
+          # echo "image=$FULL_IMAGE_NAME" >> $GITHUB_OUTPUT
+          echo "image=test-image-uri-123" >> $GITHUB_OUTPUT
+          echo "임시 테스트: 고정된 이미지 URI를 출력으로 설정함."
 
       - name: 도커 이미지 빌드 결과 디버깅
         run: |
           echo "빌드 결과 도커 이미지 = '${{ steps.build-image.outputs.image }}'"
+          echo "GITHUB_OUTPUT 값 디버깅 = '$GITHUB_OUTPUT'"
 
   deploy-app-to-ec2:
     name: 작업2 - EC2 인스턴스에 SSH 로 배포
@@ -154,14 +157,8 @@ jobs:
             echo "기타 확인 디버깅"
             echo "APP_IMAGE_URI 직접 할당 값= '${{ needs.build-and-push-image.build-image.outputs.image_uri }}'"
             echo "APP_IMAGE_URI 직접 할당 값= '${{ needs.build-and-push-image.build-image.outputs.image }}'"
-            
-            echo "=====================" 
-            
-            echo "with 확인 디버깅"
-            echo "host 직접 할당 값= '$host'"
-            echo "username 직접 할당 값= '$username'"
-            echo "key 직접 할당 값= '$key'"
-            
+            echo "GITHUB_OUTPUT 값 디버깅 = '$GITHUB_OUTPUT'"
+                             
             echo "====================="  
             
             echo "변수 할당 값 확인 디버깅"
