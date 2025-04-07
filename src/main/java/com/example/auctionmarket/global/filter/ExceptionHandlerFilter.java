@@ -7,12 +7,11 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-
+import com.example.auctionmarket.domain.auth.exception.AuthException;
 import com.example.auctionmarket.common.exception.ErrorCode;
 import com.example.auctionmarket.common.response.ErrorResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import jakarta.security.auth.message.AuthException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
