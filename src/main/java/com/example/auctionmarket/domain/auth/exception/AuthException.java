@@ -11,10 +11,12 @@ public class AuthException extends RuntimeException {
 	private ErrorCode errorCode;
 	private HttpStatus status;
 
-	AuthException(ErrorCode errorCode) {
+	public AuthException(ErrorCode errorCode) {
 		super(errorCode.getDefaultMessage());
 		this.errorCode = errorCode;
 		this.status = errorCode.getHttpStatus();
 	}
+
+
 }
 
