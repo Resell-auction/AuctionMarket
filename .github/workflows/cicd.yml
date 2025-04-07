@@ -110,7 +110,7 @@ jobs:
       - name: 도커 이미지 빌드 결과 디버깅
         run: |
           echo "빌드 결과 도커 이미지 = '${{ steps.build-image.outputs.image }}'"
-          echo "빌드 결과 도커 이미지 = '${{ build-and-push-image.outputs.image_uri }}'"
+          
 
   deploy-app-to-ec2:
     name: 작업2 - EC2 인스턴스에 SSH 로 배포
