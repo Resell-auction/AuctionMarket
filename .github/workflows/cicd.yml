@@ -132,6 +132,9 @@ jobs:
               exit 1
             fi
             
+            # 디버깅용
+            echo "DEBUG: AWS_REGION_ENV 변수 값 확인: '$AWS_REGION_ENV'"
+            
             # AWS CLI 를 사용하여 ECR 에 Docker 로그인
             echo "ECR 로그인 중..."
             aws ecr get-login-password --region $AWS_REGION_ENV | docker login --username AWS --password-stdin $ECR_REGISTRY
