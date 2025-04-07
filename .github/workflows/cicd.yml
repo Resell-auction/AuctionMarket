@@ -1,4 +1,4 @@
-name: Java CI/CD with Gradle, Docker, AWS ECR & EC2 Docker Compose Deployment (Multi-Service)
+name: Java CI/CD with Gradle, Docker, AWS ECR & EC2 App Deployment (using RDS & ElastiCache)
 
 on:
   pull_request:
@@ -14,8 +14,7 @@ on:
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
   ECR_REPOSITORY: ${{ secrets.AWS_ECR_REPOSITORY_URI }}
-  CONTAINER_NAME: auction-market
-  APP_DIR_ON_EC2: /home/ec2-user/app
+  CONTAINER_NAME: auction-market-app
 
 jobs:
   build-and-push-image:
@@ -24,28 +23,28 @@ jobs:
     outputs:
       image_uri: ${{ steps.build-image.outputs.image }}
 
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: 1234
-          MYSQL_DATABASE: auction_market
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping --silent"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-      redis:
-        image: redis:latest
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd="redis-cli -h 127.0.0.1 ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
+#    services:
+#      mysql:
+#        image: mysql:8.0
+#        env:
+#          MYSQL_ROOT_PASSWORD: 1234
+#          MYSQL_DATABASE: auction_market
+#        ports:
+#          - 3306:3306
+#        options: >-
+#          --health-cmd="mysqladmin ping --silent"
+#          --health-interval=10s
+#          --health-timeout=5s
+#          --health-retries=5
+#      redis:
+#        image: redis:latest
+#        ports:
+#          - 6379:6379
+#        options: >-
+#          --health-cmd="redis-cli -h 127.0.0.1 ping"
+#          --health-interval=10s
+#          --health-timeout=5s
+#          --health-retries=5
 
     steps:
       - name: 코드 체크아웃
@@ -71,12 +70,12 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Gradle 테스트 실행
-        env:
-          SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/auction_market
-          SPRING_DATASOURCE_USERNAME: root
-          SPRING_DATASOURCE_PASSWORD: 1234
-          SPRING_DATA_REDIS_HOST: 127.0.0.1
-          SPRING_DATA_REDIS_PORT: 6379
+#        env:
+#          SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/auction_market
+#          SPRING_DATASOURCE_USERNAME: root
+#          SPRING_DATASOURCE_PASSWORD: 1234
+#          SPRING_DATA_REDIS_HOST: 127.0.0.1
+#          SPRING_DATA_REDIS_PORT: 6379
         run: ./gradlew test
 
       - name: AWS IAM 설정
@@ -106,15 +105,12 @@ jobs:
             echo "이미지 PUSH 스킵: ${{ github.event_name }} event."
           fi
           echo "image=$FULL_IMAGE_NAME" >> $GITHUB_OUTPUT
-          # 도커 이미지 빌드한거 확인 디버깅용
-          echo "이미지 빌드 디버깅: $FULL_IMAGE_NAME"
 
-      - name: 도커 이미지 빌드한거 확인 디버깅용
+      - name: 도커 이미지 빌드 결과 디버깅
         run: |
-          echo "DEBUG: APP_IMAGE_URI 값 디버깅 = '${{ steps.build-image.outputs.image }}'"
-          export APP_IMAGE_URI=${{ steps.build-image.outputs.image }}
+          echo "빌드 결과 도커 이미지 = '${{ steps.build-image.outputs.image }}'"
 
-  deploy-to-ec2-compose:
+  deploy-app-to-ec2:
     name: 작업2 - EC2 인스턴스에 SSH 로 배포
     runs-on: ubuntu-latest
     # 의존성 설정 => build-and-push-image 완료 후 실행
@@ -123,9 +119,6 @@ jobs:
     if: github.event_name == 'push'
 
     steps:
-      - name: 코드 체크아웃 # 작업 환경에 소스 코드 (docker-compose.yml) 가져오기
-        uses: actions/checkout@v4
-
       - name: AWS IAM 설정
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -137,120 +130,109 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: SCP 를 사용하여 docker-compose.yml 파일을 EC2 인스턴스로 복사
-        uses: appleboy/scp-action@v0.1.7 # SCP 액션 사용
-        with:
-          host: ${{ secrets.EC2_SSH_HOST }}
-          username: ${{ secrets.EC2_SSH_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          port: 22
-          source: "docker-compose.yml" # 복사할 소스
-          target: "${{ env.APP_DIR_ON_EC2 }}"
-
       - name: SSH 를 통해 EC2 인스턴스에 접속하여 배포 스크립트 실행
         uses: appleboy/ssh-action@master
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           APP_IMAGE_URI: ${{ needs.build-and-push-image.outputs.image_uri }}
           AWS_REGION: ${{ env.AWS_REGION }}
-          APP_DIR: /home/ec2-user/app
+          APP_CONTAINER_NAME: ${{ env.APP_CONTAINER_NAME }}
+
+          SPRING_PROFILES_ACTIVE: prod
+          SPRING_DATASOURCE_URL: ${{ secrets.RDS_URL }}
+          SPRING_DATASOURCE_USERNAME: ${{ secrets.RDS_USERNAME }}
+          SPRING_DATASOURCE_PASSWORD: ${{ secrets.RDS_PASSWORD }}
+          SPRING_DATA_REDIS_HOST: ${{ secrets.ELASTICACHE_HOST }}
+          SPRING_DATA_REDIS_PORT: ${{ secrets.ELASTICACHE_PORT }}
+
         with:
-#          envs: |
-#            ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
-#            APP_IMAGE_URI=${{ needs.build-and-push-image.outputs.image_uri }}
-#            AWS_REGION=${{ secrets.AWS_REGION }}
-#            APP_DIR=/home/ec2-user/app
           host: ${{ secrets.EC2_SSH_HOST }}
           username: ${{ secrets.EC2_SSH_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # 값 확인 디버깅용
-            echo "DEBUG: APP_DIR 강제 할당 전= '$APP_DIR'"
+            echo "변수 할당 값 확인 디버깅'"
+            echo "SPRING_PROFILES_ACTIVE 직접 할당 값= '$SPRING_PROFILES_ACTIVE'"
+            echo "ECR_REGISTRY 직접 할당 값= '$ECR_REGISTRY'"
+            echo "APP_IMAGE_URI 직접 할당 값= '$APP_IMAGE_URI'"
+            echo "AWS_REGION 직접 할당 값= '$AWS_REGION'"
+            echo "APP_CONTAINER_NAME 직접 할당 값= '$APP_CONTAINER_NAME'"
+            echo "SPRING_DATASOURCE_URL 직접 할당 값= '$SPRING_DATASOURCE_URL'"
+            echo "SPRING_DATASOURCE_USERNAME 직접 할당 값= '$SPRING_DATASOURCE_USERNAME'"
+            echo "SPRING_DATASOURCE_PASSWORD 직접 할당 값= '$SPRING_DATASOURCE_PASSWORD'"
+            echo "SPRING_DATA_REDIS_HOST 직접 할당 값= '$SPRING_DATA_REDIS_HOST'"
+            echo "SPRING_DATA_REDIS_PORT 직접 할당 값= '$SPRING_DATA_REDIS_PORT'"
             
-            # 값 강제 할당
-            APP_DIR="/home/ec2-user/app"
+            echo "====================="  
+        
+            echo "직접 할당 값 확인 디버깅"
+            echo "ECR_REGISTRY 직접 할당 값= '${{ steps.login-ecr.outputs.registry }}'"
+            echo "APP_IMAGE_URI 직접 할당 값= '${{ needs.build-and-push-image.outputs.image_uri }}'"
+            echo "AWS_REGION 직접 할당 값= '${{ env.AWS_REGION }}'"
+            echo "APP_CONTAINER_NAME 직접 할당 값= '${{ env.APP_CONTAINER_NAME }}'"
+            echo "SPRING_DATASOURCE_URL 직접 할당 값= '${{ secrets.RDS_URL }}'"
+            echo "SPRING_DATASOURCE_USERNAME 직접 할당 값= '${{ secrets.RDS_USERNAME }}'"
+            echo "SPRING_DATASOURCE_PASSWORD 직접 할당 값= '${{ secrets.RDS_PASSWORD }}'"
+            echo "SPRING_DATA_REDIS_HOST 직접 할당 값= '${{ secrets.ELASTICACHE_HOST }}'"
+            echo "SPRING_DATA_REDIS_PORT 직접 할당 값= '${{ secrets.ELASTICACHE_PORT }}'"
             
-            # 값 확인 디버깅용
-            echo "DEBUG: APP_DIR 강제 할당 후= '$APP_DIR'"
-            echo "DEBUG: ECR_REGISTRY 을 변수로 할당한 것 = '$ECR_REGISTRY'"
-            echo "DEBUG: AWS_REGION 을 변수로 할당한 것 = '$AWS_REGION'"
-            echo "DEBUG: APP_IMAGE_URI 을 변수로 할당한 것 = '$APP_IMAGE_URI'"
+            echo "=====================" 
             
-            # 값 확인 디버깅용 (직접 할당)
-            echo "DEBUG: ECR_REGISTRY 직접 할당 = '${{ steps.login-ecr.outputs.registry }}'"
-            echo "DEBUG: AWS_REGION 직접 할당 = '${{ env.AWS_REGION }}'"
-            echo "DEBUG: APP_IMAGE_URI 직접 할당 = '${{ needs.build-and-push-image.outputs.image_uri }}'"
-            echo "DEBUG: APP_IMAGE_URI 직접 할당2 = '${{ steps.build-image.outputs.image }}'"
-            echo "DEBUG: APP_IMAGE_URI 직접 할당3 = '${{ needs.build-and-push-image.outputs.image }}'"
-            echo "DEBUG: APP_IMAGE_URI 직접 할당4 = '${{ needs.build-and-push-image.outputs }}'"
-            
-            
-            # docker-compose.yml 파일이 있는 디렉토리로 이동
-            echo "$APP_DIR 디렉토리로 이동 중..."
-            # cd $APP_DIR
-            cd $APP_DIR && echo "성공: $APP_DIR 로 이동 완료. 현재 위치: $(pwd)" || { echo "$APP_DIR 로 이동 실패"; exit 1; }
-            
-            echo "$APP_DIR 디렉토리 내용 확인"
-            ls -al
-            
-            echo "docker-compose.yml 파일 존재 확인 시도"
-            if [ -f "docker-compose.yml" ]; then
-              echo "성공: docker-compose.yml 파일을 현재 디렉토리에서 찾았습니다."
-            else
-              echo "실패: docker-compose.yml 파일을 현재 디렉토리에서 찾을 수 없습니다!"
-              echo "SCP 단계 성공 여부 및 $APP_DIR 경로 확인 필요."
-              exit 1
-            fi            
-            
-            # docker-compose.yml 디버깅용
-            echo "현재 작업 디렉토리: $(pwd)"
-            echo "$APP_DIR 디렉토리 내용 확인"
-            ls -al
-            echo "docker-compose.yml 파일 존재 확인 시도"
-            if [ -f "docker-compose.yml" ]; then
-              echo "성공: docker-compose.yml 파일을 현재 디렉토리에서 찾았습니다."
-            else
-              echo "실패: docker-compose.yml 파일을 현재 디렉토리에서 찾을 수 없습니다."
-              echo "SCP 단계가 성공했는지 확인하세요."
-              exit 1 # 파일을 못 찾으면 더 진행할 수 없으므로 여기서 종료
-            fi
-            
-            
-            # AWS CLI 를 사용하여 ECR 에 Docker 로그인
+            # ECR 로그인
             echo "ECR 로그인 중..."
-            # aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
-            aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ steps.login-ecr.outputs.registry }}
+            aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}
             if [ $? -ne 0 ]; then
-              # echo "ECR 로그인 실패: $ECR_REGISTRY"
-              echo "ECR 로그인 실패: ${{ steps.login-ecr.outputs.registry }}"
+              echo "ECR 로그인 실패"
               exit 1
             fi
+            echo "ECR 로그인 성공."
             
-            # Docker Compose 를 사용하여 최신 이미지 Pull
-            echo "docker-compose.yml 최신 이미지를 가져오는 중..."
-            # export APP_IMAGE_URI=$APP_IMAGE_URI # 환경 변수 export
-            # export APP_IMAGE_URI=${{ needs.build-and-push-image.outputs.image_uri }} # 환경 변수 export
-            # export APP_IMAGE_URI=967103305191.dkr.ecr.ap-northeast-2.amazonaws.com/auction-market:latest # 환경 변수 export
-            docker-compose pull
+            echo "=====================" 
+            
+            # 기존 컨테이너 중지 및 제거
+            echo "기존 컨테이너 중지 및 제거 시도...: ${APP_CONTAINER_NAME}"
+            docker stop ${APP_CONTAINER_NAME} || true
+            docker rm ${APP_CONTAINER_NAME} || true
+            echo "기존 컨테이너 중지 및 제거 성공"
+            
+            echo "=====================" 
+            
+            # 최신 이미지 받기
+            echo "최신 이미지 받는 중...: ${APP_IMAGE_URI}"
+            docker pull ${APP_IMAGE_URI}
             if [ $? -ne 0 ]; then
-              echo "Docker Compose pull 실패"
+              echo "이미지 받기 실패: ${APP_IMAGE_URI}"
               exit 1
             fi
+            echo "이미지 받기 완료: ${APP_IMAGE_URI}"
             
-            # 기존에 실행 중이던 애플리케이션 컨테이너 중지 + 제거
-            echo "docker-compose.yml 기존 컨테이너를 중지하고 제거하는 중..."
-            docker-compose down
+            echo "=====================" 
             
-            # 새로운 버전의 컨테이너 실행
-            echo "docker-compose.yml 새 컨테이너를 시작하는 중..."
-            docker-compose up -d
+            # 애플리케이션 컨테이너 실행
+            echo "컨테이너 실행 중...: ${APP_CONTAINER_NAME}"
+            docker run -d \
+              --name ${APP_CONTAINER_NAME} \
+              -p 8080:8080 \
+              -e SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE} \
+              -e SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL} \
+              -e SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME} \
+              -e SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD} \
+              -e SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST} \
+              -e SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT} \
+              --restart unless-stopped \
+              ${APP_IMAGE_URI}
+            
             if [ $? -ne 0 ]; then
-              echo "Docker Compose up failed!"
+              echo "컨테이너 실행 실패: ${APP_CONTAINER_NAME}"
               exit 1
             fi
+            echo "컨테이너 실행 성공: ${APP_CONTAINER_NAME}"
             
+            echo "=====================" 
+                       
             # 오래된 Docker 이미지 정리
             echo "오래된 도커 이미지 정리 중..."
             docker image prune -af
             
-            echo "Docker Compose 를 통한 배포가 성공적으로 완료되었습니다!"
+            echo "=====================" 
+            
+            echo "배포 성공"
