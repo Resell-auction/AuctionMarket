@@ -27,7 +27,8 @@ COPY src ./src
 # => 빌드 자체는 자주 일어나나 (push 할때 마다 빌드함), 매번 새로운 가상 머신에서 빌드하기 때문에 단발성 빌드임
 #  -x test 붙이면 테스트코드 검증은 안함,  -x test 안붙이면 빌드하고 테스트 코드까지 싹 돌려줌
 # => 그런데 빌드 때, 테스트코드 안돌리고 나중에 CI 워크플로우에서 돌려도 됨
-RUN ./gradlew build -x test --no-daemon
+RUN ./gradlew build --no-daemon
+RUN #./gradlew build -x test --no-daemon
 
 
 # 실행 => 빌드된 애플리케이션 실행을 위한 환경 구성
