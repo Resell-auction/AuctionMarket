@@ -106,6 +106,9 @@ jobs:
             echo "이미지 PUSH 스킵: ${{ github.event_name }} event."
           fi
           echo "image=$FULL_IMAGE_NAME" >> $GITHUB_OUTPUT
+          echo "image=..." >> $GITHUB_OUTPUT
+          # 도커 이미지 빌드한거 확인 디버깅용
+          echo "이미지 빌드 디버깅: $FULL_IMAGE_NAME"
 
       - name: 도커 이미지 빌드한거 확인 디버깅용
         run: |
