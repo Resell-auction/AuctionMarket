@@ -1,18 +1,17 @@
 package com.example.auctionmarket.domain.auction.dto.request;
 
-import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class AuctionSaveRequest {
 
     private Long productId;
