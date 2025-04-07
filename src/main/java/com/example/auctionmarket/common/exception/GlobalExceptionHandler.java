@@ -3,6 +3,7 @@ package com.example.auctionmarket.common.exception;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.auctionmarket.domain.auction.exception.AuctionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -39,4 +40,12 @@ public class GlobalExceptionHandler {
 		return ErrorResponse.of("INTERNAL_SERVER_ERROR", "서버 오류가 발생했습니다.");
 	}
 
+
+	@ExceptionHandler(AuctionException.class)
+	public ResponseEntity<ErrorResponse> handleAuctionException(AuctionException e) {
+		ErrorCode errorCode = e.getErrorCode();
+		return ResponseEntity
+				.status(errorCode.getHttpStatus())
+				.body(ErrorResponse.of(errorCode.getCode(), errorCode.getDefaultMessage()));
+	}
 }
