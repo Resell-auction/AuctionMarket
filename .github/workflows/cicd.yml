@@ -15,7 +15,6 @@ env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
   ECR_REPOSITORY: ${{ secrets.AWS_ECR_REPOSITORY_URI }}
   APP_CONTAINER_NAME: auction-market-app
-  APP_IMAGE_URI_ENV: ${{ steps.build-image.outputs.image }}
 
 jobs:
   build-and-push-image:
@@ -153,7 +152,6 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             echo "기타 확인 디버깅"
-            echo "APP_IMAGE_URI= '${{ env.APP_IMAGE_URI_ENV }}'"
             echo "APP_IMAGE_URI 직접 할당 값= '${{ needs.build-and-push-image.build-image.outputs.image_uri }}'"
             echo "APP_IMAGE_URI 직접 할당 값= '${{ needs.build-and-push-image.build-image.outputs.image }}'"
             
