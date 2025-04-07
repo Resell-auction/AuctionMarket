@@ -107,6 +107,10 @@ jobs:
           fi
           echo "image=$FULL_IMAGE_NAME" >> $GITHUB_OUTPUT
 
+      - name: 도커 이미지 빌드한거 확인 디버깅용
+        run: |
+          echo "DEBUG: APP_IMAGE_URI 값 디버깅 = '${{ steps.build-image.outputs.image }}'"
+
   deploy-to-ec2-compose:
     name: 작업2 - EC2 인스턴스에 SSH 로 배포
     runs-on: ubuntu-latest
@@ -158,16 +162,16 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             # 값 확인 디버깅용
-            echo "DEBUG: APP_DIR = '$APP_DIR'"
+            echo "DEBUG: APP_DIR 강제 할당 전= '$APP_DIR'"
             
             # 값 강제 할당
             APP_DIR="/home/ec2-user/app"
             
             # 값 확인 디버깅용
-            echo "DEBUG: APP_DIR = '$APP_DIR'"
-            echo "DEBUG: ECR_REGISTRY = '$ECR_REGISTRY'"
+            echo "DEBUG: APP_DIR 강제 할당 후= '$APP_DIR'"
+            echo "DEBUG: ECR_REGISTRY 을 변수로 할당한 것 = '$ECR_REGISTRY'"
             echo "DEBUG: AWS_REGION 을 변수로 할당한 것 = '$AWS_REGION'"
-            echo "DEBUG: APP_IMAGE_URI = '$APP_IMAGE_URI'"
+            echo "DEBUG: APP_IMAGE_URI 을 변수로 할당한 것 = '$APP_IMAGE_URI'"
             
             # 값 확인 디버깅용 (직접 할당)
             echo "DEBUG: ECR_REGISTRY 직접 할당 = '${{ steps.login-ecr.outputs.registry }}'"
