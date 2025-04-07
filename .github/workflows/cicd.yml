@@ -22,6 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       image_uri: ${{ steps.build-image.outputs.image }}
+      image_uri_123456789: ${{ steps.build-image-123456789.outputs.image }}
 
 #    services:
 #      mysql:
@@ -107,10 +108,15 @@ jobs:
           fi
           echo "image=$FULL_IMAGE_NAME" >> $GITHUB_OUTPUT
 
+      - name: 빌드 디버깅용 고정 아웃풋
+        id: build-image-123456789
+        if: github.event_name == 'push'
+        run: echo "image=123456789" >> $GITHUB_OUTPUT
+
       - name: 도커 이미지 빌드 결과 디버깅
         run: |
           echo "빌드 결과 도커 이미지 = '${{ steps.build-image.outputs.image }}'"
-          
+          echo "나와라 123456789 = '${{ steps.build-image-123456789.outputs.image }}'"
 
   deploy-app-to-ec2:
     name: 작업2 - EC2 인스턴스에 SSH 로 배포
@@ -124,6 +130,7 @@ jobs:
       - name: 도커 이미지 빌드 결과 디버깅 (deploy-app-to-ec2 작업)
         run: |
           echo "빌드 결과 도커 이미지 = '${{ needs.build-and-push-image.outputs.image_uri }}'"
+          echo "나와라 123456789 = '${{ needs.build-and-push-image.outputs.image_uri_123456789 }}'"
 
       - name: AWS IAM 설정
         uses: aws-actions/configure-aws-credentials@v4
