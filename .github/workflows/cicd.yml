@@ -62,7 +62,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: ECR 에 도커 이미디 빌드 + 태그 + 푸시
+      - name: ECR 에 Docker 이미지 빌드 + 태그 + 푸시
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
