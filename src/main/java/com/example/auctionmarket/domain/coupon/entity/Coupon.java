@@ -1,5 +1,6 @@
 package com.example.auctionmarket.domain.coupon.entity;
 
+import com.example.auctionmarket.domain.coupon.enums.CouponStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,7 +26,13 @@ public class Coupon {
 
     private int amount;
 
-    //   private String condition; 뭐죠?
+    private CouponStatus couponStatus;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    //   private String condition;
 
     public Coupon(String couponName, String description, double discountRate, LocalDateTime expiredAt, int amount){
         this.couponName=couponName;
@@ -33,6 +40,7 @@ public class Coupon {
         this.discountRate=discountRate;
         this.expiredAt=expiredAt;
         this.amount=amount;
+        this.couponStatus=CouponStatus.VALID;
     }
 
     public void update(String couponName, String description, double discountRate, LocalDateTime expiredAt){
@@ -40,6 +48,14 @@ public class Coupon {
         this.description=description;
         this.discountRate=discountRate;
         this.expiredAt=expiredAt;
+    }
+
+    public void expiredCoupon(){
+        this.couponStatus=CouponStatus.EXPIRED;
+    }
+
+    public void discountCoupon(int amount){
+        this.amount= this.amount-amount;
     }
 
 
