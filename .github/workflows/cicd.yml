@@ -113,6 +113,7 @@ jobs:
       - name: 도커 이미지 빌드한거 확인 디버깅용
         run: |
           echo "DEBUG: APP_IMAGE_URI 값 디버깅 = '${{ steps.build-image.outputs.image }}'"
+          export APP_IMAGE_URI=${{ steps.build-image.outputs.image }}
 
   deploy-to-ec2-compose:
     name: 작업2 - EC2 인스턴스에 SSH 로 배포
@@ -229,7 +230,7 @@ jobs:
             # Docker Compose 를 사용하여 최신 이미지 Pull
             echo "docker-compose.yml 최신 이미지를 가져오는 중..."
             # export APP_IMAGE_URI=$APP_IMAGE_URI # 환경 변수 export
-            export APP_IMAGE_URI=${{ needs.build-and-push-image.outputs.image_uri }} # 환경 변수 export
+            # export APP_IMAGE_URI=${{ needs.build-and-push-image.outputs.image_uri }} # 환경 변수 export
             # export APP_IMAGE_URI=967103305191.dkr.ecr.ap-northeast-2.amazonaws.com/auction-market:latest # 환경 변수 export
             docker-compose pull
             if [ $? -ne 0 ]; then
