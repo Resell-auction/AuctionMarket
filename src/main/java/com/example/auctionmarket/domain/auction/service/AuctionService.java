@@ -30,9 +30,14 @@ public class AuctionService {
 
     @Transactional
     public AuctionSaveResponse createAuction(AuthUser authUser, Long productId, AuctionSaveRequest request){
-//        //로그인한 유저가 아닐 경우 예외처리
-//        User currentUser = userRepository.findById(authUser.getId())
-//                .orElseThrow(()->new /*예외처리 들어갈 곳*/);
+        //유저 예외처리
+        User user = userRepository.findById(authUser.getUserId)
+                .orElseThrow(()->new IllegalStateException("해당 유저는 존재하지 않습니다."));
+
+        //물품을 올린 사용자가 아닌 경우 불가
+        if(authUser.getUserId() != auction.getProduct().getUserId()){
+            throw new IllegalStateException("물품을 올린 사용자가 아닙니다!");
+        }
 
         //입력한 상품이 없는 경우 예외처리
         Product product = productRepository.findById(productId)
@@ -61,7 +66,7 @@ public class AuctionService {
     }
 
     //경매 전체 조회
-    @Transactional(readOnly = true)
+    @Transactional
     public Page<AuctionResponse> getAuctions(int page, int size){
         Pageable pageable = PageRequest.of(page-1, size);
 
@@ -70,6 +75,8 @@ public class AuctionService {
         return auctions.map(auction->{
 
             String auctionMessage = remainingTimeOfAuctionStatus(auction.getStatus(), auction.getEndTime());
+
+            updateStatus(auction.getId());
 
             return new AuctionResponse(
                     auction.getId(),
@@ -88,10 +95,11 @@ public class AuctionService {
     }
 
     //경매 조회 기능(검색)
-    @Transactional(readOnly = true)
+    @Transactional
     public Page<AuctionResponse> SearchAuctions(
         String keyword,
         String category,
+//        AuthUser authUser,
         int page, int size
     ){
         Pageable pageable = PageRequest.of(page-1, size);
@@ -103,6 +111,8 @@ public class AuctionService {
 
         return auctions.map(auction->{
             String auctionMessage = remainingTimeOfAuctionStatus(auction.getStatus(), auction.getEndTime());
+
+            updateStatus(auction.getId());
 
             return new AuctionResponse(
                     auction.getId(),
@@ -127,6 +137,8 @@ public class AuctionService {
         //해당하는 경매 찾기
         Auction auction = auctionRepository.findById(auctionId)
                 .orElseThrow(()->new IllegalStateException("해당 경매는 존재하지 않습니다."));
+
+        updateStatus(auctionId);
 
         //경매가 진행 중인 상황이 아니라면 예외 처리
         if(auction.getStatus() != AuctionStatus.ONGOING){
@@ -171,6 +183,9 @@ public class AuctionService {
             //에외 처리
         }
 
+        //경매 상태 값 변경
+        updateStatus(auctionId);
+
         if(auction.getStatus() == AuctionStatus.ONGOING){
             throw new IllegalStateException("경매가 진행 중일 때에는 수정이 불가합니다!");
         }
@@ -211,6 +226,9 @@ public class AuctionService {
             //에외 처리
         }
 
+        //경매 상태 값 변경
+        updateStatus(auctionId);
+
         if(auction.getStatus() == AuctionStatus.ONGOING){
             throw new IllegalStateException("경매가 진행 중일 때에는 수정이 불가합니다!");
         }
@@ -250,6 +268,9 @@ public class AuctionService {
         if(authUser.getUserId() != auction.getProduct().getUserId()){
             //에외 처리
         }
+
+        //경매 상태 값 변경
+        updateStatus(auctionId);
 
         //경매 상태 확인
         if(auction.getStatus() == AuctionStatus.ONGOING){
@@ -296,11 +317,15 @@ public class AuctionService {
 
     //경매 상태 변경 함수
     @Transactional
-    public AuctionStatus updateStatus(LocalDateTime startTime, LocalDateTime endTime){
-        if(LocalDateTime.now().isBefore(startTime)){
+    public AuctionStatus updateStatus(Long auctionId){
+        //경매 예외처리
+        Auction auction = auctionRepository.findById(auctionId)
+                .orElseThrow(()->new IllegalStateException("해당 경매는 존재하지 않습니다."));
+
+        if(LocalDateTime.now().isBefore(auction.getStartTime())){
             return AuctionStatus.PENDING;
         }
-        else if (LocalDateTime.now().isAfter(endTime)) {
+        else if (LocalDateTime.now().isAfter(auction.getEndTime())) {
             return AuctionStatus.ENDED;
         }
         else {
