@@ -30,7 +30,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class JwtUtil {
 	private final UserRepository userRepository;
-
 	private static final String BEARER_PREFIX = "Bearer ";
 	private static final long ACCESS_TOKEN_TIME = 60 * 60 * 1000L; // 60분
 	//private static final long REFRESH_TOKEN_TIME = 60 * 60 * 24 * 1000L; // 1일
