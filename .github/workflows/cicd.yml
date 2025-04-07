@@ -110,6 +110,7 @@ jobs:
       - name: 도커 이미지 빌드 결과 디버깅
         run: |
           echo "빌드 결과 도커 이미지 = '${{ steps.build-image.outputs.image }}'"
+          echo "빌드 결과 도커 이미지 = '${{ build-and-push-image.outputs.image_uri }}'"
 
   deploy-app-to-ec2:
     name: 작업2 - EC2 인스턴스에 SSH 로 배포
@@ -117,7 +118,7 @@ jobs:
     # 의존성 설정 => build-and-push-image 완료 후 실행
     needs: build-and-push-image
     # push 일 때만 실행 => PR 시에는 실행 안 함
-    if: github.event_name == 'push'
+    # if: github.event_name == 'push'
 
     steps:
       - name: 도커 이미지 빌드 결과 디버깅 (deploy-app-to-ec2 작업)
