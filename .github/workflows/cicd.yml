@@ -166,7 +166,13 @@ jobs:
             # 값 확인 디버깅용
             echo "DEBUG: APP_DIR = '$APP_DIR'"
             echo "DEBUG: ECR_REGISTRY = '$ECR_REGISTRY'"
-            echo "DEBUG: AWS_REGION = '$AWS_REGION'"
+            echo "DEBUG: AWS_REGION 을 변수로 할당한 것 = '$AWS_REGION'"
+            echo "DEBUG: APP_IMAGE_URI = '$APP_IMAGE_URI'"
+            
+            # 값 확인 디버깅용2
+            echo "DEBUG: APP_DIR = '$APP_DIR'"
+            echo "DEBUG: ECR_REGISTRY = '$ECR_REGISTRY'"
+            echo "DEBUG: AWS_REGION 을 ${{ env.AWS_REGION }}로 바로 할당한 것 = '${{ env.AWS_REGION }}'"
             echo "DEBUG: APP_IMAGE_URI = '$APP_IMAGE_URI'"
             
             
@@ -203,7 +209,8 @@ jobs:
             
             # AWS CLI 를 사용하여 ECR 에 Docker 로그인
             echo "ECR 로그인 중..."
-            aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
+            # aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
+            aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin $ECR_REGISTRY
             if [ $? -ne 0 ]; then
               echo "ECR 로그인 실패: $ECR_REGISTRY"
               exit 1
