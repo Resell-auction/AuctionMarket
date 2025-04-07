@@ -17,7 +17,6 @@ env:
   CONTAINER_NAME: auction-market
   APP_DIR_ON_EC2: /home/ec2-user/app
 
-
 jobs:
   build-and-push-image:
     name: 작업1 - 도커 이미지 빌드 + ECR 푸시
@@ -51,6 +50,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
+      - name: Gradle 테스트 실행
+        run: ./gradlew test
+
       - name: AWS IAM 설정
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -62,7 +64,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: ECR 에 Docker 이미지 빌드 + 태그 + 푸시
+      - name: Docker 이미지 빌드 + 태그 + ECR 에 푸시
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -116,35 +118,25 @@ jobs:
         uses: appleboy/ssh-action@master
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          # APP_IMAGE_URI: ${{ needs.build-and-push-image.outputs.image_uri }}
-          # AWS_REGION_ENV: ${{ env.AWS_REGION }}
-          # APP_DIR: ${{ env.APP_DIR_ON_EC2 }}
+          APP_IMAGE_URI: ${{ needs.build-and-push-image.outputs.image_uri }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          APP_DIR: /home/ec2-user/app
         with:
           host: ${{ secrets.EC2_SSH_HOST }}
           username: ${{ secrets.EC2_SSH_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # AWS_REGION, ECR_REGISTRY, APP_DIR, APP_IMAGE_URI 값 직접 설정
-            AWS_REGION_FOR_SCRIPT="${{ env.AWS_REGION }}"
-            ECR_REGISTRY_FOR_SCRIPT="${{ env.ECR_REGISTRY }}"
-            APP_DIR_FOR_SCRIPT="${{ env.APP_DIR_ON_EC2 }}"
-            APP_IMAGE_URI="${{ needs.build-and-push-image.outputs.image_uri }}"
-            
             # docker-compose.yml 파일이 있는 디렉토리로 이동
-            # echo "$APP_DIR 디렉토리로 이동 중..."
-            echo "$APP_DIR_FOR_SCRIPT 디렉토리로 이동 중..."
-            # cd $APP_DIR
-            cd $APP_DIR_FOR_SCRIPT
+            echo "$APP_DIR 디렉토리로 이동 중..."
+            cd $APP_DIR
             if [ $? -ne 0 ]; then
-              # echo "$APP_DIR 디렉토리로 이동하는 데 실패했습니다. SCP 단계를 확인하고, APP_DIR_ON_EC2 환경 변수 값이 올바른지 확인하세요."
-              echo "$APP_DIR_FOR_SCRIPT 디렉토리로 이동하는 데 실패했습니다. SCP 단계를 확인하고, APP_DIR_ON_EC2 환경 변수 값이 올바른지 확인하세요."
+              echo "$APP_DIR 디렉토리로 이동하는 데 실패했습니다. SCP 단계를 확인하고, APP_DIR_ON_EC2 환경 변수 값이 올바른지 확인하세요."
               exit 1
             fi
             
             # docker-compose.yml 디버깅용
             echo "현재 작업 디렉토리: $(pwd)"
-            # echo "$APP_DIR 디렉토리 내용 확인"
-            echo "$APP_DIR_FOR_SCRIPT 디렉토리 내용 확인"
+            echo "$APP_DIR 디렉토리 내용 확인"
             ls -al
             echo "docker-compose.yml 파일 존재 확인 시도"
             if [ -f "docker-compose.yml" ]; then
@@ -156,18 +148,16 @@ jobs:
             fi
             
             # 디버깅용
-            # echo "DEBUG: AWS_REGION_ENV 변수 값 확인: '$AWS_REGION_ENV'"
-            echo "DEBUG: AWS_REGION_ENV 변수 값 확인: '$AWS_REGION_FOR_SCRIPT'"
-            echo "DEBUG: ECR_REGISTRY_FOR_SCRIPT 변수 값 확인: '$ECR_REGISTRY_FOR_SCRIPT'"
-            echo "DEBUG: AWS_REGION_FOR_SCRIPT 변수 값 확인: '$AWS_REGION_FOR_SCRIPT'"
-            echo "DEBUG: ECR_REGISTRY_FOR_SCRIPT 변수 값 확인: '$ECR_REGISTRY_FOR_SCRIPT'"
+            echo "DEBUG: AWS_REGION 변수 값 확인: '$AWS_REGION'"
+            echo "DEBUG: ECR_REGISTRY 변수 값 확인: '$ECR_REGISTRY'"
+            echo "DEBUG: AWS_REGION 변수 값 확인: '$AWS_REGION'"
+            echo "DEBUG: ECR_REGISTRY 변수 값 확인: '$ECR_REGISTRY'"
             
             # AWS CLI 를 사용하여 ECR 에 Docker 로그인
             echo "ECR 로그인 중..."
-            # aws ecr get-login-password --region $AWS_REGION_ENV | docker login --username AWS --password-stdin $ECR_REGISTRY
-            aws ecr get-login-password --region $AWS_REGION_FOR_SCRIPT | docker login --username AWS --password-stdin $ECR_REGISTRY_FOR_SCRIPT
+            aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
             if [ $? -ne 0 ]; then
-              echo "ECR 로그인 실패: $ECR_REGISTRY_FOR_SCRIPT"
+              echo "ECR 로그인 실패: $ECR_REGISTRY"
               exit 1
             fi
             
