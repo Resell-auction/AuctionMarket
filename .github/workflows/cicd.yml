@@ -148,6 +148,11 @@ jobs:
           AWS_REGION: ${{ secrets.AWS_REGION }}
           APP_DIR: /home/ec2-user/app
         with:
+          envs: |
+            ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
+            APP_IMAGE_URI=${{ needs.build-and-push-image.outputs.image_uri }}
+            AWS_REGION=${{ secrets.AWS_REGION }}
+            APP_DIR=/home/ec2-user/app
           host: ${{ secrets.EC2_SSH_HOST }}
           username: ${{ secrets.EC2_SSH_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
