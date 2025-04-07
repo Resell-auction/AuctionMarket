@@ -24,6 +24,20 @@ jobs:
     outputs:
       image_uri: ${{ steps.build-image.outputs.image }}
 
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: 1234
+          MYSQL_DATABASE: auction_market
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
     steps:
       - name: 코드 체크아웃
         uses: actions/checkout@v4
@@ -47,8 +61,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-#      - name: Gradle 테스트 실행
-#        run: ./gradlew test
+      - name: Gradle 테스트 실행
+        env:
+          SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/auction_market
+          SPRING_DATASOURCE_USERNAME: root
+          SPRING_DATASOURCE_PASSWORD: 1234
+        run: ./gradlew test
 
       - name: AWS IAM 설정
         uses: aws-actions/configure-aws-credentials@v4
