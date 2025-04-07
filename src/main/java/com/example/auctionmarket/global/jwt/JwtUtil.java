@@ -8,8 +8,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import com.example.auctionmarket.domain.auth.exception.InvalidTokenException;
+import com.example.auctionmarket.domain.auth.exception.TokenNotFoundException;
 import com.example.auctionmarket.domain.user.entity.User;
 import com.example.auctionmarket.domain.user.enums.UserRole;
+import com.example.auctionmarket.domain.user.exception.UserNotFoundException;
 import com.example.auctionmarket.domain.user.repository.UserRepository;
 
 import io.jsonwebtoken.Claims;
@@ -111,9 +114,11 @@ public class JwtUtil {
 	public void reissueRefreshToken(String accessToken, HttpServletResponse response) {
 		// 새로 생성하여 재발급
 		String userId = extractClaims(accessToken).getSubject();
+		User user = userRepository.findById(Long.valueOf(userId))
+			.orElseThrow(() -> new UserNotFoundException());
 		String newRefreshToken = createRefreshToken(Long.valueOf(userId));
-
-		redisCache.reissueRefreshToken(newRefreshToken, userId);
+		user.updateRefreshToken(newRefreshToken);
+		userRepository.save(user);
 		refreshTokenSetCookie(newRefreshToken, response);
 	}
 

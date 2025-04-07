@@ -8,9 +8,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.example.auctionmarket.common.auth.AuthUser;
+import com.example.auctionmarket.domain.auth.exception.ExpiredJwtTokenException;
+import com.example.auctionmarket.domain.auth.exception.InvalidJwtSignatureException;
+import com.example.auctionmarket.domain.auth.exception.InvalidTokenException;
+import com.example.auctionmarket.domain.auth.exception.UnsupportedJwtTokenException;
 import com.example.auctionmarket.domain.user.enums.UserRole;
+import com.example.auctionmarket.domain.user.repository.UserRepository;
 import com.example.auctionmarket.global.jwt.JwtAuthenticationToken;
 import com.example.auctionmarket.global.jwt.JwtUtil;
+import com.example.auctionmarket.domain.auth.exception.TokenNotFoundException;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.MalformedJwtException;
@@ -29,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private final JwtUtil jwtUtil;
+	private final UserRepository userRepository;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -62,10 +69,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				request.setAttribute("email", claims.get("email"));
 				request.setAttribute("userRole", claims.get("userRole"));
 
-				String redis = redisCache.getRefreshToken(String.valueOf(id));
+				// Redis 대신 데이터베이스에서 리프레시 토큰 조회
+				String storedRefreshToken = userRepository.findRefreshTokenById(id)
+					.orElseThrow(() -> new TokenNotFoundException());
 
 				// jwt 토큰 만료 시간 검증
-				expiredJwtToken(access, refresh, redis, response);
+				expiredJwtToken(access, refresh, storedRefreshToken, response);
 
 			} catch (SecurityException | MalformedJwtException e) {
 				log.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.", e);
@@ -73,9 +82,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			} catch (UnsupportedJwtException e) {
 				log.error("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.", e);
 				throw new UnsupportedJwtTokenException();
-			} catch (AuthenticationExpiredException e) {
-				log.error("JWT token Expired, JWT 토큰 시간이 만료 되었습니다.", e);
-				throw e;
 			} catch (Exception e) {
 				log.error("Internal server error", e);
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -104,13 +110,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			log.error("Expired JWT token, 만료된 JWT token 입니다.");
 			throw new ExpiredJwtTokenException();
 
-			// access token 만료, refresh token 유효 -> redis에 저장된 토큰과 일치성 확인 후 재발급
 		} else if (isAccessTokenExpired) {
 			String newAccessToken = jwtUtil.validateExpiredAccessToken(refreshToken, redisToken);
 			jwtUtil.accessTokenSetHeader(newAccessToken, response);
 			jwtUtil.reissueRefreshToken(newAccessToken, response);
 
-			// refresh token 만료, access token 유효 -> access 검증 후 refresh 재발급
 		} else if (isRefreshTokenExpired) {
 			jwtUtil.reissueRefreshToken(accessToken, response);
 		}

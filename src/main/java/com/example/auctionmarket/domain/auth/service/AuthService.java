@@ -13,7 +13,6 @@ import com.example.auctionmarket.domain.user.exception.EmailAccessDeniedExceptio
 import com.example.auctionmarket.domain.user.exception.InvalidPasswordException;
 import com.example.auctionmarket.domain.user.repository.UserRepository;
 import com.example.auctionmarket.global.jwt.JwtUtil;
-import com.example.auctionmarket.global.redis.RefreshCacheUtil;
 import com.example.auctionmarket.domain.user.exception.EmailNotFoundException;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,7 +25,6 @@ public class AuthService {
 	private final UserRepository userRepository;
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 	private final JwtUtil jwtUtil;
-	private final RefreshCacheUtil redisCache;
 
 	public SignupResponse signup(String email, String password, String nickname, String phoneNumber) {
 		if (userRepository.existsByEmail(email)) {
@@ -62,6 +60,7 @@ public class AuthService {
 
 		String refreshToken = jwtUtil.createRefreshToken(user.getId());
 		jwtUtil.refreshTokenSetCookie(refreshToken, servletResponse);
-		redisCache.saveRefreshToken(refreshToken, String.valueOf(user.getId()));
+		user.updateRefreshToken(refreshToken);
+		userRepository.save(user);
 	}
 }

@@ -34,6 +34,9 @@ public class User extends TimeStamped{
 	private String nickname;
 	private String address;
 
+	@Column(name = "refresh_token")
+	private String refreshToken;
+
 
 	// @OneToOne
 	// @JoinColumn(name = "payment_id")
@@ -74,6 +77,10 @@ public class User extends TimeStamped{
 
 	public void cancelUser() {
 		this.deletedAt = LocalDateTime.now();
+	}
+
+	public void updateRefreshToken(String refreshToken) {
+		this.refreshToken = refreshToken;
 	}
 
 	public String getNickname(){
