@@ -9,6 +9,7 @@ on:
     branches:
       - main
       - dev
+      - feat/cicd
 
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
