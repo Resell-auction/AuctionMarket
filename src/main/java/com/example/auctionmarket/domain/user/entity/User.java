@@ -5,10 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.example.auctionmarket.domain.coupon.entity.CouponUser;
+import com.example.auctionmarket.domain.user.enums.Role;
 import jakarta.persistence.*;
 import org.apache.logging.log4j.message.ParameterizedMessage;
-
-import com.example.auctionmarket.domain.user.enums.UserRole;
 
 import jakarta.annotation.Nullable;
 import lombok.Getter;
@@ -38,7 +37,7 @@ public class User extends TimeStamped{
 	// private Payment payment;
 
 	@Enumerated(EnumType.STRING)
-	private UserRole userRole;
+	private Role role;
 
 	@Column(name = "phone_number")
 	private String phoneNumber;
@@ -49,12 +48,12 @@ public class User extends TimeStamped{
 	public User() {
 	}
 
-	public User(String email, String password, String nickname, String phoneNumber) {
+	public User(String email, String password, String nickname, String phoneNumber, Role role) {
 		this.email = email;
 		this.password = password;
 		this.nickname = nickname;
 		this.phoneNumber = phoneNumber;
-		this.userRole=UserRole.ROLE_ADMIN;
+		this.role = role;
 	}
 
 	public void updateNickname(String nickname) {

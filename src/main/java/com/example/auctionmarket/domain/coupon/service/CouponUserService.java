@@ -4,6 +4,8 @@ import com.example.auctionmarket.common.auth.AuthUser;
 import com.example.auctionmarket.domain.coupon.dto.CouponGiveRequest;
 import com.example.auctionmarket.domain.coupon.entity.Coupon;
 import com.example.auctionmarket.domain.coupon.entity.CouponUser;
+import com.example.auctionmarket.domain.coupon.exception.CouponErrorCode;
+import com.example.auctionmarket.domain.coupon.exception.CouponException;
 import com.example.auctionmarket.domain.coupon.repository.CouponRepository;
 import com.example.auctionmarket.domain.coupon.repository.CouponUserRepository;
 import com.example.auctionmarket.domain.user.entity.User;
@@ -25,20 +27,18 @@ public class CouponUserService {
     @Transactional
     public void giveCouponByUserId(AuthUser authUser, Long id, CouponGiveRequest couponGiveRequest){
         if (!authUser.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))) {
-            throw new AccessDeniedException("관리자만 접근할 수 있습니다.");
+                .anyMatch(auth -> auth.getAuthority().equals("ADMIN"))) {
+            throw new CouponException(CouponErrorCode.NOT_ADMIN_AUTHORITY);
         };
 
         Coupon coupon = couponRepository.findById(id).orElseThrow(
-                () -> new IllegalArgumentException(" 찾는 쿠폰이 없습니다."));
+                () -> new CouponException(CouponErrorCode.NOT_FOUND_COUPON));
 
         User users = userRepository.findById(couponGiveRequest.getUserId()).orElseThrow(
-                () -> new IllegalArgumentException(" 찾는 유저가 없습니다. "));//user는 쿠폰 리스트를 갖고 있음.
+                () -> new CouponException(CouponErrorCode.NOT_FOUND_USER));//user는 쿠폰 리스트를 갖고 있음.
 
         if(couponGiveRequest.getAmount()>coupon.getAmount())
-            throw new IllegalArgumentException("남은 쿠폰이 부족합니다");
-
-     //   coupon.setUsers(users);
+            throw new CouponException(CouponErrorCode.OUT_OF_COUPON);
 
 //user, coupon객체에 couponuser 객체 생성 후 저장.
         for (int i = 0; i < couponGiveRequest.getAmount(); i++) {

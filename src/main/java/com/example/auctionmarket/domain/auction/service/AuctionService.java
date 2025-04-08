@@ -64,6 +64,8 @@ public class AuctionService {
                 request.getProgressTime()
         );
 
+        auctionRepository.save(auction);
+
         //저장한 경매 출력
         return new AuctionSaveResponse(
                 auction.getId(),
