@@ -32,7 +32,6 @@ public class User extends TimeStamped{
 	private String email;
 	private String password;
 	private String nickname;
-	private String address;
 
 	@Column(name = "refresh_token")
 	private String refreshToken;
@@ -49,8 +48,6 @@ public class User extends TimeStamped{
 	private String phoneNumber;
 
 	@Nullable
-//	private LocalDateTime createdAt;
-//	private LocalDateTime updatedAt;
 	private LocalDateTime deletedAt;
 
 	public User() {
@@ -83,14 +80,9 @@ public class User extends TimeStamped{
 		this.refreshToken = refreshToken;
 	}
 
-//	public String getNickname(){
-//		this.nickname = nickname;
-//		return null;
-//	}
-
-//	public void updateModifiedAt(){
-//		this.updatedAt = LocalDateTime.now();
-//	}
+	public String getNickname(){
+		return  this.nickname = nickname;
+	}
 
 
 }
