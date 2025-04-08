@@ -1,7 +1,0 @@
-logging:
-  level:
-    root: DEBUG  # 전체 로그 레벨을 DEBUG로 설정
-    com.example.auctionmarket: DEBUG # 프로젝트 패키지만 DEBUG로 설정
-    org.springframework.transaction: DEBUG # 트랜잭션 관련 로그 DEBUG
-    org.hibernate.SQL: DEBUG # SQL 로그 DEBUG (이미 yml에 show_sql: true 되어있음)
-    org.hibernate.type.descriptor.sql: TRACE # SQL 파라미터 값 확인
