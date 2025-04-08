@@ -20,7 +20,7 @@ public class UserResponse {
 		return UserResponse.builder()
 			.email(user.getEmail())
 			.nickName(user.getNickname())
-			.userRole(user.getUserRole().name())
+			.userRole(user.getRole().name())
 			.phoneNumber(user.getPhoneNumber())
 			.modifiedAt(user.getUpdatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
 			.build();
