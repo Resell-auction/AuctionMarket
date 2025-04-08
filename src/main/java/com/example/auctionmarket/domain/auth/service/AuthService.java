@@ -3,6 +3,7 @@ package com.example.auctionmarket.domain.auth.service;
 import java.util.Objects;
 import java.util.Optional;
 
+import com.example.auctionmarket.domain.user.enums.UserRole;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,13 +27,13 @@ public class AuthService {
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 	private final JwtUtil jwtUtil;
 
-	public SignupResponse signup(String email, String password, String nickname, String phoneNumber) {
+	public SignupResponse signup(String email, String password, String nickname, String phoneNumber, String userRole) {
 		if (userRepository.existsByEmail(email)) {
 			throw new AlreadyExistsEmailException();
 		}
 
 		String encodedPassword = bCryptPasswordEncoder.encode(password);
-		User User = new User(email, encodedPassword, nickname, phoneNumber);
+		User User = new User(email, encodedPassword, nickname, phoneNumber, UserRole.of(userRole));
 		User saveUser = userRepository.save(User);
 
 		String accessToken = jwtUtil.createAccessToken(saveUser.getId(), saveUser.getEmail(), saveUser.getRole(), saveUser.getNickname());

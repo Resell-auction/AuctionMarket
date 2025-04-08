@@ -42,7 +42,7 @@ public class User extends TimeStamped{
 	// private Payment payment;
 
 	@Enumerated(EnumType.STRING)
-	private UserRole userRole;
+	private UserRole role;
 
 	@Column(name = "phone_number")
 	private String phoneNumber;
@@ -53,11 +53,12 @@ public class User extends TimeStamped{
 	public User() {
 	}
 
-	public User(String email, String password, String nickname, String phoneNumber) {
+	public User(String email, String password, String nickname, String phoneNumber, UserRole role) {
 		this.email = email;
 		this.password = password;
 		this.nickname = nickname;
 		this.phoneNumber = phoneNumber;
+		this.role = role;
 	}
 
 	public void updateNickname(String nickname) {

@@ -26,7 +26,7 @@ public class AuthController {
 	@PostMapping("/v1/auth/signup")
 	public Response<SignupResponse> signup(@Valid @RequestBody SignupRequest signupRequest) {
 		SignupResponse signup = authService.signup(signupRequest.getEmail(), signupRequest.getPassword(),
-			signupRequest.getNickname(), signupRequest.getPhoneNumber());
+			signupRequest.getNickname(), signupRequest.getPhoneNumber(), signupRequest.getUserRole());
 		return Response.of(signup);
 	}
 

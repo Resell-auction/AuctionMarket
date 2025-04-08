@@ -33,13 +33,16 @@ public class ProductService {
     @Transactional
     public ProductResponse createProduct(AuthUser authUser, ProductSaveRequest request) {
 
+        User user = userRepository.findByEmail(authUser.getEmail())
+                .orElseThrow(() -> new UserNotFoundException());
+
         // 유저 검증 로직 (본인 확인)
         if (!userRepository.existsByEmail(authUser.getEmail())) {
             throw new UserNotFoundException();
         }
 
         ProductCategory category = ProductCategory.of(request.getCategory());
-        Product product = new Product(request.getProductName(), request.getProductContent(), category);
+        Product product = new Product(request.getProductName(), request.getProductContent(), category, user);
 
         Product savedProduct = productRepository.save(product);
 
