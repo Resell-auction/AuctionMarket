@@ -12,7 +12,7 @@ import lombok.Getter;
 public class UserResponse {
 	private String email;
 	private String nickName;
-	private String role;
+	private String userRole;
 	private String phoneNumber;
 	private String modifiedAt;
 
@@ -20,7 +20,7 @@ public class UserResponse {
 		return UserResponse.builder()
 			.email(user.getEmail())
 			.nickName(user.getNickname())
-			.role(user.getRole().name())
+			.userRole(user.getUserRole().name())
 			.phoneNumber(user.getPhoneNumber())
 			.modifiedAt(user.getUpdatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
 			.build();

@@ -42,7 +42,7 @@ public class User extends TimeStamped{
 	// private Payment payment;
 
 	@Enumerated(EnumType.STRING)
-	private UserRole role;
+	private UserRole userRole;
 
 	@Column(name = "phone_number")
 	private String phoneNumber;
@@ -83,6 +83,5 @@ public class User extends TimeStamped{
 	public String getNickname(){
 		return  this.nickname = nickname;
 	}
-
 
 }
