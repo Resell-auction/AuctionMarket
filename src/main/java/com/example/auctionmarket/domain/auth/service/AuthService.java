@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.auctionmarket.domain.auth.dto.LoginResponse;
 import com.example.auctionmarket.domain.auth.dto.SignupResponse;
 import com.example.auctionmarket.domain.user.entity.User;
 import com.example.auctionmarket.domain.user.exception.AlreadyExistsEmailException;
@@ -15,7 +16,6 @@ import com.example.auctionmarket.domain.user.repository.UserRepository;
 import com.example.auctionmarket.global.jwt.JwtUtil;
 import com.example.auctionmarket.domain.user.exception.EmailNotFoundException;
 
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -35,10 +35,14 @@ public class AuthService {
 		User User = new User(email, encodedPassword, nickname, phoneNumber);
 		User saveUser = userRepository.save(User);
 
-		return SignupResponse.from(saveUser);
+		String accessToken = jwtUtil.createAccessToken(saveUser.getId(), saveUser.getEmail(), saveUser.getRole(), saveUser.getNickname());
+		String refreshToken = jwtUtil.createRefreshToken(saveUser.getId());
+		saveUser.updateRefreshToken(refreshToken);
+		userRepository.save(saveUser);
+		return new SignupResponse(accessToken, refreshToken);
 	}
 
-	public void signin(String email, String password, HttpServletResponse servletResponse) {
+	public LoginResponse signin(String email, String password) {
 		User user = userRepository.findByEmail(email).orElseThrow(EmailNotFoundException::new);
 		Optional.ofNullable(user.getDeletedAt())
 			.filter(Objects::nonNull)
@@ -49,18 +53,12 @@ public class AuthService {
 		if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
 			throw new InvalidPasswordException();
 		}
-
-		createAndSaveJwt(user, servletResponse);
-	}
-
-	private void createAndSaveJwt(User user, HttpServletResponse servletResponse) {
-		String accessToken = jwtUtil.createAccessToken(user.getId(), user.getEmail(), user.getUserRole(),
-			user.getNickname());
-		jwtUtil.accessTokenSetHeader(accessToken, servletResponse);
+		String accessToken = jwtUtil.createAccessToken(user.getId(), user.getEmail(), user.getRole(), user.getNickname());
 
 		String refreshToken = jwtUtil.createRefreshToken(user.getId());
-		jwtUtil.refreshTokenSetCookie(refreshToken, servletResponse);
 		user.updateRefreshToken(refreshToken);
 		userRepository.save(user);
+		return new LoginResponse(accessToken, refreshToken);
 	}
+
 }
