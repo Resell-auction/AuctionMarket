@@ -3,6 +3,7 @@ package com.example.auctionmarket.global.filter;
 import java.io.IOException;
 import java.util.Arrays;
 
+import com.example.auctionmarket.domain.user.enums.Role;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -12,7 +13,6 @@ import com.example.auctionmarket.domain.auth.exception.ExpiredJwtTokenException;
 import com.example.auctionmarket.domain.auth.exception.InvalidJwtSignatureException;
 import com.example.auctionmarket.domain.auth.exception.InvalidTokenException;
 import com.example.auctionmarket.domain.auth.exception.UnsupportedJwtTokenException;
-import com.example.auctionmarket.domain.user.enums.UserRole;
 import com.example.auctionmarket.domain.user.repository.UserRepository;
 import com.example.auctionmarket.global.jwt.JwtAuthenticationToken;
 import com.example.auctionmarket.global.jwt.JwtUtil;
@@ -39,7 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-		FilterChain filterChain) throws ServletException, IOException {
+									FilterChain filterChain) throws ServletException, IOException {
 		String authorizationHeader = request.getHeader("Authorization");
 
 		if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
@@ -68,7 +68,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 				// Redis 대신 데이터베이스에서 리프레시 토큰 조회
 				String storedRefreshToken = userRepository.findRefreshTokenById(id)
-					.orElseThrow(() -> new TokenNotFoundException());
+						.orElseThrow(() -> new TokenNotFoundException());
 
 				// jwt 토큰 만료 시간 검증
 				expiredJwtToken(access, refresh, storedRefreshToken, response);
@@ -90,10 +90,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private void setAuthentication(Claims claims) {
 		Long suerId = Long.valueOf(claims.getSubject());
 		String email = claims.get("email", String.class);
-		UserRole userRole = UserRole.of(claims.get("userRole", String.class));
+		Role role = Role.of(claims.get("userRole", String.class));
 		String nickname = claims.get("nickname", String.class);
 
-		AuthUser authUser = new AuthUser(suerId, email, userRole, nickname);
+		AuthUser authUser = new AuthUser(suerId, email, role, nickname);
 		JwtAuthenticationToken authenticationToken = new JwtAuthenticationToken(authUser);
 		SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 	}
