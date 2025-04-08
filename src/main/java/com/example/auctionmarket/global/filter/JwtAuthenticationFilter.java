@@ -64,7 +64,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				Long id = Long.parseLong(claims.getSubject());
 				request.setAttribute("userId", id);
 				request.setAttribute("email", claims.get("email"));
-				request.setAttribute("userRole", claims.get("userRole"));
+				request.setAttribute("role", claims.get("role"));
 
 				// Redis 대신 데이터베이스에서 리프레시 토큰 조회
 				String storedRefreshToken = userRepository.findRefreshTokenById(id)
@@ -90,7 +90,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private void setAuthentication(Claims claims) {
 		Long suerId = Long.valueOf(claims.getSubject());
 		String email = claims.get("email", String.class);
-		Role role = Role.of(claims.get("userRole", String.class));
+		Role role = Role.of(claims.get("role", String.class));
 		String nickname = claims.get("nickname", String.class);
 
 		AuthUser authUser = new AuthUser(suerId, email, role, nickname);

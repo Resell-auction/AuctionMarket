@@ -13,7 +13,7 @@ public enum Role {
 	ADMIN(Authority.ADMIN),
 	USER(Authority.USER);
 
-	private final String userRole;
+	private final String role;
 
 	public static Role of(String role) {
 		return Arrays.stream(Role.values())

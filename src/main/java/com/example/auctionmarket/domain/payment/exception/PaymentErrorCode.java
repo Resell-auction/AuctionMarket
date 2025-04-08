@@ -12,7 +12,8 @@ public enum PaymentErrorCode implements ErrorCode {
     INVALID_PAY_TYPE(HttpStatus.BAD_REQUEST, "INVALID_PAY_TYPE", "결제 수단이 일치하지 않습니다."),
     ALREADY_COMPLETED_PAYMENT(HttpStatus.BAD_REQUEST, "ALREADY_COMPLETED_PAYMENT", "결제가 이미 완료되었습니다"),
     DEADLINE_EXPIRED_PAYMENT(HttpStatus.BAD_REQUEST,"DEADLINE_EXPIRED_PAYMENT", "결제 기한이 지났습니다"),
-    NOT_COMPLETED_PAYMENT(HttpStatus.BAD_REQUEST,"NOT_COMPLETED_PAYMENT", "결제가 완료되지 않아 환불할 수 없습니다");
+    NOT_COMPLETED_PAYMENT(HttpStatus.BAD_REQUEST,"NOT_COMPLETED_PAYMENT", "결제가 완료되지 않아 환불할 수 없습니다"),
+    NOT_FOUND_AUCTION(HttpStatus.NOT_FOUND,"NOT_FOUND_AUCTION", "해당 경매를 확인할 수 없습니다");
 
     private final HttpStatus httpStatus;
     private final String code;

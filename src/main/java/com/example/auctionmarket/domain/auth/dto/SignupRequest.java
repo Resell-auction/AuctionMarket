@@ -30,6 +30,7 @@ public class SignupRequest {
 	public SignupRequest(String email, String password, String nickname, String phoneNumber, String role) {
 		this.email = email;
 		this.password = password;
+		this.role = role;
 		this.nickname = nickname;
 		this.phoneNumber = phoneNumber;
 		this.role = role;
