@@ -39,19 +39,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-		FilterChain filterChain) throws
-		ServletException,
-		IOException {
+		FilterChain filterChain) throws ServletException, IOException {
 		String authorizationHeader = request.getHeader("Authorization");
 
 		if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
 			String access = jwtUtil.substringToken(authorizationHeader);
 
-			String refresh = Arrays.stream(request.getCookies())
-				.filter(cookie -> cookie.getName().equals("token"))
-				.findFirst()
-				.map(Cookie::getValue)
-				.orElseThrow(TokenNotFoundException::new);
+			String refresh = request.getHeader("Refresh-Token");
+			if (refresh == null){
+				throw new TokenNotFoundException();
+			}
 
 			try {
 				Claims claims = jwtUtil.extractClaims(access);
@@ -101,20 +98,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 	}
 
-	private void expiredJwtToken(String accessToken, String refreshToken, String redisToken,
-		HttpServletResponse response) {
+	private void expiredJwtToken(String accessToken, String refreshToken, String storedRefreshToken, HttpServletResponse response) throws IOException {
+		if (!refreshToken.equals(storedRefreshToken)) {
+			throw new ExpiredJwtTokenException();
+		}
+
 		boolean isAccessTokenExpired = jwtUtil.isTokenExpired(accessToken);
 		boolean isRefreshTokenExpired = jwtUtil.isTokenExpired(refreshToken);
+
 
 		if (isAccessTokenExpired && isRefreshTokenExpired) {
 			log.error("Expired JWT token, 만료된 JWT token 입니다.");
 			throw new ExpiredJwtTokenException();
-
 		} else if (isAccessTokenExpired) {
-			String newAccessToken = jwtUtil.validateExpiredAccessToken(refreshToken, redisToken);
+			String newAccessToken = jwtUtil.validateRefreshToken(refreshToken);
 			jwtUtil.accessTokenSetHeader(newAccessToken, response);
 			jwtUtil.reissueRefreshToken(newAccessToken, response);
-
 		} else if (isRefreshTokenExpired) {
 			jwtUtil.reissueRefreshToken(accessToken, response);
 		}
