@@ -39,7 +39,8 @@ public class Product extends TimeStamped {
     @Column(name = "sold_status")
     private SoldStatus soldStatus;
 
-    public Product(String productName, String productContent, ProductCategory category) {
+    public Product(User user, String productName, String productContent, ProductCategory category) {
+        this.user = user;
         this.productName = productName;
         this.productContent = productContent;
         this.category = category;
