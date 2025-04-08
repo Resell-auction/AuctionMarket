@@ -2,9 +2,8 @@ package com.example.auctionmarket.domain.user.entity;
 
 import java.time.LocalDateTime;
 
+import com.example.auctionmarket.domain.user.enums.Role;
 import org.apache.logging.log4j.message.ParameterizedMessage;
-
-import com.example.auctionmarket.domain.user.enums.UserRole;
 
 import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
@@ -42,7 +41,7 @@ public class User extends TimeStamped{
 	// private Payment payment;
 
 	@Enumerated(EnumType.STRING)
-	private UserRole userRole;
+	private Role role;
 
 	@Column(name = "phone_number")
 	private String phoneNumber;
