@@ -3,7 +3,7 @@ package com.example.auctionmarket.domain.auth.service;
 import java.util.Objects;
 import java.util.Optional;
 
-import com.example.auctionmarket.domain.user.enums.UserRole;
+import com.example.auctionmarket.domain.user.enums.Role;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +33,7 @@ public class AuthService {
 		}
 
 		String encodedPassword = bCryptPasswordEncoder.encode(password);
-		User User = new User(email, encodedPassword, nickname, phoneNumber, UserRole.of(userRole));
+		User User = new User(email, encodedPassword, nickname, phoneNumber, Role.of(userRole));
 		User saveUser = userRepository.save(User);
 
 		String accessToken = jwtUtil.createAccessToken(saveUser.getId(), saveUser.getEmail(), saveUser.getRole(), saveUser.getNickname());
