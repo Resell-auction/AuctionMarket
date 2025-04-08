@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.example.auctionmarket.domain.user.enums.Role;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -14,7 +15,6 @@ import org.springframework.util.StringUtils;
 import com.example.auctionmarket.domain.auth.exception.InvalidTokenException;
 import com.example.auctionmarket.domain.auth.exception.TokenNotFoundException;
 import com.example.auctionmarket.domain.user.entity.User;
-import com.example.auctionmarket.domain.user.enums.UserRole;
 import com.example.auctionmarket.domain.user.exception.UserNotFoundException;
 import com.example.auctionmarket.domain.user.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -50,14 +50,14 @@ public class JwtUtil {
 		key = Keys.hmacShaKeyFor(bytes);
 	}
 
-	public String createAccessToken(Long userId, String email, UserRole userRole, String nickname) {
+	public String createAccessToken(Long userId, String email, Role role, String nickname) {
 		Date date = new Date();
 
 		return BEARER_PREFIX +
 			Jwts.builder()
 				.setSubject(String.valueOf(userId))
 				.claim("email", email)
-				.claim("userRole", userRole)
+				.claim("role", role)
 				.claim("nickname", nickname)
 				.setExpiration(new Date(date.getTime() + ACCESS_TOKEN_TIME))
 				.setIssuedAt(date)

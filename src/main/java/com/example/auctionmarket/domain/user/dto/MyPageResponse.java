@@ -15,7 +15,7 @@ public class MyPageResponse {
 	private Long id;
 	private String email;
 	private String nickName;
-	private String role;
+	private String userRole;
 	private String phoneNumber;
 	private String createdAt;
 	private String modifiedAt;
@@ -25,7 +25,7 @@ public class MyPageResponse {
 			.id(user.getId())
 			.email(user.getEmail())
 			.nickName(user.getNickname())
-			.role(user.getRole().name())
+			.userRole(user.getRole().name())
 			.phoneNumber(user.getPhoneNumber())
 			.createdAt(user.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
 			.modifiedAt(user.getUpdatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
