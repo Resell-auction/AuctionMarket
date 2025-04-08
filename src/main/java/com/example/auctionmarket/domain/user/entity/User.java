@@ -43,14 +43,14 @@ public class User extends TimeStamped{
 	// private Payment payment;
 
 	@Enumerated(EnumType.STRING)
-	private UserRole role;
+	private UserRole userRole;
 
 	@Column(name = "phone_number")
 	private String phoneNumber;
 
 	@Nullable
-	private LocalDateTime createdAt;
-	private LocalDateTime updatedAt;
+//	private LocalDateTime createdAt;
+//	private LocalDateTime updatedAt;
 	private LocalDateTime deletedAt;
 
 	public User() {
@@ -83,14 +83,14 @@ public class User extends TimeStamped{
 		this.refreshToken = refreshToken;
 	}
 
-	public String getNickname(){
-		this.nickname = nickname;
-		return null;
-	}
+//	public String getNickname(){
+//		this.nickname = nickname;
+//		return null;
+//	}
 
-	public void updateModifiedAt(){
-		this.updatedAt = LocalDateTime.now();
-	}
+//	public void updateModifiedAt(){
+//		this.updatedAt = LocalDateTime.now();
+//	}
 
 
 }

@@ -108,7 +108,7 @@ public class JwtUtil {
 
 		// 새로운 토큰 생성
 		User auth = userRepository.findById(Long.parseLong(userId)).get();
-		return createAccessToken(auth.getId(), auth.getEmail(), auth.getRole(), auth.getNickname());
+		return createAccessToken(auth.getId(), auth.getEmail(), auth.getUserRole(), auth.getNickname());
 	}
 
 	public void reissueRefreshToken(String accessToken, HttpServletResponse response) {
