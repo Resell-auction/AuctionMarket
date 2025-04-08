@@ -47,7 +47,7 @@ public class AuctionService {
                 .orElseThrow(()->new AuctionException(AuctionErrorCode.PRODUCT_NOT_FOUND));
 
         //물품을 올린 사용자가 아닌 경우 불가
-        if(!Objects.equals(authUser.getId(), product.getUserId())){
+        if(!Objects.equals(authUser.getId(), product.getUser().getId())){
             throw new AuctionException(AuctionErrorCode.NOT_AUCTION_OWNER);
         }
 
@@ -63,7 +63,7 @@ public class AuctionService {
         return new AuctionSaveResponse(
                 auction.getId(),
                 auction.getProduct().getId(),
-                auction.getProduct().getUserId(),
+                auction.getProduct().getUser().getId(),
                 auction.getProduct().getProductName(),
                 auction.getProduct().getCategory(),
                 auction.getMinPrice(),
@@ -89,7 +89,7 @@ public class AuctionService {
             return new AuctionResponse(
                     auction.getId(),
                     auction.getProduct().getId(),
-                    auction.getProduct().getUserId(),
+                    auction.getProduct().getUser().getId(),
                     auction.getProduct().getProductName(),
                     auction.getProduct().getCategory(),
                     auction.getMinPrice(),
@@ -125,7 +125,7 @@ public class AuctionService {
             return new AuctionResponse(
                     auction.getId(),
                     auction.getProduct().getId(),
-                    auction.getProduct().getUserId(),
+                    auction.getProduct().getUser().getId(),
                     auction.getProduct().getProductName(),
                     auction.getProduct().getCategory(),
                     auction.getMinPrice(),
@@ -158,7 +158,7 @@ public class AuctionService {
                 .orElseThrow(()->new UserNotFoundException());
 
         //물품을 올린 사용자인 경우 불가
-        if(Objects.equals(authUser.getId(), auction.getProduct().getUserId())){
+        if(Objects.equals(authUser.getId(), auction.getProduct().getUser().getId())){
             throw new AuctionException(AuctionErrorCode.SELF_BID_NOT_ALLOWED);
         }
 
@@ -187,7 +187,7 @@ public class AuctionService {
                 .orElseThrow(()->new AuctionException(AuctionErrorCode.AUCTION_NOT_FOUND));
 
         //경매를 올린 사용자가 아닌 경우 불가
-        if(!Objects.equals(authUser.getId(), auction.getProduct().getUserId())){
+        if(!Objects.equals(authUser.getId(), auction.getProduct().getUser().getId())){
             throw new AuctionException(AuctionErrorCode.NOT_AUCTION_OWNER);
         }
 
@@ -211,7 +211,7 @@ public class AuctionService {
         return new AuctionResponse(
                 auction.getId(),
                 auction.getProduct().getId(),
-                auction.getProduct().getUserId(),
+                auction.getProduct().getUser().getId(),
                 auction.getProduct().getProductName(),
                 auction.getProduct().getCategory(),
                 auction.getMinPrice(),
@@ -234,7 +234,7 @@ public class AuctionService {
                 .orElseThrow(()->new AuctionException(AuctionErrorCode.AUCTION_NOT_FOUND));
 
         //경매를 올린 사용자가 아닌 경우 불가
-        if(!Objects.equals(authUser.getId(), auction.getProduct().getUserId())){
+        if(!Objects.equals(authUser.getId(), auction.getProduct().getUser().getId())){
             throw new AuctionException(AuctionErrorCode.NOT_AUCTION_OWNER);
         }
 
@@ -258,7 +258,7 @@ public class AuctionService {
         return new AuctionResponse(
                 auction.getId(),
                 auction.getProduct().getId(),
-                auction.getProduct().getUserId(),
+                auction.getProduct().getUser().getId(),
                 auction.getProduct().getProductName(),
                 auction.getProduct().getCategory(),
                 auction.getMinPrice(),
@@ -281,7 +281,7 @@ public class AuctionService {
                 .orElseThrow(()->new AuctionException(AuctionErrorCode.AUCTION_NOT_FOUND));
 
         //경매를 올린 사용자가 아닌 경우 불가
-        if(!Objects.equals(authUser.getId(), auction.getProduct().getUserId())){
+        if(!Objects.equals(authUser.getId(), auction.getProduct().getUser().getId())){
             throw new AuctionException(AuctionErrorCode.NOT_AUCTION_OWNER);
         }
 
