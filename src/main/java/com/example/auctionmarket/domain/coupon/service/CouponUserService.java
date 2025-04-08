@@ -1,5 +1,6 @@
 package com.example.auctionmarket.domain.coupon.service;
 
+import com.example.auctionmarket.common.auth.AuthUser;
 import com.example.auctionmarket.domain.coupon.dto.CouponGiveRequest;
 import com.example.auctionmarket.domain.coupon.entity.Coupon;
 import com.example.auctionmarket.domain.coupon.entity.CouponUser;
@@ -7,8 +8,8 @@ import com.example.auctionmarket.domain.coupon.repository.CouponRepository;
 import com.example.auctionmarket.domain.coupon.repository.CouponUserRepository;
 import com.example.auctionmarket.domain.user.entity.User;
 import com.example.auctionmarket.domain.user.repository.UserRepository;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,11 +23,11 @@ public class CouponUserService {
 
     //admin- 해당유저에게 쿠폰주기
     @Transactional
-    public void giveCouponByUserId( Long id, CouponGiveRequest couponGiveRequest){
-//        if (authUser.getAuthorities().stream()
-//                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))) {
-//            throw new AccessDeniedException("관리자만 접근할 수 있습니다.");
-//        };
+    public void giveCouponByUserId(AuthUser authUser, Long id, CouponGiveRequest couponGiveRequest){
+        if (!authUser.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))) {
+            throw new AccessDeniedException("관리자만 접근할 수 있습니다.");
+        };
 
         Coupon coupon = couponRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException(" 찾는 쿠폰이 없습니다."));
