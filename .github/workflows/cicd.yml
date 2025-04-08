@@ -144,19 +144,6 @@ jobs:
 
       - name: SSH 를 통해 EC2 인스턴스에 접속하여 배포 스크립트 실행
         uses: appleboy/ssh-action@master
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          APP_IMAGE_URI: ${{ needs.build-and-push-image.outputs.image_uri }}
-          AWS_REGION: ${{ env.AWS_REGION }}
-          APP_CONTAINER_NAME: ${{ env.APP_CONTAINER_NAME }}
-
-          SPRING_PROFILES_ACTIVE: prod
-          SPRING_DATASOURCE_URL: ${{ secrets.RDS_URL }}
-          SPRING_DATASOURCE_USERNAME: ${{ secrets.RDS_USERNAME }}
-          SPRING_DATASOURCE_PASSWORD: ${{ secrets.RDS_PASSWORD }}
-          SPRING_DATA_REDIS_HOST: ${{ secrets.ELASTICACHE_HOST }}
-          SPRING_DATA_REDIS_PORT: ${{ secrets.ELASTICACHE_PORT }}
-
         with:
           host: ${{ secrets.EC2_SSH_HOST }}
           username: ${{ secrets.EC2_SSH_USER }}
@@ -195,7 +182,7 @@ jobs:
             APP_IMAGE_URI=${{ needs.build-and-push-image.outputs.image_uri }}
             AWS_REGION=${{ env.AWS_REGION }}
             APP_CONTAINER_NAME=${{ env.APP_CONTAINER_NAME }}
-            SPRING_PROFILES_ACTIVE=prod
+            SPRING_PROFILES_ACTIVE=dev
             SPRING_DATASOURCE_URL=${{ secrets.RDS_URL }}
             SPRING_DATASOURCE_USERNAME=${{ secrets.RDS_USERNAME }}
             SPRING_DATASOURCE_PASSWORD=${{ secrets.RDS_PASSWORD }}
