@@ -28,11 +28,11 @@ public class CouponService {
 
     //admin - 쿠폰생성
     @Transactional
-    public CouponResponse createCoupon(CouponRequest couponRequest) {
-//        if (authUser.getAuthorities().stream()
-//                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))) {
-//            throw new AccessDeniedException("관리자만 접근할 수 있습니다.");
-//        };
+    public CouponResponse createCoupon(AuthUser authUser,CouponRequest couponRequest) {
+        if (!authUser.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))) {
+            throw new AccessDeniedException("관리자만 접근할 수 있습니다.");
+        };
 
         Coupon coupon = new Coupon(couponRequest.getCouponName(),
                 couponRequest.getDescription(),
@@ -84,11 +84,11 @@ public class CouponService {
 
     //admin- 쿠폰수정
     @Transactional
-    public CouponResponse updateById( Long id, CouponUpdateRequest couponUpdateRequest) {
-//        if (authUser.getAuthorities().stream()
-//                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))) {
-//            throw new AccessDeniedException("관리자만 접근할 수 있습니다.");
-//        };
+    public CouponResponse updateById( AuthUser authUser, Long id, CouponUpdateRequest couponUpdateRequest) {
+        if (!authUser.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))) {
+            throw new AccessDeniedException("관리자만 접근할 수 있습니다.");
+        };
 
         Coupon coupon = couponRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException(" 찾는 쿠폰이 없습니다."));
@@ -108,17 +108,16 @@ public class CouponService {
 
     //admin- 쿠폰삭제
     @Transactional
-    public void deleteById( Long id) {
-//        if (authUser.getAuthorities().stream()
-//                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))) {
-//            throw new AccessDeniedException("관리자만 접근할 수 있습니다.");
-//        };
+    public void deleteById(AuthUser authUser, Long id) {
+        if (!authUser.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))) {
+            throw new AccessDeniedException("관리자만 접근할 수 있습니다.");
+        };
 
         Coupon coupon = couponRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException(" 찾는 쿠폰이 없습니다."));
 
         coupon.expiredCoupon();
     }
-
 
 }
