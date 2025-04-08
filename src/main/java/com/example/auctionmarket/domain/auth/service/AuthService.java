@@ -54,7 +54,7 @@ public class AuthService {
 	}
 
 	private void createAndSaveJwt(User user, HttpServletResponse servletResponse) {
-		String accessToken = jwtUtil.createAccessToken(user.getId(), user.getEmail(), user.getRole(),
+		String accessToken = jwtUtil.createAccessToken(user.getId(), user.getEmail(), user.getUserRole(),
 			user.getNickname());
 		jwtUtil.accessTokenSetHeader(accessToken, servletResponse);
 
