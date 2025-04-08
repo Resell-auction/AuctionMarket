@@ -35,6 +35,12 @@ public class AuthService {
 		User User = new User(email, encodedPassword, nickname, phoneNumber);
 		User saveUser = userRepository.save(User);
 
+		String bearerToken = jwtUtil.createAccessToken(saveUser.getId(), saveUser.getEmail(), saveUser.getRole(), saveUser.getNickname());
+
+//SignupResponse.from(saveUser);
+//
+		return new SignupResponse(bearerToken);
+
 		return SignupResponse.from(saveUser);
 	}
 
@@ -54,6 +60,7 @@ public class AuthService {
 	}
 
 	private void createAndSaveJwt(User user, HttpServletResponse servletResponse) {
+		System.out.println("test:"+ user.getId()+ user.getEmail()+ user.getRole()+user.getNickname());
 		String accessToken = jwtUtil.createAccessToken(user.getId(), user.getEmail(), user.getRole(),
 			user.getNickname());
 		jwtUtil.accessTokenSetHeader(accessToken, servletResponse);

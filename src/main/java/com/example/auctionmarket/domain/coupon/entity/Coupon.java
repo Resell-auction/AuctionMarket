@@ -1,6 +1,8 @@
 package com.example.auctionmarket.domain.coupon.entity;
 
+import com.example.auctionmarket.common.entity.TimeStamped;
 import com.example.auctionmarket.domain.coupon.enums.CouponStatus;
+import com.example.auctionmarket.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +13,7 @@ import java.time.LocalDateTime;
 @Entity
 @NoArgsConstructor
 @Table(name="coupons")
-public class Coupon {
+public class Coupon extends TimeStamped {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,9 +30,9 @@ public class Coupon {
 
     private CouponStatus couponStatus;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "couponuser_id", nullable = true)
+    private CouponUser couponUser;
 
     //   private String condition;
 
@@ -54,9 +56,12 @@ public class Coupon {
         this.couponStatus=CouponStatus.EXPIRED;
     }
 
+    public void setUsers(CouponUser couponUser){
+        this.couponUser=couponUser;
+    }
+
     public void discountCoupon(int amount){
         this.amount= this.amount-amount;
     }
-
 
 }
