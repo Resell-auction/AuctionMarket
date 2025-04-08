@@ -2,6 +2,7 @@ package com.example.auctionmarket.domain.user.entity;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.example.auctionmarket.domain.coupon.entity.CouponUser;
 import jakarta.persistence.*;
@@ -30,8 +31,8 @@ public class User extends TimeStamped{
 	@Column(name = "refresh_token")
 	private String refreshToken;
 
-	@OneToMany(mappedBy = "couponuser_id", cascade = CascadeType.ALL)
-	private List<CouponUser> CouponUserList = new ArrayList<>();
+	@OneToMany(mappedBy = "users", cascade = CascadeType.ALL)
+	private List<CouponUser> couponUserList = new ArrayList<>();
 
 	// @OneToOne
 	// @JoinColumn(name = "payment_id")
@@ -89,7 +90,7 @@ public class User extends TimeStamped{
 //	}
 
 	public void setCouponUser(CouponUser couponUser){
-		this.couponUser= couponUser;
+		couponUserList.add(couponUser);
 	}
 
 

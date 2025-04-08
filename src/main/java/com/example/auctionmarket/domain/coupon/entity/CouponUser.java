@@ -1,10 +1,13 @@
 package com.example.auctionmarket.domain.coupon.entity;
 
+import com.example.auctionmarket.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @Entity
 @NoArgsConstructor
 @Table(name="couponusers")
@@ -22,5 +25,6 @@ public class CouponUser {
     @JoinColumn(name = "coupon_id", nullable = true)
     private Coupon coupons;
 
-    private
+    private boolean used = false;//couponstatus로도 충분?
+
 }

@@ -12,25 +12,12 @@ import lombok.Getter;
 //@Builder
 public class SignupResponse {
 
-	private Long id;
-	private String email;
-	private String nickname;
-	private String phoneNumber;
-	private String createdAt;
-	private final String bearerToken;
+	private final String accessToken;
+	private final String refreshToken;
 
-	public SignupResponse(String bearerToken) {
-		this.bearerToken = bearerToken;
+	public SignupResponse(String accessToken, String refreshToken) {
+		this.accessToken = accessToken;
+		this.refreshToken = refreshToken;
 	}
-
-//	public static SignupResponse from(User user) {
-//		return SignupResponse.builder()
-//			.id(user.getId())
-//			.email(user.getEmail())
-//			.nickname(user.getNickname())
-//			.phoneNumber(user.getPhoneNumber())
-//			.createdAt(user.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
-//			.build();
-//	}
 
 }

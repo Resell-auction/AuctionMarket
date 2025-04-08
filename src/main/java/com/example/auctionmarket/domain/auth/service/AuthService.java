@@ -35,13 +35,12 @@ public class AuthService {
 		User User = new User(email, encodedPassword, nickname, phoneNumber);
 		User saveUser = userRepository.save(User);
 
-		String bearerToken = jwtUtil.createAccessToken(saveUser.getId(), saveUser.getEmail(), saveUser.getRole(), saveUser.getNickname());
+		String accessToken = jwtUtil.createAccessToken(saveUser.getId(), saveUser.getEmail(), saveUser.getRole(), saveUser.getNickname());
+		String refreshToken = jwtUtil.createRefreshToken(saveUser.getId());
+		saveUser.updateRefreshToken(refreshToken);
+		userRepository.save(saveUser);
+		return new SignupResponse(accessToken, refreshToken);
 
-//SignupResponse.from(saveUser);
-//
-		return new SignupResponse(bearerToken);
-
-		return SignupResponse.from(saveUser);
 	}
 
 	public void signin(String email, String password, HttpServletResponse servletResponse) {
