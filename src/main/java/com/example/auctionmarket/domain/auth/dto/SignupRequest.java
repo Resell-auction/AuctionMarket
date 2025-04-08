@@ -25,7 +25,7 @@ public class SignupRequest {
 	private String phoneNumber;
 
 	@NotBlank
-	private String userRole;
+	private String role;
 
 	public SignupRequest(String email, String password, String nickname, String phoneNumber, String userRole) {
 		this.email = email;
