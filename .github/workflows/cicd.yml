@@ -181,7 +181,7 @@ jobs:
             
             echo "변수에 직접 할당 시작"
             ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
-            APP_IMAGE_URI=${{ needs.build-and-push-image.outputs.image_uri }}
+            APP_IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ secrets.AWS_ECR_REPOSITORY_URI }}:${{ github.sha }}
             AWS_REGION=${{ env.AWS_REGION }}
             APP_CONTAINER_NAME=${{ env.APP_CONTAINER_NAME }}
             SPRING_PROFILES_ACTIVE=dev
