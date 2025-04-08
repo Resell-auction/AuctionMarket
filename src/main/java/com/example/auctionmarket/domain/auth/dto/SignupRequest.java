@@ -32,6 +32,6 @@ public class SignupRequest {
 		this.password = password;
 		this.nickname = nickname;
 		this.phoneNumber = phoneNumber;
-		this.userRole = userRole;
+		this.role = userRole;
 	}
 }

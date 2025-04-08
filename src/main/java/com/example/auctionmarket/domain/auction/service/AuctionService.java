@@ -341,16 +341,6 @@ public class AuctionService {
             }
             if (LocalDateTime.now().isAfter(auction.getEndTime())) {
                 auction.setStatus(AuctionStatus.ENDED);
-            }
-            if(LocalDateTime.now().isBefore(auction.getStartTime())) {
-                auction.setStatus(AuctionStatus.PENDING);
-            }
-        if(LocalDateTime.now().isBefore(auction.getStartTime())){
-            return AuctionStatus.PENDING;
-        }
-
-        if (LocalDateTime.now().isAfter(auction.getEndTime())) {
-            auction.updateStatus(AuctionStatus.ENDED);
 
                 if (auction.getConsumerId() != null) {
                     paymentService.createPayment(auction.getId());
@@ -363,8 +353,10 @@ public class AuctionService {
 //                    ));
 //                    paymentService.createPayment(auction);
                 }
-            return AuctionStatus.ENDED;
+            }
+            if(LocalDateTime.now().isBefore(auction.getStartTime())) {
+                auction.setStatus(AuctionStatus.PENDING);
+            }
         }
-        return AuctionStatus.ONGOING;
     }
 }

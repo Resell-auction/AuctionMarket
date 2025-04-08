@@ -42,6 +42,7 @@ public class Auction extends TimeStamped {
 
     //경매 시작 시간
     @Column(nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime startTime;
 
     //경매 지속 시간
@@ -49,6 +50,7 @@ public class Auction extends TimeStamped {
     private Duration duration;
 
     @Column(nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime endTime;
 
     @Enumerated(EnumType.STRING)
