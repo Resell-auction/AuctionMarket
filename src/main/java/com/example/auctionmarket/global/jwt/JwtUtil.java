@@ -1,8 +1,11 @@
 package com.example.auctionmarket.global.jwt;
 
+import java.io.IOException;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -14,6 +17,7 @@ import com.example.auctionmarket.domain.user.entity.User;
 import com.example.auctionmarket.domain.user.enums.UserRole;
 import com.example.auctionmarket.domain.user.exception.UserNotFoundException;
 import com.example.auctionmarket.domain.user.repository.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -76,10 +80,15 @@ public class JwtUtil {
 		response.setHeader("Authorization", accessToken);
 	}
 
-	public void refreshTokenSetCookie(String token, HttpServletResponse response) {
-		Cookie cookie = new Cookie("token", token);
-		cookie.setPath("/");
-		response.addCookie(cookie);
+	public void sendRefreshToken(String token, HttpServletResponse response) throws IOException {
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+
+		Map<String, String> tokenResponse = new HashMap<>();
+		tokenResponse.put("refreshToken", token);
+
+		String jsonResponse = new ObjectMapper().writeValueAsString(tokenResponse);
+		response.getWriter().write(jsonResponse);
 	}
 
 	public String substringToken(String tokenValue) {
@@ -97,20 +106,23 @@ public class JwtUtil {
 			.getBody();
 	}
 
-	public String validateExpiredAccessToken(String cookieJwt, String redisJwt) {
-		Claims claims = extractClaims(cookieJwt);
-		String userId = claims.getSubject();
-
-		if (!redisJwt.equals(cookieJwt)) {
+	public String validateRefreshToken(String refreshToken) {
+		try {
+			// refresh 토큰 서명 검증
+			Claims claims = extractClaims(refreshToken);
+			String userId = claims.getSubject();
+			User user = userRepository.findById(Long.parseLong(userId))
+				.orElseThrow(UserNotFoundException::new);
+			if (!refreshToken.equals(user.getRefreshToken())) {
+				throw new InvalidTokenException();
+			}
+			return createAccessToken(user.getId(), user.getEmail(), user.getRole(), user.getNickname());
+		} catch (Exception e) {
 			throw new InvalidTokenException();
 		}
-
-		// 새로운 토큰 생성
-		User auth = userRepository.findById(Long.parseLong(userId)).get();
-		return createAccessToken(auth.getId(), auth.getEmail(), auth.getRole(), auth.getNickname());
 	}
 
-	public void reissueRefreshToken(String accessToken, HttpServletResponse response) {
+	public void reissueRefreshToken(String accessToken, HttpServletResponse response) throws IOException {
 		// 새로 생성하여 재발급
 		String userId = extractClaims(accessToken).getSubject();
 		User user = userRepository.findById(Long.valueOf(userId))
@@ -118,7 +130,7 @@ public class JwtUtil {
 		String newRefreshToken = createRefreshToken(Long.valueOf(userId));
 		user.updateRefreshToken(newRefreshToken);
 		userRepository.save(user);
-		refreshTokenSetCookie(newRefreshToken, response);
+		sendRefreshToken(newRefreshToken, response);
 	}
 
 	// token의 만료 여부 확인 -> 유효한 경우에만 false

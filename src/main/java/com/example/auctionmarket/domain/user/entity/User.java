@@ -32,7 +32,6 @@ public class User extends TimeStamped{
 	private String email;
 	private String password;
 	private String nickname;
-	private String address;
 
 	@Column(name = "refresh_token")
 	private String refreshToken;
@@ -84,7 +83,6 @@ public class User extends TimeStamped{
 	public String getNickname(){
 		return  this.nickname = nickname;
 	}
-
 
 
 }
