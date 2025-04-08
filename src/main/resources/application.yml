@@ -5,7 +5,8 @@ spring:
     # JPA, Hibernate 설정
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: validate
+#      ddl-auto: create
 #      ddl-auto: update
 #      ddl-auto: none
     properties:
