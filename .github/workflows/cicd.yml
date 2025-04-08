@@ -247,8 +247,8 @@ jobs:
               -e SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD} \
               -e SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST} \
               -e SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT} \
-              # --restart unless-stopped \
               ${APP_IMAGE_URI}
+              # --restart unless-stopped \
             
             if [ $? -ne 0 ]; then
               echo "컨테이너 실행 실패: ${APP_CONTAINER_NAME}"
