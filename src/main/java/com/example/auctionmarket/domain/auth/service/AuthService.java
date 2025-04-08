@@ -54,6 +54,7 @@ public class AuthService {
 			throw new InvalidPasswordException();
 		}
 		String accessToken = jwtUtil.createAccessToken(user.getId(), user.getEmail(), user.getRole(), user.getNickname());
+
 		String refreshToken = jwtUtil.createRefreshToken(user.getId());
 		user.updateRefreshToken(refreshToken);
 		userRepository.save(user);
