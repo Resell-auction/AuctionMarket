@@ -26,7 +26,6 @@ public class User extends TimeStamped{
 	private String email;
 	private String password;
 	private String nickname;
-	private String address;
 
 	@Column(name = "refresh_token")
 	private String refreshToken;
@@ -39,14 +38,12 @@ public class User extends TimeStamped{
 	// private Payment payment;
 
 	@Enumerated(EnumType.STRING)
-	private UserRole role;
+	private UserRole userRole;
 
 	@Column(name = "phone_number")
 	private String phoneNumber;
 
 	@Nullable
-//	private LocalDateTime createdAt;
-//	private LocalDateTime updatedAt;
 	private LocalDateTime deletedAt;
 
 	public User() {
@@ -57,7 +54,7 @@ public class User extends TimeStamped{
 		this.password = password;
 		this.nickname = nickname;
 		this.phoneNumber = phoneNumber;
-		this.role=UserRole.ROLE_ADMIN;
+		this.userRole=UserRole.ROLE_ADMIN;
 	}
 
 	public void updateNickname(String nickname) {
@@ -80,18 +77,12 @@ public class User extends TimeStamped{
 		this.refreshToken = refreshToken;
 	}
 
-//	public String getNickname(){
-//		this.nickname = nickname;
-//		return null;
-//	}
-
-//	public void updateModifiedAt(){
-//		this.updatedAt = LocalDateTime.now();
-//	}
+	public String getNickname(){
+		return  this.nickname = nickname;
+	}
 
 	public void setCouponUser(CouponUser couponUser){
 		couponUserList.add(couponUser);
 	}
-
 
 }

@@ -1,6 +1,5 @@
 package com.example.auctionmarket.domain.auth.dto;
 
-import com.example.auctionmarket.domain.user.enums.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -24,6 +23,9 @@ public class SignupRequest {
 	@NotBlank
 	@Pattern(regexp = "^\\d{2,3}-\\d{3,4}-\\d{4}$", message = "전화번호 양식에 맞지 않습니다. ex) 010-1234-5678")
 	private String phoneNumber;
+
+	@NotBlank
+	private String userRole;
 
 	public SignupRequest(String email, String password, String nickname, String phoneNumber) {
 		this.email = email;
