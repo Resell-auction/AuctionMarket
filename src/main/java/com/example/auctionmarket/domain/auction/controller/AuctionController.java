@@ -27,13 +27,12 @@ public class AuctionController {
     private final AuctionService auctionService;
 
     //경매 생성
-    @PostMapping("/{productId}")
+    @PostMapping
     public ResponseEntity<AuctionSaveResponse> createAuction(
             @AuthenticationPrincipal AuthUser authUser,
-            @PathVariable Long productId,
             @RequestBody AuctionSaveRequest request
             ){
-        AuctionSaveResponse auctionSaveResponse = auctionService.createAuction(authUser, productId, request);
+        AuctionSaveResponse auctionSaveResponse = auctionService.createAuction(authUser, request);
         return ResponseEntity.ok(auctionSaveResponse);
     }
 
@@ -66,7 +65,7 @@ public class AuctionController {
     }
 
     //경매 참여
-    @PutMapping("/participation/{auctionId}")
+    @PatchMapping("/participation/{auctionId}")
     public ResponseEntity<AuctionIncreasePriceResponse> increaseAuction(
             @PathVariable Long auctionId,
             @RequestBody AuctionIncreasePriceRequest request,
@@ -78,7 +77,7 @@ public class AuctionController {
     }
 
     //경매 수정(시작 시간)
-    @PutMapping("/updateStartTime/{auctionId}")
+    @PatchMapping("/updateStartTime/{auctionId}")
     public ResponseEntity<AuctionResponse> updateAuctionStartTime(
             @PathVariable Long auctionId,
             @RequestBody AuctionUpdateTimeRequest request,
@@ -90,7 +89,7 @@ public class AuctionController {
     }
 
     //경매 수정(초기 가격)
-    @PutMapping("/updateMinPrice/{auctionId}")
+    @PatchMapping("/updateMinPrice/{auctionId}")
     public ResponseEntity<AuctionResponse> updateMinPrice(
             @PathVariable Long auctionId,
             @RequestBody AuctionUpdateMinPriceRequest request,
