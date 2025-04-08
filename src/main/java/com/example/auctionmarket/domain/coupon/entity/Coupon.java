@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
@@ -30,9 +32,8 @@ public class Coupon extends TimeStamped {
 
     private CouponStatus couponStatus;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "couponuser_id", nullable = true)
-    private CouponUser couponUser;
+    @OneToMany(mappedBy = "coupons", cascade = CascadeType.ALL)
+    private List<CouponUser> couponUserList = new ArrayList<>();
 
     //   private String condition;
 
@@ -57,7 +58,8 @@ public class Coupon extends TimeStamped {
     }
 
     public void setUsers(CouponUser couponUser){
-        this.couponUser=couponUser;
+
+        couponUserList.add(couponUser);
     }
 
     public void discountCoupon(int amount){

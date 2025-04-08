@@ -6,6 +6,7 @@ import com.example.auctionmarket.domain.coupon.dto.CouponRequest;
 import com.example.auctionmarket.domain.coupon.dto.CouponResponse;
 import com.example.auctionmarket.domain.coupon.dto.CouponUpdateRequest;
 import com.example.auctionmarket.domain.coupon.service.CouponService;
+import com.example.auctionmarket.domain.coupon.service.CouponUserService;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import java.util.List;
 public class CouponController {
 
     private final CouponService couponService;
+    private final CouponUserService couponUserService;
 
     //등록
     @PostMapping//admin만 가능
@@ -55,6 +57,6 @@ public class CouponController {
     //유저에게 쿠폰을 원하는 수량만큼 주기
     @PutMapping("/admin/{id}")
     public void giveCouponByUserId(@PathVariable Long id, @RequestBody CouponGiveRequest couponGiveRequest){
-        couponService.giveCouponByUserId( id, couponGiveRequest);
+        couponUserService.giveCouponByUserId( id, couponGiveRequest);
     }
 }
