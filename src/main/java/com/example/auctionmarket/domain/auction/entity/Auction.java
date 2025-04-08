@@ -2,6 +2,8 @@ package com.example.auctionmarket.domain.auction.entity;
 
 import com.example.auctionmarket.common.entity.BaseEntity;
 import com.example.auctionmarket.domain.auction.enums.AuctionStatus;
+import com.example.auctionmarket.domain.auction.exception.AuctionErrorCode;
+import com.example.auctionmarket.domain.auction.exception.AuctionException;
 import com.example.auctionmarket.domain.product.entity.Product;
 import com.example.auctionmarket.domain.product.enums.ProductCategory;
 import jakarta.persistence.*;
@@ -67,12 +69,13 @@ public class Auction extends BaseEntity {
 
     //경매 낙찰자 정보 저장
     public void increaseMaxPrice(Long consumerId, Long increasePrice) {
-        this.consumerId = consumerId;
-
         //경매 낙찰가 증가
-        if(this.maxPrice < increasePrice) {
-            this.maxPrice = increasePrice;
+        if(this.maxPrice>=increasePrice){
+            throw new AuctionException(AuctionErrorCode.INVALID_BID_PRICE);
         }
+
+        this.maxPrice = increasePrice;
+        this.consumerId = consumerId;
     }
 
     //시작 시간 수정 함수
