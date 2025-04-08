@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.auctionmarket.common.response.Response;
+import com.example.auctionmarket.domain.auth.dto.LoginResponse;
 import com.example.auctionmarket.domain.auth.dto.SigninRequest;
 import com.example.auctionmarket.domain.auth.dto.SignupRequest;
 import com.example.auctionmarket.domain.auth.dto.SignupResponse;
@@ -30,9 +31,8 @@ public class AuthController {
 	}
 
 	@PostMapping("/v1/auth/signin")
-	public Response<Void> signin(@Valid @RequestBody SigninRequest signinRequest,
-		HttpServletResponse servletResponse) {
-		authService.signin(signinRequest.getEmail(), signinRequest.getPassword(), servletResponse);
-		return Response.empty();
+	public Response<LoginResponse> signin(@Valid @RequestBody SigninRequest signinRequest) {
+		LoginResponse login = authService.signin(signinRequest.getEmail(), signinRequest.getPassword());
+		return Response.of(login);
 	}
 }
