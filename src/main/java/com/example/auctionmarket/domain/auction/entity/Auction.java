@@ -88,4 +88,8 @@ public class Auction extends TimeStamped {
         this.minPrice = updateMinPrice;
         this.maxPrice = updateMinPrice;
     }
+
+    public void updateStatus(AuctionStatus status) {
+        this.status = status;
+    }
 }
