@@ -1,41 +1,41 @@
-package com.example.auctionmarket.global.config;
-
-// import org.springframework.cache.CacheManager;
-// import org.springframework.cache.annotation.EnableCaching;
-// import org.springframework.context.annotation.Bean;
-// import org.springframework.context.annotation.Configuration;
-// import org.springframework.data.redis.cache.RedisCacheConfiguration;
-// import org.springframework.data.redis.cache.RedisCacheManager;
-// import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
-// import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
-// import org.springframework.data.redis.serializer.RedisSerializationContext;
-// import org.springframework.data.redis.serializer.StringRedisSerializer;
+//package com.example.auctionmarket.global.config;
 //
-// import jakarta.annotation.PreDestroy;
-// import lombok.RequiredArgsConstructor;
+//import org.springframework.cache.CacheManager;
+//import org.springframework.cache.annotation.EnableCaching;
+//import org.springframework.context.annotation.Bean;
+//import org.springframework.context.annotation.Configuration;
+//import org.springframework.data.redis.cache.RedisCacheConfiguration;
+//import org.springframework.data.redis.cache.RedisCacheManager;
+//import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+//import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+//import org.springframework.data.redis.serializer.RedisSerializationContext;
+//import org.springframework.data.redis.serializer.StringRedisSerializer;
 //
-// @Configuration
-// @EnableCaching
-// @RequiredArgsConstructor
-// public class RedisCacheConfig {
+//import jakarta.annotation.PreDestroy;
+//import lombok.RequiredArgsConstructor;
 //
-// 	private final LettuceConnectionFactory lettuceConnectionFactory;
+//@Configuration
+//@EnableCaching
+//@RequiredArgsConstructor
+//public class RedisCacheConfig {
 //
-// 	@Bean
-// 	public CacheManager redisCache() {
-// 		RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
-// 			.serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
-// 			.serializeValuesWith(
-// 				RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
+//	private final LettuceConnectionFactory lettuceConnectionFactory;
 //
-// 		return RedisCacheManager.RedisCacheManagerBuilder
-// 			.fromConnectionFactory(lettuceConnectionFactory)
-// 			.cacheDefaults(redisCacheConfiguration)
-// 			.build();
-// 	}
+//	@Bean
+//	public CacheManager redisCache() {
+//		RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
+//			.serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
+//			.serializeValuesWith(
+//				RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
 //
-// 	@PreDestroy
-// 	public void destroy() {
-// 		lettuceConnectionFactory.destroy();
-// 	}
-// }
+//		return RedisCacheManager.RedisCacheManagerBuilder
+//			.fromConnectionFactory(lettuceConnectionFactory)
+//			.cacheDefaults(redisCacheConfiguration)
+//			.build();
+//	}
+//
+//	@PreDestroy
+//	public void destroy() {
+//		lettuceConnectionFactory.destroy();
+//	}
+//}
