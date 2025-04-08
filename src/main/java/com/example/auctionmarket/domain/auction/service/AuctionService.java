@@ -9,15 +9,18 @@ import com.example.auctionmarket.domain.auction.dto.response.AuctionResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionSaveResponse;
 import com.example.auctionmarket.domain.auction.entity.Auction;
 import com.example.auctionmarket.domain.auction.enums.AuctionStatus;
+import com.example.auctionmarket.domain.auction.event.AuctionEndEvent;
 import com.example.auctionmarket.domain.auction.exception.AuctionErrorCode;
 import com.example.auctionmarket.domain.auction.exception.AuctionException;
 import com.example.auctionmarket.domain.auction.repository.AuctionRepository;
+import com.example.auctionmarket.domain.payment.service.PaymentService;
 import com.example.auctionmarket.domain.product.entity.Product;
 import com.example.auctionmarket.domain.product.repository.ProductRepository;
 import com.example.auctionmarket.domain.user.entity.User;
 import com.example.auctionmarket.domain.user.exception.UserNotFoundException;
 import com.example.auctionmarket.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +38,8 @@ public class AuctionService {
     private final AuctionRepository auctionRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final PaymentService paymentService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public AuctionSaveResponse createAuction(AuthUser authUser, Long productId, AuctionSaveRequest request){
@@ -345,11 +350,23 @@ public class AuctionService {
         if(LocalDateTime.now().isBefore(auction.getStartTime())){
             return AuctionStatus.PENDING;
         }
-        else if (LocalDateTime.now().isAfter(auction.getEndTime())) {
+
+        if (LocalDateTime.now().isAfter(auction.getEndTime())) {
+            auction.updateStatus(AuctionStatus.ENDED);
+
+                if (auction.getConsumerId() != null) {
+                    paymentService.createPayment(auction.getId());
+
+                    // 나중에 동기 비동기시 변형해서 사용
+//                    eventPublisher.publishEvent(new AuctionEndEvent(
+//                            auction.getId(),
+//                            auction.getConsumerId(),
+//                            auction.getMaxPrice()
+//                    ));
+//                    paymentService.createPayment(auction);
+                }
             return AuctionStatus.ENDED;
         }
-        else {
-            return AuctionStatus.ONGOING;
-        }
+        return AuctionStatus.ONGOING;
     }
 }

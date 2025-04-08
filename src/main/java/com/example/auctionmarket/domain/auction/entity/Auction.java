@@ -86,4 +86,8 @@ public class Auction extends BaseEntity {
         this.minPrice = updateMinPrice;
         this.maxPrice = updateMinPrice;
     }
+
+    public void updateStatus(AuctionStatus status) {
+        this.status = status;
+    }
 }
