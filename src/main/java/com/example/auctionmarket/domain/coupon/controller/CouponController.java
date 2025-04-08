@@ -1,5 +1,6 @@
 package com.example.auctionmarket.domain.coupon.controller;
 
+import com.example.auctionmarket.common.auth.AuthUser;
 import com.example.auctionmarket.domain.coupon.dto.CouponGiveRequest;
 import com.example.auctionmarket.domain.coupon.dto.CouponRequest;
 import com.example.auctionmarket.domain.coupon.dto.CouponResponse;
@@ -9,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,8 +24,8 @@ public class CouponController {
 
     //등록
     @PostMapping//admin만 가능
-    public ResponseEntity<CouponResponse> createCoupon(@AuthenticationPrincipal AuthUser authUser, @RequestBody CouponRequest couponRequest){
-        return ResponseEntity.ok(couponService.createCoupon(authUser, couponRequest));
+    public ResponseEntity<CouponResponse> createCoupon(@RequestBody CouponRequest couponRequest){
+        return ResponseEntity.ok(couponService.createCoupon( couponRequest));
     }
 
     //전체 목록 조회
@@ -40,19 +42,19 @@ public class CouponController {
 
     //수정
     @PutMapping("/{id}")//admin
-    public ResponseEntity<CouponResponse> updateCoupon(@AuthenticationPrincipal AuthUser authUser,@PathVariable Long id, @RequestBody CouponUpdateRequest couponUpdateRequest){
+    public ResponseEntity<CouponResponse> updateCoupon(@PathVariable Long id, @RequestBody CouponUpdateRequest couponUpdateRequest){
         return ResponseEntity.ok(couponService.updateById(id, couponUpdateRequest));
     }
 
     //삭제
     @DeleteMapping("/{id}")//admin
-    public void deleteCoupon(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long id){
+    public void deleteCoupon(@PathVariable Long id){
         couponService.deleteById(id);
     }
 
     //유저에게 쿠폰을 원하는 수량만큼 주기
-    @PostMapping("/{id}")
-    public void giveCouponByUserId(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long id, @RequestBody CouponGiveRequest couponGiveRequest){
-        giveCouponByUserId(id, couponGiveRequest);
+    @PutMapping("/admin/{id}")
+    public void giveCouponByUserId(@PathVariable Long id, @RequestBody CouponGiveRequest couponGiveRequest){
+        couponService.giveCouponByUserId( id, couponGiveRequest);
     }
 }

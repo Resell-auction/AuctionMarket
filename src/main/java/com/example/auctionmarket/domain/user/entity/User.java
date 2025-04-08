@@ -1,22 +1,15 @@
 package com.example.auctionmarket.domain.user.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
+import com.example.auctionmarket.domain.coupon.entity.CouponUser;
+import jakarta.persistence.*;
 import org.apache.logging.log4j.message.ParameterizedMessage;
 
 import com.example.auctionmarket.domain.user.enums.UserRole;
 
 import jakarta.annotation.Nullable;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
 import lombok.Getter;
 
 @Entity
@@ -37,6 +30,8 @@ public class User extends TimeStamped{
 	@Column(name = "refresh_token")
 	private String refreshToken;
 
+	@OneToMany(mappedBy = "couponuser_id", cascade = CascadeType.ALL)
+	private List<CouponUser> CouponUserList = new ArrayList<>();
 
 	// @OneToOne
 	// @JoinColumn(name = "payment_id")
@@ -49,8 +44,8 @@ public class User extends TimeStamped{
 	private String phoneNumber;
 
 	@Nullable
-	private LocalDateTime createdAt;
-	private LocalDateTime updatedAt;
+//	private LocalDateTime createdAt;
+//	private LocalDateTime updatedAt;
 	private LocalDateTime deletedAt;
 
 	public User() {
@@ -61,6 +56,7 @@ public class User extends TimeStamped{
 		this.password = password;
 		this.nickname = nickname;
 		this.phoneNumber = phoneNumber;
+		this.role=UserRole.ROLE_ADMIN;
 	}
 
 	public void updateNickname(String nickname) {
@@ -83,13 +79,17 @@ public class User extends TimeStamped{
 		this.refreshToken = refreshToken;
 	}
 
-	public String getNickname(){
-		this.nickname = nickname;
-		return null;
-	}
+//	public String getNickname(){
+//		this.nickname = nickname;
+//		return null;
+//	}
 
-	public void updateModifiedAt(){
-		this.updatedAt = LocalDateTime.now();
+//	public void updateModifiedAt(){
+//		this.updatedAt = LocalDateTime.now();
+//	}
+
+	public void setCouponUser(CouponUser couponUser){
+		this.couponUser= couponUser;
 	}
 
 
