@@ -30,7 +30,7 @@ public class PaymentService {
     @Transactional
     public void createPayment(Long auctionId) {
         Auction auction = auctionRepository.findById(auctionId).orElseThrow(
-                ()-> new IllegalArgumentException("해당 경매 없음")
+                ()-> new PaymentException(PaymentErrorCode.NOT_FOUND_AUCTION)
         );
 
         Payment payment = Payment.builder()

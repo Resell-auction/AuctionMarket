@@ -52,11 +52,12 @@ public class User extends TimeStamped{
 	public User() {
 	}
 
-	public User(String email, String password, String nickname, String phoneNumber) {
+	public User(String email, String password, String nickname, String phoneNumber, Role role) {
 		this.email = email;
 		this.password = password;
 		this.nickname = nickname;
 		this.phoneNumber = phoneNumber;
+		this.role = role;
 	}
 
 	public void updateNickname(String nickname) {
