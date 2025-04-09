@@ -142,4 +142,5 @@ public class ProductService {
         productRepository.deleteById(productId);
     }
 
+    public void changeSoldStatus(Long productId) {}
 }

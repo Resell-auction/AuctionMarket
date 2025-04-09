@@ -5,7 +5,6 @@ import lombok.Getter;
 @Getter
 public class PaymentRequest {
 
-    private Long userId;
-    private String pay_type;
+    private String payType;
     private Long amount;
 }
