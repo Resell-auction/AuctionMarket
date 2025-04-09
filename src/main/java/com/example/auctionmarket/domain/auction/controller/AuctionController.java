@@ -11,6 +11,7 @@ import com.example.auctionmarket.domain.auction.dto.response.AuctionResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionSaveResponse;
 import com.example.auctionmarket.domain.auction.entity.Auction;
 import com.example.auctionmarket.domain.auction.service.AuctionService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,7 @@ public class AuctionController {
     @PostMapping
     public ResponseEntity<AuctionSaveResponse> createAuction(
             @AuthenticationPrincipal AuthUser authUser,
-            @RequestBody AuctionSaveRequest request
+            @Valid @RequestBody AuctionSaveRequest request
             ){
         AuctionSaveResponse auctionSaveResponse = auctionService.createAuction(authUser, request);
         return ResponseEntity.ok(auctionSaveResponse);
@@ -80,7 +81,7 @@ public class AuctionController {
     @PatchMapping("/{auctionId}/update-starttime")
     public ResponseEntity<AuctionResponse> updateAuctionStartTime(
             @PathVariable Long auctionId,
-            @RequestBody AuctionUpdateTimeRequest request,
+            @Valid @RequestBody AuctionUpdateTimeRequest request,
             @AuthenticationPrincipal AuthUser authUser
             ){
         AuctionResponse response = auctionService.updateAuctionStartTime(authUser, auctionId, request);
