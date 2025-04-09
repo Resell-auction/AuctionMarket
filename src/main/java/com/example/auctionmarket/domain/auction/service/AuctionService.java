@@ -330,6 +330,7 @@ public class AuctionService {
     }
 
     //경매 상태 변경 함수
+    @Transactional
     @Scheduled(cron = "0 * * * * *")
     public void updateStatus(){
 
@@ -339,7 +340,7 @@ public class AuctionService {
             if(LocalDateTime.now().isAfter(auction.getStartTime()) && LocalDateTime.now().isBefore(auction.getEndTime())){
                 auction.setStatus(AuctionStatus.ONGOING);
             }
-            if (LocalDateTime.now().isAfter(auction.getEndTime())) {
+            else if (LocalDateTime.now().isAfter(auction.getEndTime())) {
                 auction.setStatus(AuctionStatus.ENDED);
 
                 if (auction.getConsumerId() != null) {
@@ -354,7 +355,7 @@ public class AuctionService {
 //                    paymentService.createPayment(auction);
                 }
             }
-            if(LocalDateTime.now().isBefore(auction.getStartTime())) {
+            else if(LocalDateTime.now().isBefore(auction.getStartTime())) {
                 auction.setStatus(AuctionStatus.PENDING);
             }
         }
