@@ -65,7 +65,7 @@ public class AuctionController {
     }
 
     //경매 참여
-    @PatchMapping("/participation/{auctionId}")
+    @PatchMapping("/{auctionId}/participation")
     public ResponseEntity<AuctionIncreasePriceResponse> increaseAuction(
             @PathVariable Long auctionId,
             @RequestBody AuctionIncreasePriceRequest request,
@@ -77,7 +77,7 @@ public class AuctionController {
     }
 
     //경매 수정(시작 시간)
-    @PatchMapping("/updateStartTime/{auctionId}")
+    @PatchMapping("/{auctionId}/updateStartTime")
     public ResponseEntity<AuctionResponse> updateAuctionStartTime(
             @PathVariable Long auctionId,
             @RequestBody AuctionUpdateTimeRequest request,
@@ -89,7 +89,7 @@ public class AuctionController {
     }
 
     //경매 수정(초기 가격)
-    @PatchMapping("/updateMinPrice/{auctionId}")
+    @PatchMapping("/{auctionId}/updateMinPrice")
     public ResponseEntity<AuctionResponse> updateMinPrice(
             @PathVariable Long auctionId,
             @RequestBody AuctionUpdateMinPriceRequest request,
