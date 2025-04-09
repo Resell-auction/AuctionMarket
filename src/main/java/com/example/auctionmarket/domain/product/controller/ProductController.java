@@ -26,6 +26,8 @@ public class ProductController {
             @AuthenticationPrincipal AuthUser authUser,
             @Valid @RequestBody ProductSaveRequest request
     ) {
+        System.out.println(authUser);
+
         return Response.of(productService.createProduct(authUser, request));
     }
 

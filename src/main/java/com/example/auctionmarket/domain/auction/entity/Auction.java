@@ -1,7 +1,10 @@
 package com.example.auctionmarket.domain.auction.entity;
 
 import com.example.auctionmarket.common.entity.BaseEntity;
+import com.example.auctionmarket.common.entity.TimeStamped;
 import com.example.auctionmarket.domain.auction.enums.AuctionStatus;
+import com.example.auctionmarket.domain.auction.exception.AuctionErrorCode;
+import com.example.auctionmarket.domain.auction.exception.AuctionException;
 import com.example.auctionmarket.domain.product.entity.Product;
 import com.example.auctionmarket.domain.product.enums.ProductCategory;
 import jakarta.persistence.*;
@@ -17,7 +20,7 @@ import java.time.LocalDateTime;
 @Entity
 @NoArgsConstructor
 @Table(name = "auctions")
-public class Auction extends BaseEntity {
+public class Auction extends TimeStamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -39,6 +42,7 @@ public class Auction extends BaseEntity {
 
     //경매 시작 시간
     @Column(nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime startTime;
 
     //경매 지속 시간
@@ -46,6 +50,7 @@ public class Auction extends BaseEntity {
     private Duration duration;
 
     @Column(nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime endTime;
 
     @Enumerated(EnumType.STRING)
@@ -53,26 +58,25 @@ public class Auction extends BaseEntity {
     private AuctionStatus status;
 
     //경매 정보를 저장하기 위한 메서드
-    public static Auction of(Product product, Long minPrice, LocalDateTime startTime, Long minutes) {
-        Auction auction = new Auction();
-        auction.product = product;
-        auction.minPrice = minPrice;
-        auction.maxPrice = minPrice;//생성 되었을 떄는 기본 최대가는 최소가하고 동일하다
-        auction.startTime = startTime;
-        auction.duration = Duration.ofMinutes(minutes);
-        auction.endTime = auction.getStartTime().plus(Duration.ofMinutes(minutes));
-        auction.status = AuctionStatus.PENDING;//생성 되었을 때는 기본으로 경매 진행 전 상태이다.
-        return auction;
+    public Auction(Product product, Long minPrice, LocalDateTime startTime, Long minutes) {
+        this.product = product;
+        this.minPrice = minPrice;
+        this.maxPrice = minPrice;//생성 되었을 떄는 기본 최대가는 최소가하고 동일하다
+        this.startTime = startTime;
+        this.duration = Duration.ofMinutes(minutes);
+        this.endTime = this.getStartTime().plus(Duration.ofMinutes(minutes));
+        this.status = AuctionStatus.PENDING;//생성 되었을 때는 기본으로 경매 진행 전 상태이다.
     }
 
     //경매 낙찰자 정보 저장
     public void increaseMaxPrice(Long consumerId, Long increasePrice) {
-        this.consumerId = consumerId;
-
         //경매 낙찰가 증가
-        if(this.maxPrice < increasePrice) {
-            this.maxPrice = increasePrice;
+        if(this.maxPrice>=increasePrice){
+            throw new AuctionException(AuctionErrorCode.INVALID_BID_PRICE);
         }
+
+        this.maxPrice = increasePrice;
+        this.consumerId = consumerId;
     }
 
     //시작 시간 수정 함수
