@@ -287,10 +287,6 @@ public class AuctionService {
             throw new AuctionException(AuctionErrorCode.AUCTION_ALREADY_STARTED);
         }
 
-        if(auction.getStatus() == AuctionStatus.ENDED){
-            throw new AuctionException(AuctionErrorCode.AUCTION_ALREADY_ENDED);
-        }
-
         //경매 삭제
         auctionRepository.delete(auction);
     }

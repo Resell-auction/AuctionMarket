@@ -21,7 +21,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/auction")
+@RequestMapping("/v1/auctions")
 public class AuctionController {
 
     private final AuctionService auctionService;
@@ -77,7 +77,7 @@ public class AuctionController {
     }
 
     //경매 수정(시작 시간)
-    @PatchMapping("/{auctionId}/updateStartTime")
+    @PatchMapping("/{auctionId}/update-starttime")
     public ResponseEntity<AuctionResponse> updateAuctionStartTime(
             @PathVariable Long auctionId,
             @RequestBody AuctionUpdateTimeRequest request,
@@ -89,7 +89,7 @@ public class AuctionController {
     }
 
     //경매 수정(초기 가격)
-    @PatchMapping("/{auctionId}/updateMinPrice")
+    @PatchMapping("/{auctionId}/update-minprice")
     public ResponseEntity<AuctionResponse> updateMinPrice(
             @PathVariable Long auctionId,
             @RequestBody AuctionUpdateMinPriceRequest request,
