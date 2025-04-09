@@ -27,11 +27,11 @@ public class SignupRequest {
 	@NotBlank
 	private String role;
 
-	public SignupRequest(String email, String password, String nickname, String phoneNumber, String userRole) {
+	public SignupRequest(String email, String password, String nickname, String phoneNumber, String role) {
 		this.email = email;
 		this.password = password;
+		this.role = role;
 		this.nickname = nickname;
 		this.phoneNumber = phoneNumber;
-		this.role = userRole;
 	}
 }
