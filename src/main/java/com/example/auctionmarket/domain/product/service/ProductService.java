@@ -60,7 +60,7 @@ public class ProductService {
         );
 
         // 본인 제품만 조회 가능 로직
-        if (!authUser.getEmail().equals(user.getEmail())) {
+        if (!authUser.getEmail().equals(product.getUser().getEmail())) {
             throw new ProductException(ProductErrorCode.NOT_MY_PRODUCT);
         }
 
@@ -106,7 +106,7 @@ public class ProductService {
         }
 
         // 본인 제품만 수정 가능 로직
-        if (!authUser.getEmail().equals(user.getEmail())) {
+        if (!authUser.getEmail().equals(product.getUser().getEmail())) {
             throw new ProductException(ProductErrorCode.NOT_MY_PRODUCT);
         }
 
@@ -135,7 +135,7 @@ public class ProductService {
         }
 
         // 본인 제품만 삭제 가능 로직
-        if (!authUser.getEmail().equals(user.getEmail())) {
+        if (!authUser.getEmail().equals(product.getUser().getEmail())) {
             throw new ProductException(ProductErrorCode.NOT_MY_PRODUCT);
         }
 
