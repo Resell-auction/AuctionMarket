@@ -24,11 +24,13 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -42,13 +44,13 @@ public class AuctionService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public AuctionSaveResponse createAuction(AuthUser authUser, Long productId, AuctionSaveRequest request){
+    public AuctionSaveResponse createAuction(AuthUser authUser, AuctionSaveRequest request){
         //유저 예외처리
         User user = userRepository.findById(authUser.getId())
                 .orElseThrow(()->new UserNotFoundException());
 
         //입력한 상품이 없는 경우 예외처리
-        Product product = productRepository.findById(productId)
+        Product product = productRepository.findById(request.getProductId())
                 .orElseThrow(()->new AuctionException(AuctionErrorCode.PRODUCT_NOT_FOUND));
 
         //물품을 올린 사용자가 아닌 경우 불가
@@ -57,24 +59,26 @@ public class AuctionService {
         }
 
         //경매 내용 저장(최소 가격과 경매 진행 시간)
-        Auction auction = Auction.of(
+        Auction auction = new Auction(
                 product,
                 request.getMinPrice(),
                 request.getStartTime(),
                 request.getProgressTime()
         );
 
+        Auction saveAuction = auctionRepository.save(auction);
+
         //저장한 경매 출력
         return new AuctionSaveResponse(
-                auction.getId(),
-                auction.getProduct().getId(),
-                auction.getProduct().getUser().getId(),
-                auction.getProduct().getProductName(),
-                auction.getProduct().getCategory(),
-                auction.getMinPrice(),
-                auction.getStartTime(),
-                auction.getEndTime(),
-                auction.getStatus()
+                saveAuction.getId(),
+                saveAuction.getProduct().getId(),
+                saveAuction.getProduct().getUser().getId(),
+                saveAuction.getProduct().getProductName(),
+                saveAuction.getProduct().getCategory(),
+                saveAuction.getMinPrice(),
+                saveAuction.getStartTime(),
+                saveAuction.getEndTime(),
+                saveAuction.getStatus()
         );
     }
 
@@ -88,8 +92,6 @@ public class AuctionService {
         return auctions.map(auction->{
 
             String auctionMessage = remainingTimeOfAuctionStatus(auction.getStatus(), auction.getEndTime());
-
-            updateStatus(auction.getId());
 
             return new AuctionResponse(
                     auction.getId(),
@@ -125,8 +127,6 @@ public class AuctionService {
         return auctions.map(auction->{
             String auctionMessage = remainingTimeOfAuctionStatus(auction.getStatus(), auction.getEndTime());
 
-            updateStatus(auction.getId());
-
             return new AuctionResponse(
                     auction.getId(),
                     auction.getProduct().getId(),
@@ -150,8 +150,6 @@ public class AuctionService {
         //해당하는 경매 찾기
         Auction auction = auctionRepository.findById(auctionId)
                 .orElseThrow(()->new AuctionException(AuctionErrorCode.AUCTION_NOT_FOUND));
-
-        updateStatus(auctionId);
 
         //경매가 진행 중인 상황이 아니라면 예외 처리
         if(auction.getStatus() != AuctionStatus.ONGOING){
@@ -195,9 +193,6 @@ public class AuctionService {
         if(!Objects.equals(authUser.getId(), auction.getProduct().getUser().getId())){
             throw new AuctionException(AuctionErrorCode.NOT_AUCTION_OWNER);
         }
-
-        //경매 상태 값 변경
-        updateStatus(auctionId);
 
         if(auction.getStatus() == AuctionStatus.ONGOING){
             throw new AuctionException(AuctionErrorCode.AUCTION_ALREADY_STARTED);
@@ -243,9 +238,6 @@ public class AuctionService {
             throw new AuctionException(AuctionErrorCode.NOT_AUCTION_OWNER);
         }
 
-        //경매 상태 값 변경
-        updateStatus(auctionId);
-
         if(auction.getStatus() == AuctionStatus.ONGOING){
             throw new AuctionException(AuctionErrorCode.AUCTION_ALREADY_STARTED);
         }
@@ -290,16 +282,9 @@ public class AuctionService {
             throw new AuctionException(AuctionErrorCode.NOT_AUCTION_OWNER);
         }
 
-        //경매 상태 값 변경
-        updateStatus(auctionId);
-
         //경매 상태 확인
         if(auction.getStatus() == AuctionStatus.ONGOING){
             throw new AuctionException(AuctionErrorCode.AUCTION_ALREADY_STARTED);
-        }
-
-        if(auction.getStatus() == AuctionStatus.ENDED){
-            throw new AuctionException(AuctionErrorCode.AUCTION_ALREADY_ENDED);
         }
 
         //경매 삭제
@@ -342,17 +327,17 @@ public class AuctionService {
 
     //경매 상태 변경 함수
     @Transactional
-    public AuctionStatus updateStatus(Long auctionId){
-        //경매 예외처리
-        Auction auction = auctionRepository.findById(auctionId)
-                .orElseThrow(()->new IllegalStateException("해당 경매는 존재하지 않습니다."));
+    @Scheduled(cron = "0 * * * * *")
+    public void updateStatus(){
 
-        if(LocalDateTime.now().isBefore(auction.getStartTime())){
-            return AuctionStatus.PENDING;
-        }
+        List<Auction> auctions = auctionRepository.findAll();
 
-        if (LocalDateTime.now().isAfter(auction.getEndTime())) {
-            auction.updateStatus(AuctionStatus.ENDED);
+        for(Auction auction : auctions){
+            if(LocalDateTime.now().isAfter(auction.getStartTime()) && LocalDateTime.now().isBefore(auction.getEndTime())){
+                auction.setStatus(AuctionStatus.ONGOING);
+            }
+            else if (LocalDateTime.now().isAfter(auction.getEndTime())) {
+                auction.setStatus(AuctionStatus.ENDED);
 
                 if (auction.getConsumerId() != null) {
                     paymentService.createPayment(auction.getId());
@@ -365,8 +350,10 @@ public class AuctionService {
 //                    ));
 //                    paymentService.createPayment(auction);
                 }
-            return AuctionStatus.ENDED;
+            }
+            else if(LocalDateTime.now().isBefore(auction.getStartTime())) {
+                auction.setStatus(AuctionStatus.PENDING);
+            }
         }
-        return AuctionStatus.ONGOING;
     }
 }
