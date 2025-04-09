@@ -55,7 +55,7 @@ public class CouponController {
     }
 
     //유저에게 쿠폰을 원하는 수량만큼 주기
-    @PutMapping("/admin/{id}")
+    @PutMapping("/{id}/give")
     public void giveCouponByUserId(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long id, @RequestBody CouponGiveRequest couponGiveRequest){
         couponUserService.giveCouponByUserId(authUser, id, couponGiveRequest);
     }

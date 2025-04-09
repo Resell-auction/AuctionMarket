@@ -63,6 +63,10 @@ dependencies {
 
 	//spring security
 	implementation 'org.springframework.boot:spring-boot-starter-security'
+	testImplementation 'org.mockito:mockito-core:5.11.0'
+	testImplementation 'org.mockito:mockito-junit-jupiter:5.11.0'
+	testImplementation 'org.assertj:assertj-core:3.25.3'
+
 	testImplementation 'org.springframework.security:spring-security-test'
 }
 
