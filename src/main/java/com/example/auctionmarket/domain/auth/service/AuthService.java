@@ -27,13 +27,13 @@ public class AuthService {
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 	private final JwtUtil jwtUtil;
 
-	public SignupResponse signup(String email, String password, String nickname, String phoneNumber, String userRole) {
+	public SignupResponse signup(String email, String password, String nickname, String phoneNumber, String role) {
 		if (userRepository.existsByEmail(email)) {
 			throw new AlreadyExistsEmailException();
 		}
 
 		String encodedPassword = bCryptPasswordEncoder.encode(password);
-		User User = new User(email, encodedPassword, nickname, phoneNumber, Role.of(userRole));
+		User User = new User(email, encodedPassword, nickname, phoneNumber, Role.of(role));
 		User saveUser = userRepository.save(User);
 
 		String accessToken = jwtUtil.createAccessToken(saveUser.getId(), saveUser.getEmail(), saveUser.getRole(), saveUser.getNickname());
