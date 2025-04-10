@@ -1,5 +1,6 @@
 package com.example.auctionmarket.domain.coupon.entity;
 
+import com.example.auctionmarket.domain.coupon.enums.CouponType;
 import com.example.auctionmarket.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -25,6 +26,11 @@ public class CouponUser {
     @JoinColumn(name = "coupon_id", nullable = true)
     private Coupon coupons;
 
+    @Enumerated(EnumType.STRING)
+    private CouponType couponType;
+
     private boolean used = false;//couponstatus로도 충분?
 
 }
+
+//

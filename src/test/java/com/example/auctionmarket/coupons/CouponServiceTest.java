@@ -6,6 +6,7 @@ import com.example.auctionmarket.domain.coupon.dto.CouponResponse;
 import com.example.auctionmarket.domain.coupon.dto.CouponUpdateRequest;
 import com.example.auctionmarket.domain.coupon.entity.Coupon;
 import com.example.auctionmarket.domain.coupon.enums.CouponStatus;
+import com.example.auctionmarket.domain.coupon.enums.CouponType;
 import com.example.auctionmarket.domain.coupon.exception.CouponErrorCode;
 import com.example.auctionmarket.domain.coupon.exception.CouponException;
 import com.example.auctionmarket.domain.coupon.repository.CouponRepository;
@@ -52,10 +53,11 @@ public class CouponServiceTest {
     @Test
     void 쿠폰_생성_성공(){
         //given
+
         LocalDateTime expiredAt = LocalDateTime.parse("2025-05-05T00:00:00");
         AuthUser authUser = new AuthUser(1L,"abc@naver.com", Role.ADMIN,"nickname");
-        CouponRequest couponRequest= new CouponRequest("coupon1","description1",10.0,expiredAt, 10);
-        Coupon coupon = new Coupon("coupon1","description1",10.0,expiredAt,10);
+        CouponRequest couponRequest= new CouponRequest("coupon1","description1",10L,  expiredAt, 10, CouponType.PERCENT);
+        Coupon coupon = new Coupon("coupon1","description1",10L,expiredAt,10,CouponType.PERCENT);
         List<GrantedAuthority> authorities = List.of(
                 new SimpleGrantedAuthority("ADMIN")
         );
@@ -72,7 +74,7 @@ public class CouponServiceTest {
     void admin이_아닌_유저가_생성을_시도하면_에러가_발생한다(){
         LocalDateTime expiredAt = LocalDateTime.parse("2025-05-05T00:00:00");
         AuthUser authUser = new AuthUser(1L,"abc@naver.com", Role.USER,"nickname");
-        CouponRequest couponRequest= new CouponRequest("coupon1","description1",10.0,expiredAt, 10);
+        CouponRequest couponRequest= new CouponRequest("coupon1","description1",10L,  expiredAt, 10, CouponType.PERCENT);
 
         assertThrows(CouponException.class, ()->couponService.createCoupon(authUser,couponRequest));
     }
@@ -85,7 +87,7 @@ public class CouponServiceTest {
 
         // given
         List<Coupon> mockCoupons = IntStream.rangeClosed(1, 10)
-                .mapToObj(i -> new Coupon("coupon1","description1",10.0,expiredAt,10))
+                .mapToObj(i -> new Coupon("coupon1","description1",10L,expiredAt,10,CouponType.PERCENT))
                 .collect(Collectors.toList());
 
         given(couponRepository.findByCouponStatus(CouponStatus.VALID)).willReturn(mockCoupons);
@@ -106,7 +108,7 @@ public class CouponServiceTest {
         // given
         LocalDateTime expiredAt = LocalDateTime.parse("2025-05-05T00:00:00");
 
-        Coupon coupon = new Coupon("coupon1","description1",10.0,expiredAt,10);
+        Coupon coupon = new Coupon("coupon1","description1",10L,expiredAt,10,CouponType.PERCENT);
 
         given(couponRepository.findById(coupon.getId())).willReturn(Optional.of(coupon));
 
@@ -122,15 +124,15 @@ public class CouponServiceTest {
     void 쿠폰_수정_성공(){
         // given
         LocalDateTime expiredAt = LocalDateTime.parse("2025-05-05T00:00:00");
-        Coupon coupon = new Coupon("coupon1","description1",10.0,expiredAt,10);
-        CouponUpdateRequest couponUpdateRequest= new CouponUpdateRequest("coupon2","description2", 10.0, expiredAt);
+        Coupon coupon = new Coupon("coupon1","description1",10L,expiredAt,10,CouponType.PERCENT);
+        CouponUpdateRequest couponUpdateRequest= new CouponUpdateRequest("coupon2","description2", 10L, expiredAt);
         AuthUser authUser = new AuthUser(1L,"abc@naver.com", Role.ADMIN,"nickname");
 
         given(couponRepository.findById(1L)).willReturn(Optional.of(coupon));
 
         coupon.update(couponUpdateRequest.getCouponName(),
                 couponUpdateRequest.getDescription(),
-                couponUpdateRequest.getDiscountRate(),
+                couponUpdateRequest.getDiscountAmount(),
                 expiredAt);
 
         // when
@@ -156,7 +158,7 @@ public class CouponServiceTest {
     void 쿠폰_삭제_성공(){
         LocalDateTime expiredAt = LocalDateTime.parse("2025-05-05T00:00:00");
         AuthUser authUser = new AuthUser(1L,"abc@naver.com", Role.ADMIN,"nickname");
-        Coupon coupon = new Coupon("coupon1","description1",10.0,expiredAt,10);
+        Coupon coupon = new Coupon("coupon1","description1",10L,expiredAt,10,CouponType.PERCENT);
         given(couponRepository.findById(1L)).willReturn(Optional.of(coupon));
 
         couponService.deleteById(authUser,1L);
