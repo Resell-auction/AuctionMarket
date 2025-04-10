@@ -15,7 +15,8 @@ public enum PaymentErrorCode implements ErrorCode {
     DEADLINE_EXPIRED_PAYMENT(HttpStatus.BAD_REQUEST,"DEADLINE_EXPIRED_PAYMENT", "결제 기한이 지났습니다"),
     NOT_COMPLETED_PAYMENT(HttpStatus.BAD_REQUEST,"NOT_COMPLETED_PAYMENT", "결제가 완료되지 않아 환불할 수 없습니다"),
     NOT_FOUND_AUCTION(HttpStatus.NOT_FOUND,"NOT_FOUND_AUCTION", "해당 경매를 확인할 수 없습니다"),
-    NOT_FOUND_PRODUCT(HttpStatus.NOT_FOUND, "NOT_FOUND_PRODUCT", "해당 제품을 확인할 수 없습니다");
+    NOT_FOUND_PRODUCT(HttpStatus.NOT_FOUND, "NOT_FOUND_PRODUCT", "해당 제품을 확인할 수 없습니다"),
+    NOT_FOUND_COUPON(HttpStatus.NOT_FOUND,"NOT_FOUND_COUPON", "해당 쿠폰을 확인할 수 없습니다");
 
     private final HttpStatus httpStatus;
     private final String code;

@@ -3,9 +3,7 @@ package com.example.auctionmarket.domain.payment.enums;
 import java.util.Arrays;
 
 public enum PayType {
-    POINT,
-    COUPON,
-    MIXED;
+    POINT;
 
     public static PayType of(String payType) {
         return Arrays.stream(PayType.values())

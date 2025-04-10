@@ -83,6 +83,4 @@ public class Payment {
         this.couponUserId = couponUserId;
         this.couponUsed = true;
     }
-
-//    public Long calculateDiscount(long) {}
 }

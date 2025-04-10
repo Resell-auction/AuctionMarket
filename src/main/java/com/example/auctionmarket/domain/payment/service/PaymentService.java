@@ -72,7 +72,7 @@ public class PaymentService {
 
         if (paymentRequest.getCouponId() != null) {
             CouponUser couponUser = couponUserRepository.findById(paymentRequest.getCouponId())
-                    .orElseThrow(()-> new IllegalArgumentException("Coupon not found"));
+                    .orElseThrow(()-> new PaymentException(PaymentErrorCode.NOT_FOUND_COUPON));
 
             if (!Objects.equals(couponUser.getUsers().getId(), authUser.getId())) {
                 throw new IllegalArgumentException("쿠폰 사용자가 아닙니다");
@@ -124,7 +124,7 @@ public class PaymentService {
 
         if (payment.isCouponUsed() && payment.getCouponUserId() != null) {
             CouponUser couponUser = couponUserRepository.findById(payment.getCouponUserId())
-                    .orElseThrow(()-> new IllegalArgumentException("Coupon not found"));
+                    .orElseThrow(()-> new PaymentException(PaymentErrorCode.NOT_FOUND_COUPON));
             couponUser.setUsed(false);
         }
 
