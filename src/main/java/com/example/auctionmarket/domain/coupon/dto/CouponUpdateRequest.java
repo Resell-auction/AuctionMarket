@@ -10,7 +10,7 @@ public class CouponUpdateRequest {
 
     private String description;
 
-    private double discountRate;
+    private Long discountAmount;
 
     private LocalDateTime expiredAt;
 }
