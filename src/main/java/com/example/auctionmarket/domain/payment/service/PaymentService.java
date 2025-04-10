@@ -3,6 +3,8 @@ package com.example.auctionmarket.domain.payment.service;
 import com.example.auctionmarket.common.auth.AuthUser;
 import com.example.auctionmarket.domain.auction.entity.Auction;
 import com.example.auctionmarket.domain.auction.repository.AuctionRepository;
+import com.example.auctionmarket.domain.coupon.entity.CouponUser;
+import com.example.auctionmarket.domain.coupon.repository.CouponUserRepository;
 import com.example.auctionmarket.domain.payment.dto.request.PaymentRequest;
 import com.example.auctionmarket.domain.payment.dto.request.RefundRequest;
 import com.example.auctionmarket.domain.payment.entity.Payment;
@@ -31,6 +33,7 @@ public class PaymentService {
     private final RefundRepository refundRepository;
     private final AuctionRepository auctionRepository;
     private final ProductRepository productRepository;
+    private final CouponUserRepository couponUserRepository;
 
     @Transactional
     public void createPayment(Long auctionId) {
@@ -67,6 +70,25 @@ public class PaymentService {
             throw new PaymentException(PaymentErrorCode.PAYMENT_ALREADY_REFUNDED);
         }
 
+        if (paymentRequest.getCouponId() != null) {
+            CouponUser couponUser = couponUserRepository.findById(paymentRequest.getCouponId())
+                    .orElseThrow(()-> new IllegalArgumentException("Coupon not found"));
+
+            if (!Objects.equals(couponUser.getUsers().getId(), authUser.getId())) {
+                throw new IllegalArgumentException("쿠폰 사용자가 아닙니다");
+            }
+
+            if (couponUser.isUsed()) {
+                throw new IllegalArgumentException("이미 사용된 쿠폰입니다");
+            }
+
+            Long discountAmount = couponUser.getCoupons().calculateDiscountRate(payment.getAmount());
+            payment.applyCoupon(discountAmount, couponUser.getId());
+
+            couponUser.setUsed(true);
+            couponUserRepository.save(couponUser);
+        }
+
         PayType payType = PayType.of(paymentRequest.getPayType());
 
         payment.completePayment(payType);
@@ -100,6 +122,12 @@ public class PaymentService {
         // 환불 처리
         payment.refund();
 
+        if (payment.isCouponUsed() && payment.getCouponUserId() != null) {
+            CouponUser couponUser = couponUserRepository.findById(payment.getCouponUserId())
+                    .orElseThrow(()-> new IllegalArgumentException("Coupon not found"));
+            couponUser.setUsed(false);
+        }
+
         Refund refund = Refund.builder()
                 .paymentId(payment.getId())
                 .payType(refundType)
@@ -120,8 +148,6 @@ public class PaymentService {
     }
 
     public boolean shouldCreatePayment(Long auctionId) {
-        return paymentRepository.findByAuctionId(auctionId)
-                .map(payment -> payment.getPayStatus().equals(PayStatus.PENDING))
-                .orElse(true);
+        return paymentRepository.findByAuctionId(auctionId).isEmpty();
     }
 }

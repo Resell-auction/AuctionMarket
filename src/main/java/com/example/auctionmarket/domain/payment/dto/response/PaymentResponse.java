@@ -2,8 +2,11 @@ package com.example.auctionmarket.domain.payment.dto.response;
 
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
 public class PaymentResponse {
 
-    private String pay_type;
+    private Long amount;
+    private LocalDateTime refundDeadline;
 }
