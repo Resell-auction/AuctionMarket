@@ -336,6 +336,7 @@ public class AuctionService {
             if(LocalDateTime.now().isAfter(auction.getStartTime()) && LocalDateTime.now().isBefore(auction.getEndTime())){
                 auction.setStatus(AuctionStatus.ONGOING);
             }
+
             else if (LocalDateTime.now().isAfter(auction.getEndTime())) {
                 auction.setStatus(AuctionStatus.ENDED);
 
@@ -351,6 +352,7 @@ public class AuctionService {
 //                    paymentService.createPayment(auction);
                 }
             }
+
             else if(LocalDateTime.now().isBefore(auction.getStartTime())) {
                 auction.setStatus(AuctionStatus.PENDING);
             }

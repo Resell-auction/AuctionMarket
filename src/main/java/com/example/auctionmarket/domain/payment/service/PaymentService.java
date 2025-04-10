@@ -55,6 +55,7 @@ public class PaymentService {
         if (!payment.getAmount().equals(paymentRequest.getAmount())) {
             throw new PaymentException(PaymentErrorCode.INVALID_PAYMENT_AMOUNT);
         }
+
         // 후순위자에게 기회가 넘어간 경우
         // 환불이 된 상태
         if (payment.getPay_status().equals(PayStatus.REFUNDED)) {
