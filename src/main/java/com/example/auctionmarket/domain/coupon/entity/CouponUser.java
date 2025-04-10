@@ -3,6 +3,7 @@ package com.example.auctionmarket.domain.coupon.entity;
 import com.example.auctionmarket.domain.coupon.enums.CouponType;
 import com.example.auctionmarket.domain.user.entity.User;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
