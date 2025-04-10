@@ -38,16 +38,17 @@ public class CouponService {
 
         Coupon coupon = new Coupon(couponRequest.getCouponName(),
                 couponRequest.getDescription(),
-                couponRequest.getDiscountRate(),
+                couponRequest.getDiscountAmount(),
                 couponRequest.getExpiredAt(),
-                couponRequest.getAmount());
+                couponRequest.getAmount(),
+                couponRequest.getCouponType());
 
         Coupon savedCoupon = couponRepository.save(coupon);
 
         return new CouponResponse(savedCoupon.getId(),
                 savedCoupon.getCouponName(),
                 savedCoupon.getDescription(),
-                savedCoupon.getDiscountRate(),
+                savedCoupon.getDiscountAmount(),
                 savedCoupon.getExpiredAt(),
                 savedCoupon.getAmount());
     }
@@ -62,7 +63,7 @@ public class CouponService {
             couponList.add(new CouponResponse(coupon.getId(),
                     coupon.getCouponName(),
                     coupon.getDescription(),
-                    coupon.getDiscountRate(),
+                    coupon.getDiscountAmount(),
                     coupon.getExpiredAt(),
                     coupon.getAmount()));
 
@@ -79,7 +80,7 @@ public class CouponService {
         return new CouponResponse(coupon.getId(),
                 coupon.getCouponName(),
                 coupon.getDescription(),
-                coupon.getDiscountRate(),
+                coupon.getDiscountAmount(),
                 coupon.getExpiredAt(),
                 coupon.getAmount());
     }
@@ -97,13 +98,13 @@ public class CouponService {
 
         coupon.update(couponUpdateRequest.getCouponName(),
                 couponUpdateRequest.getDescription(),
-                couponUpdateRequest.getDiscountRate(),
+                couponUpdateRequest.getDiscountAmount(),
                 couponUpdateRequest.getExpiredAt());
 
         return new CouponResponse(coupon.getId(),
                 coupon.getCouponName(),
                 coupon.getDescription(),
-                coupon.getDiscountRate(),
+                coupon.getDiscountAmount(),
                 coupon.getExpiredAt(),
                 coupon.getAmount());
     }

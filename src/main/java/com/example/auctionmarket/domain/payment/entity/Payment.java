@@ -23,6 +23,7 @@ public class Payment {
 //    private Long orderId; // 결제 요청 아이디
     private Long userId; // 유저 아이디
     private Long auctionId; // 경매 아이디
+    private Long couponUserId;
 
     @Enumerated(EnumType.STRING)
     private PayType payType; // 결제 수단
@@ -30,6 +31,7 @@ public class Payment {
     private PayStatus payStatus; // 결제 상태
 
     private Long amount; // 총 금액
+    private boolean couponUsed; // 쿠폰 사용여부
     private Long discountAmount; // 할인율
     private LocalDateTime deadline; // 결제 기한
     private LocalDateTime payDate; // 결제완료 시간
@@ -74,4 +76,13 @@ public class Payment {
     public void refund() {
         this.payStatus = PayStatus.REFUNDED;
     }
+
+    public void applyCoupon(Long discountAmount, Long couponUserId) {
+        this.amount -= discountAmount;
+        this.discountAmount = discountAmount;
+        this.couponUserId = couponUserId;
+        this.couponUsed = true;
+    }
+
+//    public Long calculateDiscount(long) {}
 }
