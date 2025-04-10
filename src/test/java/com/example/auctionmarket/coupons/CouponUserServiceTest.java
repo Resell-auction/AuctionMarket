@@ -3,6 +3,7 @@ package com.example.auctionmarket.coupons;
 import com.example.auctionmarket.common.auth.AuthUser;
 import com.example.auctionmarket.domain.coupon.dto.CouponGiveRequest;
 import com.example.auctionmarket.domain.coupon.entity.Coupon;
+import com.example.auctionmarket.domain.coupon.enums.CouponType;
 import com.example.auctionmarket.domain.coupon.repository.CouponRepository;
 import com.example.auctionmarket.domain.coupon.repository.CouponUserRepository;
 import com.example.auctionmarket.domain.coupon.service.CouponUserService;
@@ -46,7 +47,7 @@ public class CouponUserServiceTest {
         LocalDateTime expiredAt = LocalDateTime.parse("2025-05-05T00:00:00");
         CouponGiveRequest couponGiveRequest= new CouponGiveRequest(1L,4);
         AuthUser authUser = new AuthUser(1L,"abc@naver.com", Role.ADMIN,"nickname");
-        Coupon coupon = new Coupon("coupon1","description1",10.0,expiredAt,10);
+        Coupon coupon = new Coupon("coupon1","description1",10L,expiredAt,10, CouponType.PERCENT);
         User user = Mockito.mock(User.class);
         
         given(couponRepository.findById(1L)).willReturn(Optional.of(coupon));

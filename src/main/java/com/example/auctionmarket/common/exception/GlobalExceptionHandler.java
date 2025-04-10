@@ -30,7 +30,6 @@ public class GlobalExceptionHandler {
 		for (FieldError err : fieldErrors) {
 			errors.add(ValidResponse.of(err.getField(), err.getDefaultMessage()));
 		}
-		log.error(" " + ex);
 
 		return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
 	}

@@ -53,7 +53,6 @@ public class CouponServiceTest {
     @Test
     void 쿠폰_생성_성공(){
         //given
-
         LocalDateTime expiredAt = LocalDateTime.parse("2025-05-05T00:00:00");
         AuthUser authUser = new AuthUser(1L,"abc@naver.com", Role.ADMIN,"nickname");
         CouponRequest couponRequest= new CouponRequest("coupon1","description1",10L,  expiredAt, 10, CouponType.PERCENT);
@@ -72,10 +71,12 @@ public class CouponServiceTest {
 
     @Test
     void admin이_아닌_유저가_생성을_시도하면_에러가_발생한다(){
+        //given
         LocalDateTime expiredAt = LocalDateTime.parse("2025-05-05T00:00:00");
         AuthUser authUser = new AuthUser(1L,"abc@naver.com", Role.USER,"nickname");
         CouponRequest couponRequest= new CouponRequest("coupon1","description1",10L,  expiredAt, 10, CouponType.PERCENT);
 
+        //when&then
         assertThrows(CouponException.class, ()->couponService.createCoupon(authUser,couponRequest));
     }
 
@@ -121,6 +122,15 @@ public class CouponServiceTest {
     }
 
     @Test
+    void 쿠폰_단건_조회_시_찾는_쿠폰이_없으면_에러가_발생한다(){
+        //given
+        given(couponRepository.findById(1L)).willReturn(Optional.empty());
+
+        //when&then
+        assertThrows(CouponException.class, ()->couponService.findById(1L));
+    }
+
+    @Test
     void 쿠폰_수정_성공(){
         // given
         LocalDateTime expiredAt = LocalDateTime.parse("2025-05-05T00:00:00");
@@ -146,11 +156,26 @@ public class CouponServiceTest {
 
     @Test
     void 수정시_잘못된_쿠폰_아이디를_입력하면_에러가_발생한다(){
+        // given
+        LocalDateTime expiredAt = LocalDateTime.parse("2025-05-05T00:00:00");
+        CouponUpdateRequest couponUpdateRequest= new CouponUpdateRequest("coupon2","description2", 10L, expiredAt);
+        AuthUser authUser = new AuthUser(1L,"abc@naver.com", Role.ADMIN,"nickname");
 
+        given(couponRepository.findById(1L)).willReturn(Optional.empty());
+
+        // when & then
+        assertThrows(CouponException.class, ()->couponService.updateById(authUser,1L, couponUpdateRequest));
     }
 
     @Test
     void admin이_아닌_유저가_수정을_시도하면_에러가_발생한다(){
+        // given
+        LocalDateTime expiredAt = LocalDateTime.parse("2025-05-05T00:00:00");
+        CouponUpdateRequest couponUpdateRequest= new CouponUpdateRequest("coupon2","description2", 10L, expiredAt);
+        AuthUser authUser = new AuthUser(1L,"abc@naver.com", Role.USER,"nickname");
+
+        // when & then
+        assertThrows(CouponException.class, ()->couponService.updateById(authUser,1L,couponUpdateRequest));
 
     }
 
@@ -167,12 +192,24 @@ public class CouponServiceTest {
     }
 
     @Test
-    void 삭제시_잘못된_쿠폰_아이디를_입력하면_에러가_발생한다(){
+    void 삭제시_없는_쿠폰_아이디를_입력하면_에러가_발생한다(){
+        //given
+        LocalDateTime expiredAt = LocalDateTime.parse("2025-05-05T00:00:00");
+        AuthUser authUser = new AuthUser(1L,"abc@naver.com", Role.ADMIN,"nickname");
 
+        given(couponRepository.findById(1L)).willReturn(Optional.empty());
+
+        //when&then
+        assertThrows(CouponException.class, ()->couponService.deleteById(authUser,1L));
     }
 
     @Test
     void admin이_아닌_유저가_삭제를_시도하면_에러가_발생한다(){
+        //given
+        AuthUser authUser = new AuthUser(1L,"abc@naver.com", Role.USER,"nickname");
+
+        //when&then
+        assertThrows(CouponException.class, ()->couponService.deleteById(authUser,1L));
 
     }
 
