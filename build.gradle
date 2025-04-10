@@ -1,122 +1,75 @@
 plugins {
-    id 'java'
-    id 'org.springframework.boot' version '3.4.4'
-    id 'io.spring.dependency-management' version '1.1.7'
+	id 'java'
+	id 'org.springframework.boot' version '3.4.4'
+	id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 
-
 java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
 }
 
 configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
 }
 
 repositories {
-    mavenCentral()
-//    maven { url 'https://repo.spring.io/milestone' }
+	mavenCentral()
 }
 
-//ext {
-//    // Spring Cloud 버전 명시
-//    set('springCloudVersion', "2024.0.1")
-//}
-
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-    // 레디스(가지고있으면 테스트 할때 실제 레디스 서버를 연결하지 않아도 만들어야함 ->  embedded redis 추가해야함)
-    implementation 'org.redisson:redisson-spring-boot-starter:3.37.0' // 레디슨
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation group: 'it.ozimov', name: 'embedded-redis', version: '0.7.1' // embedded redis dependency 추가
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	//implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	// 레디스(가지고있으면 테스트 할때 실제 레디스 서버를 연결하지 않아도 만들어야함 ->  embedded redis 추가해야함)
+	// implementation 'org.redisson:redisson-spring-boot-starter:3.37.0' // 레디슨
+	// implementation group: 'it.ozimov', name: 'embedded-redis', version: '0.7.1' // embedded redis dependency 추가
+	compileOnly 'org.projectlombok:lombok'
+	runtimeOnly 'com.mysql:mysql-connector-j'
 
-    compileOnly group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
-    compileOnly 'org.projectlombok:lombok'
+	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+	annotationProcessor 'org.projectlombok:lombok'
 
-    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
-    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
-    runtimeOnly 'com.mysql:mysql-connector-j'
+//	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
-    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
-    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
-    annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	runtimeOnly 'com.h2database:h2'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	// bcrypt
+	implementation 'at.favre.lib:bcrypt:0.10.2'
 
-    testImplementation 'org.springframework.security:spring-security-test'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    runtimeOnly 'com.h2database:h2'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	//JWT
+	compileOnly group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
 
-    testImplementation 'org.springframework.security:spring-security-test'
+	// AOP
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
 
-    //Querydsl 추가
-    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
-//    implementation 'com.querydsl:querydsl-apt:5.0.0'
-    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
-    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
-    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+	//QueryDSL
+	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+	annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
-    // AOP
-    implementation 'org.springframework.boot:spring-boot-starter-aop'
-
-    // WebSocket + STOMP
-    // WebSocket: 실시간 통신 + 양방향 통신 => 연결 통로
-    // STOMP: WebSocket 위에서 동작하는 메시징 프로토콜 => WebSocket 통신을 구조화
-//    implementation 'org.springframework.boot:spring-boot-starter-websocket'
-
-    // Spring Cloud Stream + Kafka
-    // Kafka: 비동기 메시지 전달을 위한 중간 매개체 => 메세지 브로커 (메시지 큐)
-    // Spring Cloud Stream: 메세지 브로커를 추상화 시켜주는 프레임 워크
-//    implementation 'org.springframework.cloud:spring-cloud-stream' // 이벤트 기반 마이크로서비스 구축을 위한 추상화 라이브러리
-//    implementation 'org.springframework.cloud:spring-cloud-stream-binder-kafka' // Spring Cloud Stream 과 Kafka 메시지 브로커 연동
-//    implementation 'org.springframework.kafka:spring-kafka' // Kafka 라이브러리
-//    testImplementation 'org.springframework.cloud:spring-cloud-stream-test-binder' // 메시지 브로커 없이 Stream 애플리케이션 테스트 지원
-//    implementation 'org.springframework.cloud:spring-cloud-starter-stream-kafka:4.2.1'
-    /*
-    TODO: 문제점: 원래 버전을 명시하지 말고 Spring Cloud BOM (Bill of Materials) 방식을 사용하는 게 좋음
-     => set('springCloudVersion', "2024.0.1")만 설정해두면 그 하위 항목 중에서 알아서 4.2.1 찾게 해야함
-     => 그런데 자꾸 버전을 찾을 수 없다고 오류 떠서 어쩔 수 없이 버전을 명시해둔 상황...
-     */
-
-//    implementation 'org.springframework.cloud:spring-cloud-starter-stream-kafka'
-
-//    implementation 'org.springframework.kafka:spring-kafka'
-//    implementation(Spring.cloud.stream.binderKafka)
-//    implementation("org.springframework.cloud:spring-cloud-starter-stream-kafka")
-//    implementation(Spring.cloud.stream.stream)
-
-    //Swagger
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
-
-//    testRuntimeOnly 'com.h2database:h2'
-//    testImplementation 'it.ozimov:embedded-redis:0.7.3'
-
+	//spring security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	testImplementation 'org.springframework.security:spring-security-test'
 }
 
 tasks.named('test') {
-    useJUnitPlatform()
+	useJUnitPlatform()
 }
 
 //clean {
 //    delete file('src/main/generated')
 //}
-
-// spring-cloud 버전 명시용
-//dependencyManagement {
-//    imports {
-//        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-//    }
-//}
-
