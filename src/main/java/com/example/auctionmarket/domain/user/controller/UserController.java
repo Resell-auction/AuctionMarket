@@ -25,11 +25,13 @@ public class UserController {
 
 	private final UserService userService;
 
+	// 프로필 확인
 	@GetMapping("/v1/users/my")
 	public Response<MyPageResponse> getMyPage(@AuthenticationPrincipal AuthUser authUser) {
 		return Response.of(userService.getMyPage(authUser.getId()));
 	}
 
+	// 유저정보 수정
 	@PatchMapping("/v1/users/my")
 	public Response<UserResponse> updateUser(@AuthenticationPrincipal AuthUser authUser,
 		@RequestBody UpdateUserRequest updateUserRequest) {
@@ -38,6 +40,7 @@ public class UserController {
 				updateUserRequest.getPhoneNumber()));
 	}
 
+	// 비밀번호 수정
 	@PatchMapping("/v1/users/my/password")
 	public Response<Void> updatePassword(@AuthenticationPrincipal AuthUser authUser,
 		@Valid @RequestBody UpdatePasswordRequest updatePasswordRequest) {
@@ -46,6 +49,7 @@ public class UserController {
 		return Response.empty();
 	}
 
+	// 유저 삭제
 	@DeleteMapping("/v1/users/my")
 	public Response<Void> deleteUser(@AuthenticationPrincipal AuthUser authUser) {
 		userService.deleteUser(authUser.getId());

@@ -37,26 +37,26 @@ public class CouponController {
     }
 
     //단건 조회
-    @GetMapping("/{id}")
-    public ResponseEntity<CouponResponse> findById(@PathVariable Long id){
-        return ResponseEntity.ok(couponService.findById(id));
+    @GetMapping("/{couponId}")
+    public ResponseEntity<CouponResponse> findById(@PathVariable Long couponId){
+        return ResponseEntity.ok(couponService.findById(couponId));
     }
 
     //수정
-    @PutMapping("/{id}")//admin
-    public ResponseEntity<CouponResponse> updateCoupon(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long id, @RequestBody CouponUpdateRequest couponUpdateRequest){
-        return ResponseEntity.ok(couponService.updateById(authUser, id, couponUpdateRequest));
+    @PutMapping("/{couponId}")//admin
+    public ResponseEntity<CouponResponse> updateCoupon(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long couponId, @RequestBody CouponUpdateRequest couponUpdateRequest){
+        return ResponseEntity.ok(couponService.updateById(authUser, couponId, couponUpdateRequest));
     }
 
     //삭제
-    @DeleteMapping("/{id}")//admin
-    public void deleteCoupon(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long id){
-        couponService.deleteById(authUser, id);
+    @DeleteMapping("/{couponId}")//admin
+    public void deleteCoupon(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long couponId){
+        couponService.deleteById(authUser, couponId);
     }
 
     //유저에게 쿠폰을 원하는 수량만큼 주기
-    @PutMapping("/admin/{id}")
-    public void giveCouponByUserId(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long id, @RequestBody CouponGiveRequest couponGiveRequest){
-        couponUserService.giveCouponByUserId(authUser, id, couponGiveRequest);
+    @PutMapping("/{couponId}/give")
+    public void giveCouponByUserId(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long couponId, @RequestBody CouponGiveRequest couponGiveRequest){
+        couponUserService.giveCouponByUserId(authUser, couponId, couponGiveRequest);
     }
 }

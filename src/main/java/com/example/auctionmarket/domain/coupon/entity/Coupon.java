@@ -2,6 +2,7 @@ package com.example.auctionmarket.domain.coupon.entity;
 
 import com.example.auctionmarket.common.entity.TimeStamped;
 import com.example.auctionmarket.domain.coupon.enums.CouponStatus;
+import com.example.auctionmarket.domain.coupon.enums.CouponType;
 import com.example.auctionmarket.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -24,7 +25,7 @@ public class Coupon extends TimeStamped {
 
     private String description;
 
-    private double discountRate;
+    private Long discountAmount;
 
     private LocalDateTime expiredAt;
 
@@ -32,24 +33,28 @@ public class Coupon extends TimeStamped {
 
     private CouponStatus couponStatus;
 
+    @Enumerated(EnumType.STRING)
+    private CouponType couponType;
+
     @OneToMany(mappedBy = "coupons", cascade = CascadeType.ALL)
     private List<CouponUser> couponUserList = new ArrayList<>();
 
     //   private String condition;
 
-    public Coupon(String couponName, String description, double discountRate, LocalDateTime expiredAt, int amount){
+    public Coupon(String couponName, String description, Long discountAmount, LocalDateTime expiredAt, int amount, CouponType couponType) {
         this.couponName=couponName;
         this.description=description;
-        this.discountRate=discountRate;
+        this.discountAmount=discountAmount;
         this.expiredAt=expiredAt;
         this.amount=amount;
         this.couponStatus=CouponStatus.VALID;
+        this.couponType=couponType;
     }
 
-    public void update(String couponName, String description, double discountRate, LocalDateTime expiredAt){
+    public void update(String couponName, String description, Long discountAmount, LocalDateTime expiredAt){
         this.couponName=couponName;
         this.description=description;
-        this.discountRate=discountRate;
+        this.discountAmount=discountAmount;
         this.expiredAt=expiredAt;
     }
 
@@ -66,4 +71,13 @@ public class Coupon extends TimeStamped {
         this.amount= this.amount-amount;
     }
 
+    public Long calculateDiscountRate(Long paymentAmount) {
+        if (this.couponType == CouponType.FIXED) {
+            return discountAmount;
+        } else if (this.couponType == CouponType.PERCENT) {
+            return paymentAmount * this.discountAmount / 100;
+        } else {
+            throw new IllegalArgumentException("CouponType not supported");
+        }
+    }
 }

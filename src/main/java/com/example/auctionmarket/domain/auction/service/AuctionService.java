@@ -9,7 +9,6 @@ import com.example.auctionmarket.domain.auction.dto.response.AuctionResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionSaveResponse;
 import com.example.auctionmarket.domain.auction.entity.Auction;
 import com.example.auctionmarket.domain.auction.enums.AuctionStatus;
-import com.example.auctionmarket.domain.auction.event.AuctionEndEvent;
 import com.example.auctionmarket.domain.auction.exception.AuctionErrorCode;
 import com.example.auctionmarket.domain.auction.exception.AuctionException;
 import com.example.auctionmarket.domain.auction.repository.AuctionRepository;
@@ -20,7 +19,6 @@ import com.example.auctionmarket.domain.user.entity.User;
 import com.example.auctionmarket.domain.user.exception.UserNotFoundException;
 import com.example.auctionmarket.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -41,7 +39,6 @@ public class AuctionService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final PaymentService paymentService;
-    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public AuctionSaveResponse createAuction(AuthUser authUser, AuctionSaveRequest request){
@@ -287,10 +284,6 @@ public class AuctionService {
             throw new AuctionException(AuctionErrorCode.AUCTION_ALREADY_STARTED);
         }
 
-        if(auction.getStatus() == AuctionStatus.ENDED){
-            throw new AuctionException(AuctionErrorCode.AUCTION_ALREADY_ENDED);
-        }
-
         //경매 삭제
         auctionRepository.delete(auction);
     }
@@ -332,7 +325,7 @@ public class AuctionService {
     //경매 상태 변경 함수
     @Transactional
     @Scheduled(cron = "0 * * * * *")
-    public void updateStatus(){
+    public void updateStatus() {
 
         List<Auction> auctions = auctionRepository.findAll();
 
@@ -343,7 +336,7 @@ public class AuctionService {
             else if (LocalDateTime.now().isAfter(auction.getEndTime())) {
                 auction.setStatus(AuctionStatus.ENDED);
 
-                if (auction.getConsumerId() != null) {
+                if (auction.getConsumerId() != null && paymentService.shouldCreatePayment(auction.getId())) {
                     paymentService.createPayment(auction.getId());
 
                     // 나중에 동기 비동기시 변형해서 사용

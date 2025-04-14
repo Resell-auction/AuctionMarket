@@ -1,5 +1,6 @@
 package com.example.auctionmarket.domain.coupon.dto;
 
+import com.example.auctionmarket.domain.coupon.enums.CouponType;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -10,10 +11,12 @@ public class CouponRequest {
 
     private String description;
 
-    private double discountRate;
+    private Long discountAmount;
 
     private LocalDateTime expiredAt;
 
     private int amount;
+
+    private CouponType couponType;
 
 }
