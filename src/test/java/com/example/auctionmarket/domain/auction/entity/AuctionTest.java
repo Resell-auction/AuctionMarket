@@ -72,4 +72,45 @@ public class AuctionTest {
                 .isInstanceOf(AuctionException.class)
                 .hasMessageContaining(AuctionErrorCode.INVALID_BID_PRICE.getDefaultMessage());
     }
+
+    @Test
+    @DisplayName("시작 시간 수정")
+    public void updateStartTime_Success(){
+        //given
+        LocalDateTime newStartTime = LocalDateTime.now().plusHours(2);
+
+        //when
+        auction.updateStartTime(newStartTime);
+
+        //then
+        assertThat(auction.getStartTime()).isEqualTo(newStartTime);
+        assertThat(auction.getEndTime()).isEqualTo(newStartTime.plusMinutes(30));
+    }
+
+    @Test
+    @DisplayName("최소 가격 수정")
+    public void updateMinPrice_Success(){
+        //given
+        Long newMinPrice = 20000L;
+
+        //when
+        auction.updateMinPrice(newMinPrice);
+
+        //then
+        assertThat(auction.getMinPrice()).isEqualTo(newMinPrice);
+        assertThat(auction.getMaxPrice()).isEqualTo(newMinPrice);
+    }
+
+    @Test
+    @DisplayName("상태 변화")
+    public void updateStatus_Success(){
+        //given
+        AuctionStatus newStatus = AuctionStatus.ONGOING;
+
+        //when
+        auction.updateStatus(newStatus);
+
+        //then
+        assertThat(auction.getStatus()).isEqualTo(newStatus);
+    }
 }
