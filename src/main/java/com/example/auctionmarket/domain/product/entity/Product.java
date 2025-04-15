@@ -3,11 +3,14 @@ package com.example.auctionmarket.domain.product.entity;
 import com.example.auctionmarket.common.entity.TimeStamped;
 import com.example.auctionmarket.domain.product.enums.ProductCategory;
 import com.example.auctionmarket.domain.product.enums.SoldStatus;
+import com.example.auctionmarket.domain.productimage.entity.ProductImage;
 import com.example.auctionmarket.domain.user.entity.User;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
@@ -22,6 +25,9 @@ public class Product extends TimeStamped {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductImage> productImageList = new ArrayList<>();
 
     @Column(name = "auction_id")
     private Long auctionId;
