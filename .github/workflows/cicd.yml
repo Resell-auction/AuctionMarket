@@ -224,6 +224,10 @@ jobs:
           
             echo "====================="
             
+            echo "Filebeat 설정 파일 소유자 변경"
+            sudo chown root:root filebeat/filebeat.yml
+            
+            echo "====================="
             
             echo "EC2 인스턴스에 docker-compose 설치 확인"
             if ! docker compose version &> /dev/null
