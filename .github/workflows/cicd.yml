@@ -149,7 +149,19 @@ jobs:
           echo "Listing root directory contents:"
           ls -la
           echo "Listing filebeat directory contents (if exists):"
-          ls -la filebeat/ || echo "filebeat directory not found"    
+          ls -la filebeat/ || echo "filebeat directory not found"
+
+      - name: Check file paths before tar 2
+        run: |
+          echo "Current directory: $(pwd)"
+          echo "Listing CURRENT directory contents:"
+          ls -la . # 현재 디렉토리(.) 목록 보기
+          echo "Checking for docker-compose.yml:"
+          ls -la docker-compose.yml || echo "!!! docker-compose.yml NOT FOUND in current directory !!!"
+          echo "Checking for filebeat directory:"
+          ls -la filebeat/ || echo "!!! filebeat directory NOT FOUND in current directory !!!"
+          echo "Checking for filebeat/filebeat.yml:"
+          ls -la filebeat/filebeat.yml || echo "!!! filebeat/filebeat.yml NOT FOUND !!!"
 
       - name: 필요한 배포 파일 준비 (tar 압축)
         run: tar -czvf deploy_package.tar.gz docker-compose.yml filebeat/filebeat.yml
