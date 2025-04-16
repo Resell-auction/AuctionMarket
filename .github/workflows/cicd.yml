@@ -142,6 +142,18 @@ jobs:
         run: |
           echo "🔔 빌드 결과 도커 이미지 = '${{ needs.build-and-push-image.outputs.image_uri }}'"
           echo "🔔 빌드 결과 도커 이미지 직접 구성 = '${{ steps.login-ecr.outputs.registry }}/${{ secrets.AWS_ECR_REPOSITORY_URI }}:${{ github.sha }}'"
+          
+      - name: 필요한 배포 파일 준비 (tar 압축)
+        run: tar -czvf deploy_package.tar.gz docker-compose.yml filebeat/filebeat.yml # 실제 파일 경로에 맞게 수정
+
+      - name: EC2에 배포 파일 복사
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.EC2_SSH_HOST }}
+          username: ${{ secrets.EC2_SSH_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "deploy_package.tar.gz"
+          target: "/home/${{ secrets.EC2_SSH_USER }}/" # EC2 홈 디렉토리 등에 복사
 
       - name: SSH 를 통해 EC2 인스턴스에 접속하여 배포 스크립트 실행
         uses: appleboy/ssh-action@master
@@ -149,46 +161,25 @@ jobs:
           host: ${{ secrets.EC2_SSH_HOST }}
           username: ${{ secrets.EC2_SSH_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
+
           script: |
-        
-            echo "변수 할당 값 확인 디버깅"
-            echo "SPRING_PROFILES_ACTIVE 변수 할당 값= '$SPRING_PROFILES_ACTIVE'"
-            echo "ECR_REGISTRY 변수 할당 값= '$ECR_REGISTRY'"
-            echo "APP_IMAGE_URI 변수 할당 값= '$APP_IMAGE_URI'"
-            echo "AWS_REGION 변수 할당 값= '$AWS_REGION'"
-            echo "APP_CONTAINER_NAME 변수 할당 값= '$APP_CONTAINER_NAME'"
-            echo "SPRING_DATASOURCE_URL 변수 할당 값= '$SPRING_DATASOURCE_URL'"
-            echo "SPRING_DATASOURCE_USERNAME 변수 할당 값= '$SPRING_DATASOURCE_USERNAME'"
-            echo "SPRING_DATASOURCE_PASSWORD 변수 할당 값= '$SPRING_DATASOURCE_PASSWORD'"
-            echo "SPRING_DATA_REDIS_HOST 변수 할당 값= '$SPRING_DATA_REDIS_HOST'"
-            echo "SPRING_DATA_REDIS_PORT 변수 할당 값= '$SPRING_DATA_REDIS_PORT'"
+                   
+            echo "변수에 직접 할당 시작"        
+            ECR_REGISTRY='${{ steps.login-ecr.outputs.registry }}'            
+            APP_IMAGE_URI='${{ steps.login-ecr.outputs.registry }}/${{ secrets.AWS_ECR_REPOSITORY_URI }}:${{ github.sha }}'
+            AWS_REGION='${{ env.AWS_REGION }}'
             
-            echo "====================="  
-        
-            echo "직접 할당 값 확인 디버깅"
-            echo "ECR_REGISTRY 직접 할당 값= '${{ steps.login-ecr.outputs.registry }}'"
-            echo "APP_IMAGE_URI 직접 할당 값= '${{ needs.build-and-push-image.outputs.image_uri }}'"
-            echo "AWS_REGION 직접 할당 값= '${{ env.AWS_REGION }}'"
-            echo "APP_CONTAINER_NAME 직접 할당 값= '${{ env.APP_CONTAINER_NAME }}'"
-            echo "SPRING_DATASOURCE_URL 직접 할당 값= '${{ secrets.RDS_URL }}'"
-            echo "SPRING_DATASOURCE_USERNAME 직접 할당 값= '${{ secrets.RDS_USERNAME }}'"
-            echo "SPRING_DATASOURCE_PASSWORD 직접 할당 값= '${{ secrets.RDS_PASSWORD }}'"
-            echo "SPRING_DATA_REDIS_HOST 직접 할당 값= '${{ secrets.ELASTICACHE_HOST }}'"
-            echo "SPRING_DATA_REDIS_PORT 직접 할당 값= '${{ secrets.ELASTICACHE_PORT }}'"
+            APP_CONTAINER_NAME='${{ env.APP_CONTAINER_NAME }}'
             
-            echo "=====================" 
+            SPRING_PROFILES_ACTIVE='dev'
+            SPRING_DATASOURCE_URL='${{ secrets.RDS_URL }}'
+            SPRING_DATASOURCE_USERNAME='${{ secrets.RDS_USERNAME }}'
+            SPRING_DATASOURCE_PASSWORD='${{ secrets.RDS_PASSWORD }}'
+            SPRING_DATA_REDIS_HOST='${{ secrets.ELASTICACHE_HOST }}'
+            SPRING_DATA_REDIS_PORT='${{ secrets.ELASTICACHE_PORT }}'
             
-            echo "변수에 직접 할당 시작"
-            ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
-            APP_IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ secrets.AWS_ECR_REPOSITORY_URI }}:${{ github.sha }}
-            AWS_REGION=${{ env.AWS_REGION }}
-            APP_CONTAINER_NAME=${{ env.APP_CONTAINER_NAME }}
-            SPRING_PROFILES_ACTIVE=dev
-            SPRING_DATASOURCE_URL=${{ secrets.RDS_URL }}
-            SPRING_DATASOURCE_USERNAME=${{ secrets.RDS_USERNAME }}
-            SPRING_DATASOURCE_PASSWORD=${{ secrets.RDS_PASSWORD }}
-            SPRING_DATA_REDIS_HOST=${{ secrets.ELASTICACHE_HOST }}
-            SPRING_DATA_REDIS_PORT=${{ secrets.ELASTICACHE_PORT }}
+            JWT_SECRET_KEY='2SELqxKueQ4uZpyzvqXECg00k9vSt7ioId2TwvyRDZk=' # 테스트 위해 임시로 하드코딩함
+            LOGSTASH_EC2_PRIVATE_IP='${{ secrets.LOGSTASH_EC2_PRIVATE_IP }}'
           
             echo "=====================" 
             
@@ -204,6 +195,50 @@ jobs:
             echo "SPRING_DATA_REDIS_HOST 변수 할당 값= '$SPRING_DATA_REDIS_HOST'"
             echo "SPRING_DATA_REDIS_PORT 변수 할당 값= '$SPRING_DATA_REDIS_PORT'"
             
+            echo "JWT_SECRET_KEY 변수 할당 값= '$JWT_SECRET_KEY'"
+            echo "LOGSTASH_EC2_PRIVATE_IP 변수 할당 값= '$LOGSTASH_EC2_PRIVATE_IP'"
+            
+            echo "=====================" 
+            
+            echo "변수 export"
+            export ECR_REGISTRY
+            export APP_IMAGE_URI
+            export AWS_REGION
+            export APP_CONTAINER_NAME
+            export SPRING_PROFILES_ACTIVE
+            export SPRING_DATASOURCE_URL
+            export SPRING_DATASOURCE_USERNAME
+            export SPRING_DATASOURCE_PASSWORD
+            export SPRING_DATA_REDIS_HOST
+            export SPRING_DATA_REDIS_PORT
+            export JWT_SECRET_KEY
+            export LOGSTASH_EC2_PRIVATE_IP
+            
+            echo "====================="                   
+        
+            echo "배포 디렉토리 생성 및 이동"
+            mkdir -p deploy
+            cd deploy
+            
+            echo "압축 해제"
+            tar -xzvf ../deploy_package.tar.gz
+            
+            echo "Logstash IP 주소 filebeat.yml 에 적용"
+            sed -i "s/LOGSTASH_EC2_PRIVATE_IP/${LOGSTASH_EC2_PRIVATE_IP}/g" filebeat.yml
+          
+            echo "====================="
+            
+            
+            echo "EC2 인스턴스에 docker-compose 설치 확인"
+            if ! docker compose version &> /dev/null
+            then
+              echo "docker compose 를 찾을 수 없습니다. 설치하는 중..."
+              sudo yum install docker-compose-plugin -y
+            else
+              echo "docker compose 를 찾았습니다."
+            fi
+            
+          
             echo "=====================" 
             
             # ECR 로그인
@@ -216,15 +251,7 @@ jobs:
             echo "ECR 로그인 성공."
             
             echo "=====================" 
-            
-            # 기존 컨테이너 중지 및 제거
-            echo "기존 컨테이너 중지 및 제거 시도...: ${APP_CONTAINER_NAME}"
-            docker stop ${APP_CONTAINER_NAME} || true
-            docker rm ${APP_CONTAINER_NAME} || true
-            echo "기존 컨테이너 중지 및 제거 성공"
-            
-            echo "=====================" 
-            
+                    
             # 최신 이미지 받기
             echo "최신 이미지 받는 중...: ${APP_IMAGE_URI}"
             docker pull ${APP_IMAGE_URI}
@@ -236,25 +263,19 @@ jobs:
             
             echo "=====================" 
             
-            # 애플리케이션 컨테이너 실행
-            echo "컨테이너 실행 중...: ${APP_CONTAINER_NAME}"
-            docker run -d \
-              --name ${APP_CONTAINER_NAME} \
-              -p 8080:8080 \
-              -e SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE} \
-              -e SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL} \
-              -e SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME} \
-              -e SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD} \
-              -e SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST} \
-              -e SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT} \
-              ${APP_IMAGE_URI}
-              # --restart unless-stopped \
+            echo "최신 Filebeat 이미지 받는 중..."
+            docker pull docker.elastic.co/beats/filebeat:8.17.4
             
-            if [ $? -ne 0 ]; then
-              echo "컨테이너 실행 실패: ${APP_CONTAINER_NAME}"
-              exit 1
-            fi
-            echo "컨테이너 실행 성공: ${APP_CONTAINER_NAME}"
+            echo "=====================" 
+            
+            echo "기존 스택 중지 및 제거 시도..."
+            docker-compose down --volumes --remove-orphans || true
+            
+            echo "=====================" 
+            
+            echo "Docker Compose 스택 실행 중..."
+            docker-compose up -d
+            if [ $? -ne 0 ]; then echo "Docker Compose 실행 실패"; exit 1; fi
             
             echo "=====================" 
                        
