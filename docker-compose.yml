@@ -38,7 +38,7 @@ services:
       - app # 앱 컨테이너가 먼저 시작되도록
     volumes:
       # 위에서 작성한 filebeat.yml 파일을 컨테이너 내부 설정 경로로 마운트
-      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
       # 앱 서비스와 동일한 로그 볼륨을 읽기 전용으로 마운트
       - app-logs:/var/log/app:ro
     networks:
