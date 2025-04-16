@@ -140,25 +140,6 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: 도커 이미지 빌드 결과 디버깅 (deploy-app-to-ec2 작업)
-        run: |
-          echo "🔔 빌드 결과 도커 이미지 = '${{ needs.build-and-push-image.outputs.image_uri }}'"
-          echo "🔔 빌드 결과 도커 이미지 직접 구성 = '${{ steps.login-ecr.outputs.registry }}/${{ secrets.AWS_ECR_REPOSITORY_URI }}:${{ github.sha }}'"
-          
-      - name: Check file paths before tar
-        run: |
-          echo "Current directory (pwd): $(pwd)"
-          echo "Listing CURRENT directory contents (ls -la .):"
-          ls -la .
-          echo "---------------------------------------------"
-          echo "Listing PARENT directory contents (ls -la ..):"
-          ls -la .. # 상위 디렉토리 목록 보기
-          echo "---------------------------------------------"
-          echo "Checking for ../docker-compose.yml:"
-          ls -la ../docker-compose.yml || echo "!!! docker-compose.yml NOT FOUND in PARENT directory !!!"
-          echo "Checking for ../filebeat/filebeat.yml:"
-          ls -la ../filebeat/filebeat.yml || echo "!!! filebeat/filebeat.yml NOT FOUND in PARENT/filebeat directory !!!"
-
       - name: 필요한 배포 파일 준비 (tar 압축)
         run: tar -czvf deploy_package.tar.gz docker-compose.yml filebeat/filebeat.yml
 
@@ -286,13 +267,13 @@ jobs:
             echo "기존 스택 중지 및 제거 시도..."
             docker stop ${APP_CONTAINER_NAME} || true 
             docker rm ${APP_CONTAINER_NAME} || true
-            docker-compose down --volumes --remove-orphans || true
+            docker compose down --volumes --remove-orphans || true
             echo "정리 완료."
             
             echo "=====================" 
             
             echo "Docker Compose 스택 실행 중..."
-            docker-compose up -d
+            docker compose up -d
             if [ $? -ne 0 ]; then echo "Docker Compose 실행 실패"; exit 1; fi
             
             echo "=====================" 
