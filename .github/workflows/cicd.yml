@@ -239,7 +239,7 @@ jobs:
             tar -xzvf ../deploy_package.tar.gz
             
             echo "Logstash IP 주소 filebeat.yml 에 적용"
-            sed -i "s/LOGSTASH_EC2_PRIVATE_IP/${LOGSTASH_EC2_PRIVATE_IP}/g" filebeat.yml
+            sed -i "s/LOGSTASH_EC2_PRIVATE_IP/${LOGSTASH_EC2_PRIVATE_IP}/g" filebeat/filebeat.yml
           
             echo "====================="
             
@@ -284,7 +284,10 @@ jobs:
             echo "=====================" 
             
             echo "기존 스택 중지 및 제거 시도..."
+            docker stop ${APP_CONTAINER_NAME} || true 
+            docker rm ${APP_CONTAINER_NAME} || true
             docker-compose down --volumes --remove-orphans || true
+            echo "정리 완료."
             
             echo "=====================" 
             
