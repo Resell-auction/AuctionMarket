@@ -160,7 +160,7 @@ jobs:
           ls -la ../filebeat/filebeat.yml || echo "!!! filebeat/filebeat.yml NOT FOUND in PARENT/filebeat directory !!!"
 
       - name: 필요한 배포 파일 준비 (tar 압축)
-        run: tar -czvf deploy_package.tar.gz ../docker-compose.yml ../filebeat/filebeat.yml
+        run: tar -czvf deploy_package.tar.gz docker-compose.yml filebeat/filebeat.yml
 
       - name: EC2에 배포 파일 복사
         uses: appleboy/scp-action@master
