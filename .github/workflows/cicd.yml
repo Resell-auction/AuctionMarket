@@ -143,8 +143,16 @@ jobs:
           echo "🔔 빌드 결과 도커 이미지 = '${{ needs.build-and-push-image.outputs.image_uri }}'"
           echo "🔔 빌드 결과 도커 이미지 직접 구성 = '${{ steps.login-ecr.outputs.registry }}/${{ secrets.AWS_ECR_REPOSITORY_URI }}:${{ github.sha }}'"
           
+      - name: Check file paths before tar
+        run: |
+          echo "Current directory: $(pwd)"
+          echo "Listing root directory contents:"
+          ls -la
+          echo "Listing filebeat directory contents (if exists):"
+          ls -la filebeat/ || echo "filebeat directory not found"    
+
       - name: 필요한 배포 파일 준비 (tar 압축)
-        run: tar -czvf deploy_package.tar.gz docker-compose.yml filebeat/filebeat.yml # 실제 파일 경로에 맞게 수정
+        run: tar -czvf deploy_package.tar.gz docker-compose.yml filebeat/filebeat.yml
 
       - name: EC2에 배포 파일 복사
         uses: appleboy/scp-action@master
