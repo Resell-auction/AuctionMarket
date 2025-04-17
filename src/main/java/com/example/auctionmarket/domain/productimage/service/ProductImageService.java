@@ -23,6 +23,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
@@ -111,6 +112,38 @@ public class ProductImageService {
         }
 
         return responseList;
+    }
+
+    // 제품 이미지 삭제
+    @Transactional
+    public void deleteImage(AuthUser authUser, Long productId, Long productImageId) {
+        // 유저 검증 로직 (본인 확인)
+        User user = userRepository.findById(authUser.getId()).orElseThrow(
+                () -> new UserNotFoundException()
+        );
+
+        Product product = productRepository.findById(productId).orElseThrow(
+                () -> new AuctionException(AuctionErrorCode.PRODUCT_NOT_FOUND)
+        );
+
+        // 본인 제품만 이미지 삭제 가능
+        if (!authUser.getEmail().equals(product.getUser().getEmail())) {
+            throw new ProductException(ProductErrorCode.NOT_MY_PRODUCT);
+        }
+
+        ProductImage productImage = productImageRepository.findById(productImageId).orElseThrow(
+                () -> new ProductImageException(ProductImageErrorCode.IMAGE_NOT_FOUND)
+        );
+
+        String key = "uploads/images/" + productImage.getFileName();
+
+        DeleteObjectRequest deleteRequest = DeleteObjectRequest.builder()
+                .bucket(bucket)
+                .key(key)
+                .build();
+
+        s3Client.deleteObject(deleteRequest);
+        productImageRepository.delete(productImage);
     }
 
     // 파일 확장자 추출 메서드
