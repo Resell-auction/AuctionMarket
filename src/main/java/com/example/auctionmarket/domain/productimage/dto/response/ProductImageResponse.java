@@ -7,13 +7,16 @@ public class ProductImageResponse {
 
     private final Long id;
 
-    private final String imagePath;
-
     private final String fileName;
 
-    public ProductImageResponse(Long id, String imagePath, String fileName) {
+    private final String originFileName;
+
+    private final String imageUrl;
+
+    public ProductImageResponse(Long id, String fileName, String originFileName, String imageUrl) {
         this.id = id;
-        this.imagePath = imagePath;
         this.fileName = fileName;
+        this.originFileName = originFileName;
+        this.imageUrl = imageUrl;
     }
 }

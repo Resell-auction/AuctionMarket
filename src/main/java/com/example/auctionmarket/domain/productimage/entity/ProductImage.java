@@ -16,19 +16,25 @@ public class ProductImage extends TimeStamped {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
+    // 저장된 파일 이름 (UUID + 이미지 이름) <- 이미지 이름 중복 방지를 위해 ex) image12514.jpg
     @Column(name = "file_name")
     private String fileName;
 
-    // 저장한 이미지 경로 (UUID + 이미지 이름) <- 이미지 이름 중복 방지를 위해
-    @Column(name = "image_path")
-    private String imagePath;
+    // 원본 파일 이름 ex) Spring.jpg
+    @Column(name = "origin_file_name")
+    private String originFileName;
 
-    public ProductImage(Product product, String fileName, String imagePath) {
+    // 저장한 이미지 경로
+    @Column(name = "image_url")
+    private String imageUrl;
+
+    public ProductImage(Product product, String fileName, String originFileName, String imageUrl) {
         this.product = product;
         this.fileName = fileName;
-        this.imagePath = imagePath;
+        this.originFileName = originFileName;
+        this.imageUrl = imageUrl;
     }
 }
