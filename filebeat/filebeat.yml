@@ -2,12 +2,12 @@
 
 # Filebeat 입력 설정: Filebeat 가 어떤 종류의 데이터를 어디서 가져올지 설정
 filebeat.inputs:
-  - type: log # 여러 입력 유형 중 'log' 타입을 사용
+  - type: filestream # 여러 입력 유형 중 'log' 타입을 사용
     enabled: true # 이 입력을 활성화 (false 로 하면 이 블록을 무시함)
     paths: # Filebeat 가 어떤 파일을 감시할지 그 경로를 지정
       # docker-compose.yml 에서 호스트의 로그 디렉토리를 컨테이너의 /var/log/app-logs 로 마운트했음
       # logback-spring.xml 설정에 따라 .json.log 로 끝나는 파일을 찾도록 수정
-      - /var/log/app-logs/*.json.log
+      - /var/log/app/*.json.log
 
     # 하나의 로그 이벤트가 여러 줄에 걸쳐 기록되는 경우가 많음
     # => Filebeat 는 기본적으로 한 줄을 하나의 이벤트로 처리하기 때문에,
