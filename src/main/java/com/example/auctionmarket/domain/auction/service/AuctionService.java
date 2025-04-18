@@ -1,6 +1,8 @@
 package com.example.auctionmarket.domain.auction.service;
 
 import com.example.auctionmarket.common.auth.AuthUser;
+import com.example.auctionmarket.common.websocket.WebSocketAuctionCreateRequest;
+import com.example.auctionmarket.common.websocket.WebSocketClient;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionSaveRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateMinPriceRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateTimeRequest;
@@ -39,6 +41,7 @@ public class AuctionService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final PaymentService paymentService;
+    private final WebSocketClient webSocketClient;
 
     @Transactional
     public AuctionSaveResponse createAuction(AuthUser authUser, AuctionSaveRequest request){
@@ -65,6 +68,15 @@ public class AuctionService {
 
         Auction saveAuction = auctionRepository.save(auction);
 
+        webSocketClient.createAuctionRoom(
+                new WebSocketAuctionCreateRequest(
+                        saveAuction.getId(),
+                        saveAuction.getProduct().getProductName(),
+                        saveAuction.getMinPrice(),
+                        saveAuction.getEndTime()
+                )
+        );
+
         //저장한 경매 출력
         return new AuctionSaveResponse(
                 saveAuction.getId(),
@@ -75,7 +87,9 @@ public class AuctionService {
                 saveAuction.getMinPrice(),
                 saveAuction.getStartTime(),
                 saveAuction.getEndTime(),
-                saveAuction.getStatus()
+                saveAuction.getStatus(),
+                "http://localhost:8081/auction.html?auctionId=" + saveAuction.getId()
+
         );
     }
 
@@ -101,7 +115,8 @@ public class AuctionService {
                     auction.getStartTime(),
                     auction.getEndTime(),
                     auction.getStatus(),
-                    auctionMessage
+                    auctionMessage,
+                    "http://localhost:8081/auction.html?auctionId=" + auction.getId()
             );
         });
     }
@@ -135,7 +150,8 @@ public class AuctionService {
                     auction.getStartTime(),
                     auction.getEndTime(),
                     auction.getStatus(),
-                    auctionMessage
+                    auctionMessage,
+                    "http://localhost:8081/auction.html?auctionId=" + auction.getId()
             );
         });
     }
@@ -216,7 +232,8 @@ public class AuctionService {
                 auction.getStartTime(),
                 auction.getEndTime(),
                 auction.getStatus(),
-                auctionMessage
+                auctionMessage,
+                "http://localhost:8081/auction.html?auctionId=" + auction.getId()
         );
     }
 
@@ -260,7 +277,8 @@ public class AuctionService {
                 auction.getStartTime(),
                 auction.getEndTime(),
                 auction.getStatus(),
-                auctionMessage
+                auctionMessage,
+                "http://localhost:8081/auction.html?auctionId=" + auction.getId()
         );
     }
 
