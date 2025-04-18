@@ -20,9 +20,10 @@ public class AuctionResponse {
     private final LocalDateTime endTime;
     private final AuctionStatus status;
     private final String remainingTime;
+    private final String websocketUrl;
 
     public AuctionResponse(Long id, Long productId, Long userId, String productName, ProductCategory category, Long minPrice, Long maxPrice,
-                           LocalDateTime startTime, LocalDateTime endTime, AuctionStatus status, String remainingTime) {
+                           LocalDateTime startTime, LocalDateTime endTime, AuctionStatus status, String remainingTime, String websocketUrl) {
         this.id = id;
         this.productId = productId;
         this.userId = userId;
@@ -34,5 +35,6 @@ public class AuctionResponse {
         this.endTime = endTime;
         this.status = status;
         this.remainingTime = remainingTime;
+        this.websocketUrl = websocketUrl;
     }
 }
