@@ -5,10 +5,7 @@ import com.example.auctionmarket.domain.payment.enums.PayType;
 import com.example.auctionmarket.domain.payment.exception.PaymentErrorCode;
 import com.example.auctionmarket.domain.payment.exception.PaymentException;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -48,25 +45,27 @@ public class Payment {
 
     // 결제 상태 변경
     public void completePayment(PayType payType) {
+        // 결제가 완료된 상태면 결제불가
         if (this.payStatus == PayStatus.COMPLETED) {
             throw new PaymentException(PaymentErrorCode.ALREADY_COMPLETED_PAYMENT);
         }
+        // 결제 데드라인을 넘었으면 결제 불가
         if (this.deadline.isBefore(LocalDateTime.now())) {
             throw new PaymentException(PaymentErrorCode.DEADLINE_EXPIRED_PAYMENT);
         }
         this.payType = payType;
         this.payStatus = PayStatus.COMPLETED;
         this.payDate = LocalDateTime.now();
-        this.refundDeadline = LocalDateTime.now().plusDays(1);
+        this.refundDeadline = this.payDate.plusDays(1);
     }
 
     // 환불 가능 여부 체크
     public void canRefund() {
-        if (this.payStatus != PayStatus.COMPLETED) {
-            throw new PaymentException(PaymentErrorCode.NOT_COMPLETED_PAYMENT);
-        }
         if (this.payStatus.equals(PayStatus.REFUNDED)) {
             throw new PaymentException(PaymentErrorCode.PAYMENT_ALREADY_REFUNDED);
+        }
+        if (this.payStatus != PayStatus.COMPLETED) {
+            throw new PaymentException(PaymentErrorCode.NOT_COMPLETED_PAYMENT);
         }
         if (this.refundDeadline.isBefore(LocalDateTime.now())) {
             throw new PaymentException(PaymentErrorCode.DEADLINE_EXPIRED_PAYMENT);
