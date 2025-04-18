@@ -32,8 +32,9 @@ RUN ./gradlew build -x test --no-daemon
 
 
 # 실행 => 빌드된 애플리케이션 실행을 위한 환경 구성
+#FROM eclipse-temurin:17-jdk-alpine
+FROM eclipse-temurin:17-jre-alpine
 # JRE만 포함된 경량 이미지를 사용하여 최종 이미지 크기를 최소화
-FROM eclipse-temurin:17-jdk-alpine
 
 # 메타 데이터 라벨
 LABEL org.opencontainers.image.authors="FinalProject8" \
