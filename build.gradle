@@ -39,6 +39,7 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'com.h2database:h2'
 	runtimeOnly 'com.h2database:h2'
 	testRuntimeOnly 'com.h2database:h2'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -66,7 +67,19 @@ dependencies {
 
 	//Redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-	implementation 'org.redisson:redisson-spring-boot-starter:3.27.1'
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
+
+	//caffeine
+	implementation 'com.github.ben-manes.caffeine:caffeine'
+
+	//JHM
+	testImplementation 'org.openjdk.jmh:jmh-core:1.36'
+	testImplementation 'org.openjdk.jmh:jmh-generator-annprocess:1.36'
+	testAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.36'
+
+	//jackson
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+	implementation 'org.springframework.data:spring-data-commons'
 }
 
 tasks.named('test') {

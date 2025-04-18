@@ -24,9 +24,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,6 +53,9 @@ public class AuctionServiceTest {
     @Mock
     private PaymentService paymentService;
 
+    @Mock
+    private RedisTemplate<String, Object> redisTemplate;
+
     @InjectMocks
     private AuctionService auctionService;
 
@@ -57,6 +63,7 @@ public class AuctionServiceTest {
     private User user;
     private Product product;
     private Auction auction;
+    private Page<Auction> auctionPage;
 
     @BeforeEach
     void setUp() {
@@ -74,6 +81,9 @@ public class AuctionServiceTest {
                 2L
         );
         setIdUsingReflection(auction, 1L);
+
+        List<Auction> auctions = Collections.singletonList(auction);
+        auctionPage = new PageImpl<>(auctions);
     }
 
     private void setIdUsingReflection(Object entity, Long id) {
@@ -116,18 +126,17 @@ public class AuctionServiceTest {
     }
 
     @Test
-    @DisplayName("경매 전체 조회 성공")
+    @DisplayName("경매 전체 조회 - 기본")
     public void getAuctions_Success(){
         //given
-        Pageable pageable = PageRequest.of(0, 10);
-        Page<Auction> auctionPage = new PageImpl<>(List.of(auction), pageable, 1);
-
-        when(auctionRepository.findAll(pageable)).thenReturn(auctionPage);
+        when(auctionRepository.findAll(any(Pageable.class))).thenReturn(auctionPage);
 
         //when
-        Page<AuctionResponse> result = auctionService.getAuctions(1, 10);
+        Page<AuctionResponse> result = auctionService.getAuctions(1,10);
 
         //then
-        
+        assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
+        assertEquals("testproduct", result.getContent().get(0).getProductName());
     }
 }

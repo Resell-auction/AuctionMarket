@@ -7,6 +7,7 @@ import com.example.auctionmarket.domain.auction.dto.request.AuctionSaveRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateMinPriceRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateTimeRequest;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionIncreasePriceResponse;
+import com.example.auctionmarket.domain.auction.dto.response.AuctionPageResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionSaveResponse;
 import com.example.auctionmarket.domain.auction.entity.Auction;
@@ -39,11 +40,11 @@ public class AuctionController {
 
     //경매 전체 조회
     @GetMapping
-    public ResponseEntity<Page<AuctionResponse>> getAuctions(
+    public ResponseEntity<AuctionPageResponse> getAuctions(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size
     ){
-        Page<AuctionResponse> result = auctionService.getAuctions(page, size);
+        AuctionPageResponse result = auctionService.getAuctionsRedis(page, size);
 
         return ResponseEntity.ok(result);
     }

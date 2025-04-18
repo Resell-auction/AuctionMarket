@@ -5,6 +5,7 @@ import com.example.auctionmarket.domain.auction.dto.request.AuctionSaveRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateMinPriceRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateTimeRequest;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionIncreasePriceResponse;
+import com.example.auctionmarket.domain.auction.dto.response.AuctionPageResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionSaveResponse;
 import com.example.auctionmarket.domain.auction.entity.Auction;
@@ -19,8 +20,12 @@ import com.example.auctionmarket.domain.user.entity.User;
 import com.example.auctionmarket.domain.user.exception.UserNotFoundException;
 import com.example.auctionmarket.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -87,30 +92,47 @@ public class AuctionService {
     @Transactional
     public Page<AuctionResponse> getAuctions(int page, int size){
         Pageable pageable = PageRequest.of(page-1, size);
-
         Page<Auction> auctions = auctionRepository.findAll(pageable);
-
-        return auctions.map(auction->{
-
-            String auctionMessage = remainingTimeOfAuctionStatus(auction.getStatus(), auction.getEndTime());
-
-            return new AuctionResponse(
-                    auction.getId(),
-                    auction.getProduct().getId(),
-                    auction.getProduct().getUser().getId(),
-                    auction.getProduct().getProductName(),
-                    auction.getProduct().getCategory(),
-                    auction.getMinPrice(),
-                    auction.getMaxPrice(),
-                    auction.getStartTime(),
-                    auction.getEndTime(),
-                    auction.getStatus(),
-                    auctionMessage
-            );
-        });
+        return mapToAuctionResponsePage(auctions);
     }
 
-    //경매 조회 기능(검색)
+    //경매 전체 조회(redis)
+    @Transactional(readOnly = true)
+    @Cacheable(value = "auctions::list", key = "'page:'+#page+':size:'+#size", cacheManager = "redisCacheManager")
+    public AuctionPageResponse getAuctionsRedis(int page, int size){
+        Pageable pageable = PageRequest.of(page-1, size);
+        Page<Auction> auctions = auctionRepository.findAll(pageable);
+
+        Page<AuctionResponse> responses = mapToAuctionResponsePage(auctions);
+
+        return new AuctionPageResponse(
+                responses.getContent(),
+                responses.getNumber(),
+                responses.getSize(),
+                responses.getTotalElements(),
+                responses.getTotalPages()
+        );
+    }
+
+    //경매 전체 조회(caffeine)
+    @Transactional(readOnly = true)
+    @Cacheable(value = "auctions::list", key = "'page:'+#page+':size:'+#size", cacheManager = "caffeineCacheManager")
+    public AuctionPageResponse getAuctionsCaffeine(int page, int size){
+        Pageable pageable = PageRequest.of(page-1, size);
+        Page<Auction> auctions = auctionRepository.findAll(pageable);
+
+        Page<AuctionResponse> responses = mapToAuctionResponsePage(auctions);
+
+        return new AuctionPageResponse(
+                responses.getContent(),
+                responses.getNumber(),
+                responses.getSize(),
+                responses.getTotalElements(),
+                responses.getTotalPages()
+        );
+    }
+
+    //경매 검색 기능
     @Transactional
     public Page<AuctionResponse> SearchAuctions(
         String keyword,
@@ -119,64 +141,60 @@ public class AuctionService {
         int page, int size
     ){
         Pageable pageable = PageRequest.of(page-1, size);
-
-
-        Page<Auction> auctions = auctionRepository.findBySearch(
-                keyword, category, pageable
-        );
-
-        return auctions.map(auction->{
-            String auctionMessage = remainingTimeOfAuctionStatus(auction.getStatus(), auction.getEndTime());
-
-            return new AuctionResponse(
-                    auction.getId(),
-                    auction.getProduct().getId(),
-                    auction.getProduct().getUser().getId(),
-                    auction.getProduct().getProductName(),
-                    auction.getProduct().getCategory(),
-                    auction.getMinPrice(),
-                    auction.getMaxPrice(),
-                    auction.getStartTime(),
-                    auction.getEndTime(),
-                    auction.getStatus(),
-                    auctionMessage
-            );
-        });
+        Page<Auction> auctions = auctionRepository.findBySearch(keyword, category, pageable);
+        return mapToAuctionResponsePage(auctions);
     }
 
-    //경매 참여
+    //경매 검색 기능(redis)
+    @Transactional(readOnly = true)
+    @Cacheable(value = "auctions::search", key = "'search:'+#keyword+':category:'+#category+':page:'+#page+':size:'+#size",
+    cacheManager = "redisCacheManager")
+    public AuctionPageResponse searchAuctionsRedis(
+            String keyword,
+            String category,
+            int page,
+            int size
+    ){
+        Pageable pageable = PageRequest.of(page-1, size);
+        Page<Auction> auctions = auctionRepository.findBySearch(keyword, category, pageable);
+        Page<AuctionResponse> responses = mapToAuctionResponsePage(auctions);
+
+        return new AuctionPageResponse(
+                responses.getContent(),
+                responses.getNumber(),
+                responses.getSize(),
+                responses.getTotalElements(),
+                responses.getTotalPages()
+        );
+    }
+
+    //경매 검색 기능(caffeine)
+    @Transactional(readOnly = true)
+    @Cacheable(value = "auctions::search", key = "'search:'+#keyword+':category:'+#category+':page:'+#page+':size:'+#size",
+            cacheManager = "caffeineCacheManager")
+    public AuctionPageResponse searchAuctionsCaffeine(
+            String keyword,
+            String category,
+            int page,
+            int size
+    ){
+        Pageable pageable = PageRequest.of(page-1, size);
+        Page<Auction> auctions = auctionRepository.findBySearch(keyword, category, pageable);
+        Page<AuctionResponse> responses = mapToAuctionResponsePage(auctions);
+
+        return new AuctionPageResponse(
+                responses.getContent(),
+                responses.getNumber(),
+                responses.getSize(),
+                responses.getTotalElements(),
+                responses.getTotalPages()
+        );
+    }
+
+    //경매 입찰
     @Transactional
     public AuctionIncreasePriceResponse increasePrice(AuthUser authUser, Long auctionId, Long increasedPrice){
-
-        //해당하는 경매 찾기
-        Auction auction = auctionRepository.findById(auctionId)
-                .orElseThrow(()->new AuctionException(AuctionErrorCode.AUCTION_NOT_FOUND));
-
-        //경매가 진행 중인 상황이 아니라면 예외 처리
-        if(auction.getStatus() != AuctionStatus.ONGOING){
-            throw new AuctionException(AuctionErrorCode.AUCTION_NOT_STARTED);
-        }
-
-        //유저 예외처리
-        User user = userRepository.findById(authUser.getId())
-                .orElseThrow(()->new UserNotFoundException());
-
-        //물품을 올린 사용자인 경우 불가
-        if(Objects.equals(authUser.getId(), auction.getProduct().getUser().getId())){
-            throw new AuctionException(AuctionErrorCode.SELF_BID_NOT_ALLOWED);
-        }
-
-        auction.increaseMaxPrice(authUser.getId(), increasedPrice);
-
-        return new AuctionIncreasePriceResponse(
-                auction.getId(),
-                auction.getProduct().getId(),
-                auction.getConsumerId(),
-                auction.getProduct().getProductName(),
-                auction.getProduct().getCategory(),
-                auction.getMinPrice(),
-                auction.getMaxPrice()
-        );
+        return processBid(authUser, auctionId, increasedPrice);
     }
 
     //경매 수정(시작 시간)
@@ -342,19 +360,70 @@ public class AuctionService {
 
                 if (auction.getConsumerId() != null && paymentService.shouldCreatePayment(auction.getId())) {
                     paymentService.createPayment(auction.getId());
-
-                    // 나중에 동기 비동기시 변형해서 사용
-//                    eventPublisher.publishEvent(new AuctionEndEvent(
-//                            auction.getId(),
-//                            auction.getConsumerId(),
-//                            auction.getMaxPrice()
-//                    ));
-//                    paymentService.createPayment(auction);
                 }
             }
             else if(LocalDateTime.now().isBefore(auction.getStartTime())) {
                 auction.setStatus(AuctionStatus.PENDING);
             }
         }
+    }
+
+    //조회 응답 공통 로직
+    private Page<AuctionResponse> mapToAuctionResponsePage(Page<Auction> auctions){
+        return auctions.map(auction ->{
+            String auctionMessage = remainingTimeOfAuctionStatus(auction.getStatus(), auction.getEndTime());
+            return new AuctionResponse(
+                    auction.getId(),
+                    auction.getProduct().getId(),
+                    auction.getProduct().getUser().getId(),
+                    auction.getProduct().getProductName(),
+                    auction.getProduct().getCategory(),
+                    auction.getMinPrice(),
+                    auction.getMaxPrice(),
+                    auction.getStartTime(),
+                    auction.getEndTime(),
+                    auction.getStatus(),
+                    auctionMessage
+            );
+        });
+    }
+
+    //입찰 처리 공통 로직
+    private AuctionIncreasePriceResponse processBid(AuthUser authUser, Long auctionId, Long increasePrice){
+        Auction auction = auctionRepository.findById(auctionId)
+                .orElseThrow(()->new AuctionException(AuctionErrorCode.AUCTION_NOT_FOUND));
+
+        validateBidConditions(authUser, auction);
+
+        auction.increaseMaxPrice(authUser.getId(), increasePrice);
+
+        return createBidResponse(auction);
+    }
+
+    //입찰 유효성 검사 공통 로직
+    private void validateBidConditions(AuthUser authUser, Auction auction){
+        if(auction.getStatus() != AuctionStatus.ONGOING){
+            throw new AuctionException(AuctionErrorCode.AUCTION_NOT_STARTED);
+        }
+
+        User user = userRepository.findById(authUser.getId())
+                .orElseThrow(()->new UserNotFoundException());
+
+        if(Objects.equals(authUser.getId(), auction.getProduct().getUser().getId())){
+            throw new AuctionException(AuctionErrorCode.SELF_BID_NOT_ALLOWED);
+        }
+    }
+
+    //응답 생성 공통 로직
+    private AuctionIncreasePriceResponse createBidResponse(Auction auction){
+        return new AuctionIncreasePriceResponse(
+                auction.getId(),
+                auction.getProduct().getId(),
+                auction.getConsumerId(),
+                auction.getProduct().getProductName(),
+                auction.getProduct().getCategory(),
+                auction.getMinPrice(),
+                auction.getMaxPrice()
+        );
     }
 }
