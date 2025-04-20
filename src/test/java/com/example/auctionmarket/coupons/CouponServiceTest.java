@@ -85,8 +85,6 @@ public class CouponServiceTest {
     void 쿠폰_목록_조회_성공(){
         // given
         LocalDateTime expiredAt = LocalDateTime.parse("2025-05-05T00:00:00");
-
-        // given
         List<Coupon> mockCoupons = IntStream.rangeClosed(1, 10)
                 .mapToObj(i -> new Coupon("coupon1","description1",10L,expiredAt,10,CouponType.PERCENT))
                 .collect(Collectors.toList());
@@ -108,7 +106,6 @@ public class CouponServiceTest {
     void 쿠폰_단건_조회_성공(){
         // given
         LocalDateTime expiredAt = LocalDateTime.parse("2025-05-05T00:00:00");
-
         Coupon coupon = new Coupon("coupon1","description1",10L,expiredAt,10,CouponType.PERCENT);
 
         given(couponRepository.findById(coupon.getId())).willReturn(Optional.of(coupon));
@@ -176,7 +173,6 @@ public class CouponServiceTest {
 
         // when & then
         assertThrows(CouponException.class, ()->couponService.updateById(authUser,1L,couponUpdateRequest));
-
     }
 
     @Test
@@ -210,7 +206,6 @@ public class CouponServiceTest {
 
         //when&then
         assertThrows(CouponException.class, ()->couponService.deleteById(authUser,1L));
-
     }
 
 

@@ -1,0 +1,10 @@
+= My API Documentation
+Author Name
+:toc: left
+:sectnums:
+
+== 사용자 API
+
+include::{snippets}/get-user/http-request.adoc[]
+include::{snippets}/get-user/http-response.adoc[]
+include::{snippets}/get-user/response-fields.adoc[]
