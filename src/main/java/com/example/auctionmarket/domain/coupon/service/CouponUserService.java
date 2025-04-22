@@ -23,7 +23,7 @@ public class CouponUserService {
     private final CouponUserRepository couponUserRepository;
     private final UserRepository userRepository;
 
-    //admin- 해당유저에게 쿠폰주기
+    //admin - 해당유저에게 쿠폰주기
     @Transactional
     public void giveCouponByUserId(AuthUser authUser, Long id, CouponGiveRequest couponGiveRequest){
         if (!authUser.getAuthorities().stream()
@@ -40,11 +40,12 @@ public class CouponUserService {
         if(couponGiveRequest.getAmount()>coupon.getAmount())
             throw new CouponException(CouponErrorCode.OUT_OF_COUPON);
 
-//user, coupon객체에 couponuser 객체 생성 후 저장.
+        //user, coupon객체에 couponuser 객체 생성 후 저장.
         for (int i = 0; i < couponGiveRequest.getAmount(); i++) {
             CouponUser couponUser = new CouponUser();
             couponUser.setUsers(users);
             couponUser.setCoupons(coupon);
+            couponUser.setCouponType(coupon.getCouponType());
             couponUserRepository.save(couponUser);
         }
 

@@ -1,7 +1,6 @@
 package com.example.auctionmarket.domain.coupon.service;
 
 import com.example.auctionmarket.common.auth.AuthUser;
-import com.example.auctionmarket.domain.coupon.dto.CouponGiveRequest;
 import com.example.auctionmarket.domain.coupon.dto.CouponRequest;
 import com.example.auctionmarket.domain.coupon.dto.CouponResponse;
 import com.example.auctionmarket.domain.coupon.dto.CouponUpdateRequest;
@@ -10,11 +9,8 @@ import com.example.auctionmarket.domain.coupon.enums.CouponStatus;
 import com.example.auctionmarket.domain.coupon.exception.CouponErrorCode;
 import com.example.auctionmarket.domain.coupon.exception.CouponException;
 import com.example.auctionmarket.domain.coupon.repository.CouponRepository;
-import com.example.auctionmarket.domain.user.entity.User;
 import com.example.auctionmarket.domain.user.repository.UserRepository;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +22,6 @@ import java.util.List;
 public class CouponService {
 
     private final CouponRepository couponRepository;
-    private final UserRepository userRepository;
 
     //admin - 쿠폰생성
     @Transactional
@@ -38,16 +33,17 @@ public class CouponService {
 
         Coupon coupon = new Coupon(couponRequest.getCouponName(),
                 couponRequest.getDescription(),
-                couponRequest.getDiscountRate(),
+                couponRequest.getDiscountAmount(),
                 couponRequest.getExpiredAt(),
-                couponRequest.getAmount());
+                couponRequest.getAmount(),
+                couponRequest.getCouponType());
 
         Coupon savedCoupon = couponRepository.save(coupon);
 
         return new CouponResponse(savedCoupon.getId(),
                 savedCoupon.getCouponName(),
                 savedCoupon.getDescription(),
-                savedCoupon.getDiscountRate(),
+                savedCoupon.getDiscountAmount(),
                 savedCoupon.getExpiredAt(),
                 savedCoupon.getAmount());
     }
@@ -62,7 +58,7 @@ public class CouponService {
             couponList.add(new CouponResponse(coupon.getId(),
                     coupon.getCouponName(),
                     coupon.getDescription(),
-                    coupon.getDiscountRate(),
+                    coupon.getDiscountAmount(),
                     coupon.getExpiredAt(),
                     coupon.getAmount()));
 
@@ -71,52 +67,52 @@ public class CouponService {
 
     //쿠폰단건조회
     @Transactional(readOnly = true)
-    public CouponResponse findById( Long id) {
+    public CouponResponse findById( Long couponId) {
 
-        Coupon coupon = couponRepository.findById(id).orElseThrow(
+        Coupon coupon = couponRepository.findById(couponId).orElseThrow(
                 () -> new CouponException(CouponErrorCode.NOT_FOUND_COUPON));
 
         return new CouponResponse(coupon.getId(),
                 coupon.getCouponName(),
                 coupon.getDescription(),
-                coupon.getDiscountRate(),
+                coupon.getDiscountAmount(),
                 coupon.getExpiredAt(),
                 coupon.getAmount());
     }
 
     //admin- 쿠폰수정
     @Transactional
-    public CouponResponse updateById( AuthUser authUser, Long id, CouponUpdateRequest couponUpdateRequest) {
+    public CouponResponse updateById( AuthUser authUser, Long couponId, CouponUpdateRequest couponUpdateRequest) {
         if (!authUser.getAuthorities().stream()
                 .anyMatch(auth -> auth.getAuthority().equals("ADMIN"))) {
             throw new CouponException(CouponErrorCode.NOT_ADMIN_AUTHORITY);
         };
 
-        Coupon coupon = couponRepository.findById(id).orElseThrow(
+        Coupon coupon = couponRepository.findById(couponId).orElseThrow(
                 () -> new CouponException(CouponErrorCode.NOT_FOUND_COUPON));
 
         coupon.update(couponUpdateRequest.getCouponName(),
                 couponUpdateRequest.getDescription(),
-                couponUpdateRequest.getDiscountRate(),
+                couponUpdateRequest.getDiscountAmount(),
                 couponUpdateRequest.getExpiredAt());
 
         return new CouponResponse(coupon.getId(),
                 coupon.getCouponName(),
                 coupon.getDescription(),
-                coupon.getDiscountRate(),
+                coupon.getDiscountAmount(),
                 coupon.getExpiredAt(),
                 coupon.getAmount());
     }
 
     //admin- 쿠폰삭제
     @Transactional
-    public void deleteById(AuthUser authUser, Long id) {
+    public void deleteById(AuthUser authUser, Long couponId) {
         if (!authUser.getAuthorities().stream()
                 .anyMatch(auth -> auth.getAuthority().equals("ADMIN"))) {
              throw new CouponException(CouponErrorCode.NOT_ADMIN_AUTHORITY);
         };
 
-        Coupon coupon = couponRepository.findById(id).orElseThrow(
+        Coupon coupon = couponRepository.findById(couponId).orElseThrow(
                 () -> new CouponException(CouponErrorCode.NOT_FOUND_COUPON));
 
         coupon.expiredCoupon();

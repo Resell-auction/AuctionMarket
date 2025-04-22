@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
-import org.springframework.context.annotation.Bean;
 
 import java.time.LocalDateTime;
 
@@ -17,8 +16,8 @@ public class Refund {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Payment payment;
+    private Long paymentId;
+    private Long userId;
 
     private PayType payType;
     private String description;
@@ -26,10 +25,18 @@ public class Refund {
     private LocalDateTime refundedAt;
 
     @Builder
-    public Refund(Payment payment, PayType payType, String description, LocalDateTime refundedAt) {
-        this.payment = payment;
+    public Refund(Long paymentId, Long userId, PayType payType, String description, LocalDateTime refundedAt) {
+        this.paymentId = paymentId;
+        this.userId = userId;
         this.payType = payType;
         this.description = description;
         this.refundedAt = refundedAt;
     }
+
+    public void completeRefund(PayType payType, String description) {
+        this.refundedAt = LocalDateTime.now();
+        this.description = description;
+        this.payType = payType;
+    }
+
 }
