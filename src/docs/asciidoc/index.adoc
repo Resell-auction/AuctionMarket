@@ -5,6 +5,6 @@ Author Name
 
 == 사용자 API
 
-include::{snippets}/get-user/http-request.adoc[]
-include::{snippets}/get-user/http-response.adoc[]
-include::{snippets}/get-user/response-fields.adoc[]
+include::{snippets}/get-coupon/http-request.adoc[]
+include::{snippets}/get-coupon/http-response.adoc[]
+include::{snippets}/get-coupon/response-fields.adoc[]

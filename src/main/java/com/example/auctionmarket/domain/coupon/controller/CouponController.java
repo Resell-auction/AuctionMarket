@@ -56,7 +56,7 @@ public class CouponController {
 
     //단건 조회
     @GetMapping("/{couponId}")
-    public ResponseEntity<CouponResponse> findById(@PathVariable Long couponId){
+    public ResponseEntity<CouponResponse> findById(@PathVariable("couponId") Long couponId){
 
   //      log.info("[쿠폰단건조회API]- 쿠폰ID: {}", couponId);
         logService.saveLog( couponId, "📍[API]COUPON_FIND_ID", "쿠폰목록조회API");

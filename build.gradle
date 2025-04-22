@@ -102,8 +102,11 @@ test {
 }
 
 asciidoctor {
-	inputs.dir snippetsDir
 	dependsOn test
+	inputs.dir snippetsDir
+	sources {
+		include 'index.adoc'
+	}
 }
 //clean {
 //    delete file('src/main/generated')

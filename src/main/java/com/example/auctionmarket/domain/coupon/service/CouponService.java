@@ -19,8 +19,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.time.LocalTime.now;
 
 @Slf4j
 @Service
@@ -50,20 +54,22 @@ public class CouponService {
 
             Coupon savedCoupon = null;
 
-
             savedCoupon = couponRepository.save(coupon);
             logService.saveLog(savedCoupon.getId(), "✅COUPON_SAVE_SUCCESS", "쿠폰등록성공.");
 
-        //쿠폰 생성과 동시에 redis에 추가
-        String redisKey = "coupon_stock:" + savedCoupon.getId();
-        redisTemplate.opsForValue().set(redisKey, String.valueOf(couponRequest.getAmount()));
+            //쿠폰 생성과 동시에 redis에 추가
+            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime expiredAt = couponRequest.getExpiredAt();
 
-        return new CouponResponse(savedCoupon.getId(),
-                savedCoupon.getCouponName(),
-                savedCoupon.getDescription(),
-                savedCoupon.getDiscountAmount(),
-                savedCoupon.getExpiredAt(),
-                savedCoupon.getAmount());
+            String redisKey = "coupon_stock:" + savedCoupon.getId();
+            redisTemplate.opsForValue().set(redisKey, String.valueOf(couponRequest.getAmount()), Duration.between(now, expiredAt).getSeconds());
+
+            return new CouponResponse(savedCoupon.getId(),
+                    savedCoupon.getCouponName(),
+                    savedCoupon.getDescription(),
+                    savedCoupon.getDiscountAmount(),
+                    savedCoupon.getExpiredAt(),
+                    savedCoupon.getAmount());
 
         } catch (CouponException e) {
             log.error("❗로그 저장 실패: {}", e.getMessage());
