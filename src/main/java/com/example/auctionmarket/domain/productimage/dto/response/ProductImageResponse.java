@@ -11,12 +11,15 @@ public class ProductImageResponse {
 
     private final String originFileName;
 
-    private final String imageUrl;
+    private final String s3ImageUrl;
 
-    public ProductImageResponse(Long id, String fileName, String originFileName, String imageUrl) {
+    private final String cloudFrontImageUrl;
+
+    public ProductImageResponse(Long id, String fileName, String originFileName, String s3ImageUrl, String cloudFrontImageUrl) {
         this.id = id;
         this.fileName = fileName;
         this.originFileName = originFileName;
-        this.imageUrl = imageUrl;
+        this.s3ImageUrl = s3ImageUrl;
+        this.cloudFrontImageUrl = cloudFrontImageUrl;
     }
 }

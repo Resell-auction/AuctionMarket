@@ -28,13 +28,17 @@ public class ProductImage extends TimeStamped {
     private String originFileName;
 
     // 저장한 이미지 경로
-    @Column(name = "image_url")
-    private String imageUrl;
+    @Column(name = "s3_image_url")
+    private String s3ImageUrl;
 
-    public ProductImage(Product product, String fileName, String originFileName, String imageUrl) {
+    @Column(name = "cloud_front_image_url")
+    private String cloudFrontImageUrl;
+
+    public ProductImage(Product product, String fileName, String originFileName, String s3ImageUrl, String cloudFrontImageUrl) {
         this.product = product;
         this.fileName = fileName;
         this.originFileName = originFileName;
-        this.imageUrl = imageUrl;
+        this.s3ImageUrl = s3ImageUrl;
+        this.cloudFrontImageUrl = cloudFrontImageUrl;
     }
 }

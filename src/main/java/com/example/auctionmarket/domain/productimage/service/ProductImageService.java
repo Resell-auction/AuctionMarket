@@ -44,6 +44,9 @@ public class ProductImageService {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
+    @Value("${cloud.aws.cloudfront.domain}")
+    private String cloudFrontDomain;
+
     // 제품 이미지 업로드
     @Transactional
     public List<ProductImageResponse> uploadProductImages(AuthUser authUser, Long productId, List<MultipartFile> files) throws IOException {
@@ -96,16 +99,19 @@ public class ProductImageService {
             s3Client.putObject(putObjectRequest, requestBody);
 
             // 업로드 성공 시 파일 URL 반환
-            String imageUrl = "https://" + bucket + ".s3.amazonaws.com/" + key;
+            String s3ImageUrl = "https://" + bucket + ".s3.amazonaws.com/" + key;
+            String cloudFrontImageUrl =  cloudFrontDomain + "/" + key;
 
-            ProductImage productImage = new ProductImage(product, fileName, originFileName, imageUrl);
+
+            ProductImage productImage = new ProductImage(product, fileName, originFileName, s3ImageUrl, cloudFrontImageUrl);
             productImageRepository.save(productImage);
 
             ProductImageResponse response = new ProductImageResponse(
                     productImage.getId(),
                     productImage.getFileName(),
                     productImage.getOriginFileName(),
-                    productImage.getImageUrl()
+                    productImage.getS3ImageUrl(),
+                    productImage.getCloudFrontImageUrl()
             );
 
             responseList.add(response);
@@ -164,6 +170,7 @@ public class ProductImageService {
                 lowerExtension.equals(".gif") ||
                 lowerExtension.equals(".pdf");
     }
+
 
 
 }
