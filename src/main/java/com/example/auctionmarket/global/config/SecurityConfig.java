@@ -45,7 +45,9 @@ public class SecurityConfig {
 			.logout(AbstractHttpConfigurer::disable)
 			.rememberMe(AbstractHttpConfigurer::disable)
 			.authorizeHttpRequests(auth -> auth
-				.requestMatchers(new AntPathRequestMatcher("/v1/auth/**")).permitAll()
+				.requestMatchers(
+						new AntPathRequestMatcher("/v1/auth/**"),
+						new AntPathRequestMatcher("/v1/auctions/end")).permitAll()
 				.anyRequest().authenticated()
 			)
 			.build();

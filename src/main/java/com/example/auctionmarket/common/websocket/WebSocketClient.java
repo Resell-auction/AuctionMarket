@@ -1,5 +1,6 @@
 package com.example.auctionmarket.common.websocket;
 
+import com.example.auctionmarket.domain.auction.dto.response.AuctionJoinResponse;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
@@ -24,21 +25,15 @@ public class WebSocketClient {
 
     public String createAuctionRoom(WebSocketAuctionCreateRequest request) {
         String url = websocketUrl + "/internal/auction/start";
-    ResponseEntity<WebSocketAuctionCreateResponse> response = restTemplate.postForEntity(url, request, WebSocketAuctionCreateResponse.class);
+        ResponseEntity<com.example.auctionmarket.common.websocket.WebSocketAuctionCreateResponse> response = restTemplate.postForEntity(url, request, com.example.auctionmarket.common.websocket.WebSocketAuctionCreateResponse.class);
 
-    return response.getBody().getWebsocketUrl();
+        return response.getBody().getWebsocketUrl();
+    }
+
+    public String joinAuctionRoom(WebSocketAuctionJoinRequest request) {
+        String url = websocketUrl + "/internal/auction/join";
+        ResponseEntity<AuctionJoinResponse> response = restTemplate.postForEntity(url, request, AuctionJoinResponse.class);
+
+        return response.getBody().getWebsocketUrl();
     }
 }
-
-//    public String notifyAuctionCreated(Long auctionId, String productName, Long minPrice) {
-//        String url = "http://websocket-server.local/internal/auction/start";
-//
-//        Map<String, Object> request = new HashMap<>();
-//        request.put("auctionId", auctionId);
-//        request.put("productName", productName);
-//        request.put("minPrice", minPrice);
-//
-//        ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
-//        return response.getBody().get("websocketUrl").toString();
-//    }
-//}
