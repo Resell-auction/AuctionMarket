@@ -83,6 +83,10 @@ dependencies {
 
 	//elastic search
 	implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+	implementation 'co.elastic.clients:elasticsearch-java:8.15.0'
+
+	//aws opensearch
+	implementation 'org.opensearch.client:opensearch-rest-high-level-client:2.17.0' // OpenSearch Java 클라이언트
 }
 
 tasks.named('test') {

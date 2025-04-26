@@ -1,5 +1,6 @@
 package com.example.auctionmarket.domain.auction.service;
 
+import com.example.auctionmarket.domain.auction.document.AuctionDocument;
 import com.example.auctionmarket.domain.auction.entity.Auction;
 import com.example.auctionmarket.domain.auction.enums.AuctionStatus;
 import com.example.auctionmarket.domain.auction.mapper.AuctionMapper;
@@ -19,7 +20,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -39,6 +42,9 @@ public class AuctionSearchBenchmarkTest {
 
     @Autowired
     private AuctionSearchService auctionSearchService;
+
+    @Autowired
+    private AuctionOpenSearchService auctionOpenSearchService;
 
     @BeforeEach
     void cleanUp(){
@@ -71,14 +77,33 @@ public class AuctionSearchBenchmarkTest {
             );
             auctionRepository.save(auction);
             auctionSearchRepository.save(AuctionMapper.toDucument(auction));
+
+            //OpenSearch 인덱싱 추가
+            AuctionDocument document = AuctionDocument.builder()
+                    .id(auction.getId())
+                    .productName(auction.getProduct().getProductName())
+                    .category(auction.getProduct().getCategory().name())
+                    .minPrice(auction.getMinPrice())
+                    .startTime(auction.getStartTime().toString())
+                    .endTime(auction.getEndTime().toString())
+                    .build();
+
+            try{
+                auctionOpenSearchService.save(document);
+            }catch (IOException e){
+                System.out.println("OpenSearch 인덱싱 실패: {"+e.getMessage()+"}");
+            }
         }
 
         System.out.println("10000건의 더미 경매가 생성되었습니다.");
     }
 
     @Test
-    public void benchmarkSearch() {
-        Pageable pageable = PageRequest.of(0, 10);
+    public void benchmarkSearch() throws IOException {
+        int size=10;
+        int page=1;
+
+        Pageable pageable = PageRequest.of(page-1, size);
         String keyword = "testproduct";
         String category = "SHOES";
 
@@ -93,5 +118,11 @@ public class AuctionSearchBenchmarkTest {
         auctionSearchService.searchAuctions(keyword, category, pageable);
         long endTime2 = System.currentTimeMillis();
         System.out.println("Elastic Search 검색 소요 시간: "+(endTime2-startTime2)+"ms");
+
+        //OpenSearch를 사용한 검색 기능
+        long startTime3 = System.currentTimeMillis();
+        List<AuctionDocument> result = auctionOpenSearchService.search(keyword, category, page, size);
+        long endTime3 = System.currentTimeMillis();
+        System.out.println("OpenSearch 검색 소요 시간: "+(endTime3-startTime3)+"ms");
     }
 }

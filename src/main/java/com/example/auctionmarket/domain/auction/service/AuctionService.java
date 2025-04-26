@@ -3,6 +3,7 @@ package com.example.auctionmarket.domain.auction.service;
 import com.example.auctionmarket.common.auth.AuthUser;
 import com.example.auctionmarket.common.websocket.WebSocketAuctionCreateRequest;
 import com.example.auctionmarket.common.websocket.WebSocketClient;
+import com.example.auctionmarket.domain.auction.document.AuctionDocument;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionSaveRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateMinPriceRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateTimeRequest;
@@ -37,6 +38,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -48,6 +50,7 @@ public class AuctionService {
 
     private final AuctionRepository auctionRepository;
     private final AuctionSearchRepository auctionSearchRepository;
+    private final AuctionOpenSearchService auctionOpenSearchService;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final PaymentService paymentService;
@@ -82,6 +85,22 @@ public class AuctionService {
 
         //ES 색인
         auctionSearchRepository.save(AuctionMapper.toDucument(saveAuction));
+
+        //OpenSearch 인덱싱 추가
+        AuctionDocument document = AuctionDocument.builder()
+                        .id(auction.getId())
+                                .productName(auction.getProduct().getProductName())
+                                        .category(auction.getProduct().getCategory().name())
+                                                .minPrice(auction.getMinPrice())
+                                                        .startTime(auction.getStartTime().toString())
+                                                                .endTime(auction.getEndTime().toString())
+                                                                        .build();
+
+        try{
+            auctionOpenSearchService.save(document);
+        }catch (IOException e){
+            System.out.println("OpenSearch 인덱싱 실패: {"+e.getMessage()+"}");
+        }
 
         webSocketClient.createAuctionRoom(
                 new WebSocketAuctionCreateRequest(
