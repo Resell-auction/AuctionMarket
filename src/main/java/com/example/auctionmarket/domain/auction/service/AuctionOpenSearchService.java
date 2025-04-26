@@ -3,6 +3,7 @@ package com.example.auctionmarket.domain.auction.service;
 import com.example.auctionmarket.domain.auction.document.AuctionDocument;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.opensearch.action.index.IndexRequest;
 import org.opensearch.action.search.SearchRequest;
 import org.opensearch.action.search.SearchResponse;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuctionOpenSearchService {

@@ -15,7 +15,7 @@ import static org.springframework.data.web.config.EnableSpringDataWebSupport.Pag
 @EnableJpaAuditing
 @EnableScheduling // @Scheduled 사용을 위한 어노테이션
 @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO) //page 직렬화를 위한 어노테이션
-@EnableElasticsearchRepositories(basePackages = "com.example.auctionmarket.domain.auction.repository")
+//@EnableElasticsearchRepositories(basePackages = "com.example.auctionmarket.domain.auction.repository")
 public class AuctionMarketApplication {
 
 	public static void main(String[] args) {
