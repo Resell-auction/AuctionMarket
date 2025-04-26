@@ -5,6 +5,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
-public interface AuctionSearchRepository extends ElasticsearchRepository<AuctionDocument, String> {
-    Page<AuctionDocument> findByProductNameContainingIgnoreCase(String productName, Pageable pageable);
-}
+//public interface AuctionSearchRepository extends ElasticsearchRepository<AuctionDocument, String> {
+//    Page<AuctionDocument> findByProductNameContainingIgnoreCase(String productName, Pageable pageable);
+//}
