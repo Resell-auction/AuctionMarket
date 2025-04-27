@@ -37,12 +37,4 @@ public class OpenSearchConfig {
 
         return new RestHighLevelClient(builder);
     }
-
-//    @Override
-//    public ClientConfiguration clientConfiguration() {
-//        return ClientConfiguration.builder()
-//                .connectedTo(openSearchUrl)
-//                .usingSsl()
-//                .withBasicAuth(username, password).build();
-//    }
 }
