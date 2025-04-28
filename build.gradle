@@ -87,6 +87,9 @@ dependencies {
 
 	//aws opensearch
 	implementation 'org.opensearch.client:opensearch-rest-high-level-client:2.17.0' // OpenSearch Java 클라이언트
+	implementation 'software.amazon.awssdk:auth'
+	implementation 'software.amazon.awssdk:core'
+	implementation 'software.amazon.awssdk:opensearch'
 }
 
 tasks.named('test') {
