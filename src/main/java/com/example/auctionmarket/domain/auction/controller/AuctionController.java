@@ -1,6 +1,7 @@
 package com.example.auctionmarket.domain.auction.controller;
 
 import com.example.auctionmarket.common.auth.AuthUser;
+import com.example.auctionmarket.domain.auction.dto.request.AuctionEndRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionSaveRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateMinPriceRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateTimeRequest;
@@ -101,8 +102,6 @@ public class AuctionController {
 
     @PostMapping("end")
     public void handleAuctionEnd(@RequestBody AuctionEndRequest request) {
-        auctionService.endAuction(request.auctionId);
+        auctionService.endAuction(request);
     }
-
-    public record AuctionEndRequest(Long auctionId) {}
 }

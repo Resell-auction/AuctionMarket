@@ -6,7 +6,6 @@ import com.example.auctionmarket.domain.auction.repository.AuctionRepository;
 import com.example.auctionmarket.domain.coupon.entity.Coupon;
 import com.example.auctionmarket.domain.coupon.entity.CouponUser;
 import com.example.auctionmarket.domain.coupon.enums.CouponType;
-import com.example.auctionmarket.domain.coupon.repository.CouponRepository;
 import com.example.auctionmarket.domain.coupon.repository.CouponUserRepository;
 import com.example.auctionmarket.domain.payment.dto.request.PaymentRequest;
 import com.example.auctionmarket.domain.payment.entity.Payment;
@@ -28,12 +27,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
@@ -69,7 +66,7 @@ class PaymentServiceTest {
         given(auctionRepository.findById(auctionId)).willReturn(Optional.of(auction));
         // when
         LocalDateTime before = LocalDateTime.now();
-        paymentService.createPayment(auctionId);
+        paymentService.createPayment(auctionId, consumerId, maxPrice);
         LocalDateTime after = LocalDateTime.now();
         // then
         ArgumentCaptor<Payment> paymentArgumentCaptor = ArgumentCaptor.forClass(Payment.class);

@@ -4,6 +4,7 @@ import com.example.auctionmarket.common.auth.AuthUser;
 import com.example.auctionmarket.common.websocket.WebSocketAuctionCreateRequest;
 import com.example.auctionmarket.common.websocket.WebSocketAuctionJoinRequest;
 import com.example.auctionmarket.common.websocket.WebSocketClient;
+import com.example.auctionmarket.domain.auction.dto.request.AuctionEndRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionSaveRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateMinPriceRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateTimeRequest;
@@ -22,20 +23,19 @@ import com.example.auctionmarket.domain.user.entity.User;
 import com.example.auctionmarket.domain.user.exception.UserNotFoundException;
 import com.example.auctionmarket.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuctionService {
@@ -45,7 +45,6 @@ public class AuctionService {
     private final ProductRepository productRepository;
     private final PaymentService paymentService;
     private final WebSocketClient webSocketClient;
-    private final RestTemplate restTemplate;
 
     @Transactional
     public AuctionSaveResponse createAuction(AuthUser authUser, AuctionSaveRequest request){
@@ -167,18 +166,13 @@ public class AuctionService {
         User user = userRepository.findById(authUser.getId())
                 .orElseThrow(()->new UserNotFoundException());
 
-        String websocketUrl = "http://localhost:8081/internal/auction/join";
-
-        Map<String, Object> request = new HashMap<>();
-        request.put("auctionId", auctionId);
-        request.put("nickname", authUser.getNickname());
-
         Auction auction = auctionRepository.findById(auctionId)
                 .orElseThrow(()->new AuctionException(AuctionErrorCode.AUCTION_NOT_FOUND));
 
         webSocketClient.joinAuctionRoom(
                 new WebSocketAuctionJoinRequest(
                         auction.getId(),
+                        user.getId(),
                         user.getNickname()
                 )
         );
@@ -340,49 +334,20 @@ public class AuctionService {
                 duration.toMinutesPart());
     }
 
-//    //경매 상태 변경 함수
-//    @Transactional
-//    @Scheduled(cron = "0 * * * * *")
-//    public void updateStatus() {
-//
-//        List<Auction> auctions = auctionRepository.findAll();
-//
-//        for(Auction auction : auctions){
-//            if(LocalDateTime.now().isAfter(auction.getStartTime()) && LocalDateTime.now().isBefore(auction.getEndTime())){
-//                auction.setStatus(AuctionStatus.ONGOING);
-//            }
-//            else if (LocalDateTime.now().isAfter(auction.getEndTime())) {
-//                auction.setStatus(AuctionStatus.ENDED);
-//
-//                if (auction.getConsumerId() != null && paymentService.shouldCreatePayment(auction.getId())) {
-//                    paymentService.createPayment(auction.getId());
-//
-//                    // 나중에 동기 비동기시 변형해서 사용
-////                    eventPublisher.publishEvent(new AuctionEndEvent(
-////                            auction.getId(),
-////                            auction.getConsumerId(),
-////                            auction.getMaxPrice()
-////                    ));
-////                    paymentService.createPayment(auction);
-//                }
-//            }
-//            else if(LocalDateTime.now().isBefore(auction.getStartTime())) {
-//                auction.setStatus(AuctionStatus.PENDING);
-//            }
-//        }
-//    }
-
-    public void endAuction (Long auctionId) {
-        Auction auction = auctionRepository.findById(auctionId)
+    public void endAuction (AuctionEndRequest request) {
+        Auction auction = auctionRepository.findById(request.getAuctionId())
                 .orElseThrow(()->new AuctionException(AuctionErrorCode.AUCTION_NOT_FOUND));
-        if (LocalDateTime.now().isAfter(auction.getEndTime())) {
-            auction.setStatus(AuctionStatus.ENDED);
 
-            if (auction.getConsumerId() != null && paymentService.shouldCreatePayment(auction.getId())) {
-                paymentService.createPayment(auction.getId());
-            }
+        auction.setConsumerId(request.getConsumerId());
+        auction.setMaxPrice(request.getAmount());
 
-            auctionRepository.save(auction);
+        log.info("consumerId: {}", auction.getConsumerId());
+
+        if (auction.getConsumerId() != null && paymentService.shouldCreatePayment(auction.getId())) {
+                paymentService.createPayment(request.getAuctionId(), request.getConsumerId(), request.getAmount());
         }
+
+        auction.setStatus(AuctionStatus.ENDED);
+        auctionRepository.save(auction);
     }
 }

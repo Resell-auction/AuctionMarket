@@ -36,16 +36,16 @@ public class PaymentService {
     private final CouponUserRepository couponUserRepository;
 
     @Transactional
-    public void createPayment(Long auctionId) {
+    public void createPayment(Long auctionId,Long consumerId, Long amount) {
         Auction auction = auctionRepository.findById(auctionId).orElseThrow(
                 ()-> new PaymentException(PaymentErrorCode.NOT_FOUND_AUCTION)
         );
 
         Payment payment = Payment.builder()
-                .userId(auction.getConsumerId())
+                .userId(consumerId)
                 .auctionId(auction.getId())
                 .payStatus(PayStatus.PENDING)
-                .amount(auction.getMaxPrice())
+                .amount(amount)
                 .deadline(LocalDateTime.now().plusDays(1))
                 .build();
         paymentRepository.save(payment);
