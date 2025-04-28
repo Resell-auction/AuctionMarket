@@ -18,6 +18,7 @@ import com.example.auctionmarket.domain.auction.exception.AuctionException;
 import com.example.auctionmarket.domain.auction.mapper.AuctionMapper;
 import com.example.auctionmarket.domain.auction.repository.AuctionRepository;
 //import com.example.auctionmarket.domain.auction.repository.AuctionSearchRepository;
+import com.example.auctionmarket.domain.auction.repository.AuctionSearchRepository;
 import com.example.auctionmarket.domain.payment.service.PaymentService;
 import com.example.auctionmarket.domain.product.entity.Product;
 import com.example.auctionmarket.domain.product.repository.ProductRepository;
@@ -49,7 +50,7 @@ import java.util.Objects;
 public class AuctionService {
 
     private final AuctionRepository auctionRepository;
-//    private final AuctionSearchRepository auctionSearchRepository;
+    private final AuctionSearchRepository auctionSearchRepository;
     private final AuctionOpenSearchService auctionOpenSearchService;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
@@ -83,8 +84,8 @@ public class AuctionService {
 
         Auction saveAuction = auctionRepository.save(auction);
 
-//        //ES 색인
-//        auctionSearchRepository.save(AuctionMapper.toDucument(saveAuction));
+        //ES 색인
+        auctionSearchRepository.save(AuctionMapper.toDucument(saveAuction));
 
         //OpenSearch 인덱싱 추가
         AuctionDocument document = AuctionDocument.builder()
@@ -263,8 +264,8 @@ public class AuctionService {
         //입력 받은 수정할 시작 시간 저장
         auction.updateStartTime(request.getUpdateTime());
 
-//        //elastic search 색인도 업데이트
-//        auctionSearchRepository.save(AuctionMapper.toDucument(auction));
+        //elastic search 색인도 업데이트
+        auctionSearchRepository.save(AuctionMapper.toDucument(auction));
 
         String auctionMessage = remainingTimeOfAuctionStatus(auction.getStatus(), auction.getEndTime());
 
@@ -311,8 +312,8 @@ public class AuctionService {
         //입력 받은 최소가 저장
         auction.updateMinPrice(request.getMinPrice());
 
-//        //elastic search 색인도 업데이트
-//        auctionSearchRepository.save(AuctionMapper.toDucument(auction));
+        //elastic search 색인도 업데이트
+        auctionSearchRepository.save(AuctionMapper.toDucument(auction));
 
         String auctionMessage = remainingTimeOfAuctionStatus(auction.getStatus(), auction.getEndTime());
 

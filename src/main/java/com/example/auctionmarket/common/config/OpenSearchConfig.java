@@ -1,6 +1,6 @@
 package com.example.auctionmarket.common.config;
 
-import com.example.auctionmarket.common.aws.AWSReqeustSigningApacheInterceptor;
+//import com.example.auctionmarket.common.aws.AWSReqeustSigningApacheInterceptor;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -26,55 +26,55 @@ public class OpenSearchConfig {
     @Value("${opensearch.url}")
     private String openSearchUrl;
 
-//    @Value("${opensearch.username}")
-//    private String username;
+    @Value("${opensearch.username}")
+    private String username;
+
+    @Value("${opensearch.password}")
+    private String password;
+
+//    @Value("${cloud.aws.credentials.access-key}")
+//    private String accessKey;
 //
-//    @Value("${opensearch.password}")
-//    private String password;
-
-    @Value("${cloud.aws.credentials.access-key}")
-    private String accessKey;
-
-    @Value("${cloud.aws.credentials.secret-key}")
-    private String secretKey;
-
-    @Value("${cloud.aws.region.static}")
-    private String region;
-
-//    @Bean
-//    public RestHighLevelClient restHighLevelClient() {
-//        final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-//        credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
+//    @Value("${cloud.aws.credentials.secret-key}")
+//    private String secretKey;
 //
-//        RestClientBuilder builder = RestClient.builder(HttpHost.create(openSearchUrl))
-//                .setHttpClientConfigCallback(httpClientBuilder ->
-//                        httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider));
-//
-//        return new RestHighLevelClient(builder);
-//    }
+//    @Value("${cloud.aws.region.static}")
+//    private String region;
 
     @Bean
     public RestHighLevelClient restHighLevelClient() {
-        Aws4Signer signer = Aws4Signer.create();
-        StaticCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(
-                AwsBasicCredentials.create(accessKey, secretKey)
-        );
+        final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
 
-        HttpHost host = HttpHost.create(openSearchUrl);
+        RestClientBuilder builder = RestClient.builder(HttpHost.create(openSearchUrl))
+                .setHttpClientConfigCallback(httpClientBuilder ->
+                        httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider));
 
-        RestClientBuilder restClient = RestClient.builder(host)
-                .setHttpClientConfigCallback(httpClientBuilder -> {
-                    ApacheHttpClient.Builder apacheClientBuilder = ApacheHttpClient.builder();
-                    return httpClientBuilder
-                            .addInterceptorLast(new AWSReqeustSigningApacheInterceptor(
-                                    "es",
-                                    signer,
-                                    credentialsProvider,
-                                    Region.of(region),
-                                    openSearchUrl
-                            ));
-                });
-
-        return new RestHighLevelClient(restClient);
+        return new RestHighLevelClient(builder);
     }
+
+//    @Bean
+//    public RestHighLevelClient restHighLevelClient() {
+//        Aws4Signer signer = Aws4Signer.create();
+//        StaticCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(
+//                AwsBasicCredentials.create(accessKey, secretKey)
+//        );
+//
+//        HttpHost host = HttpHost.create(openSearchUrl);
+//
+//        RestClientBuilder restClient = RestClient.builder(host)
+//                .setHttpClientConfigCallback(httpClientBuilder -> {
+//                    ApacheHttpClient.Builder apacheClientBuilder = ApacheHttpClient.builder();
+//                    return httpClientBuilder
+//                            .addInterceptorLast(new AWSReqeustSigningApacheInterceptor(
+//                                    "es",
+//                                    signer,
+//                                    credentialsProvider,
+//                                    Region.of(region),
+//                                    openSearchUrl
+//                            ));
+//                });
+//
+//        return new RestHighLevelClient(restClient);
+//    }
 }
