@@ -50,6 +50,18 @@ public class ProductController {
         return Response.fromPage(productService.getAllProducts(authUser, page, size));
     }
 
+    // 제품 검색
+    @GetMapping("/v1/products/search")
+    public Response<ProductResponse> searchProducts(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String category,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @AuthenticationPrincipal AuthUser authUser
+    ) {
+        return Response.fromPage(productService.searchProducts(keyword, category, page, size, authUser));
+    }
+
     // 제품 정보 수정
     @PatchMapping("/v1/products/{productId}")
     public Response<ProductResponse> updateProduct(
@@ -69,4 +81,5 @@ public class ProductController {
         productService.deleteProduct(authUser, productId);
         return Response.of("제품이 삭제되었습니다.");
     }
+
 }

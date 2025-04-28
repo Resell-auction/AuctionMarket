@@ -87,6 +87,30 @@ public class ProductService {
         return new PageImpl<>(dtoList, pageable, productPage.getTotalElements());
     }
 
+    //경매 검색
+    @Transactional(readOnly = true)
+    public Page<ProductResponse> searchProducts(String keyword, String category, int page, int size, AuthUser authUser) {
+
+        // 유저 검증 로직 (본인 확인)
+        User user = userRepository.findById(authUser.getId()).orElseThrow(
+                () -> new UserNotFoundException()
+        );
+
+        int adjustPage = (page > 0) ? page - 1 : 0;
+        Pageable pageable = PageRequest.of(adjustPage, size);
+
+        ProductCategory productCategory = ProductCategory.of(category);
+
+        Page<Product> productPage = productRepository.findProductsBySearch(keyword, /* category */ productCategory  , pageable);
+
+        List<ProductResponse> dtoList = productPage.getContent().stream()
+                .map(ProductResponse::toDto)
+                .toList();
+
+        return new PageImpl<>(dtoList, pageable, productPage.getTotalElements());
+
+    }
+
     // 제품 정보 수정
     @Transactional
     public ProductResponse updateProduct(AuthUser authUser, Long productId, ProductUpdateRequest request) {
@@ -143,4 +167,6 @@ public class ProductService {
     }
 
     public void changeSoldStatus(Long productId) {}
+
+
 }

@@ -15,7 +15,10 @@ import java.util.List;
 @Getter
 @Entity
 @NoArgsConstructor
-@Table(name = "product")
+@Table(name = "product"
+        , indexes = {
+        @Index(name = "idx_product_name", columnList = "category, productName")
+})
 public class Product extends TimeStamped {
 
     @Id
