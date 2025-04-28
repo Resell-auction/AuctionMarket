@@ -2,7 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.4'
 	id 'io.spring.dependency-management' version '1.1.7'
-	id 'org.asciidoctor.convert' version '1.5.8'
+	id 'org.asciidoctor.jvm.convert' version '3.3.2'
 
 }
 
@@ -21,12 +21,12 @@ configurations {
 	}
 }
 
-repositories {
-	mavenCentral()
+configurations {
+	asciidoctorExt
 }
 
-ext {
-	snippetsDir = file('build/generated-snippets')
+repositories {
+	mavenCentral()
 }
 
 dependencies {
@@ -80,12 +80,14 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 
 	//restdocs
+	asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
 	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 
-}
+	//aws event bridge
+	implementation 'software.amazon.awssdk:eventbridge:2.20.0' // 최신 버전 확인
+	implementation 'com.amazonaws:aws-lambda-java-core:1.2.1'
 
-tasks.named('test') {
-	useJUnitPlatform()
+
 }
 
 //docker
@@ -101,13 +103,37 @@ test {
 	outputs.dir snippetsDir
 }
 
+tasks.register("restDocsTest", Test) {
+	description = "REST Docs용 테스트만 실행"
+	group = "verification"
+
+	useJUnitPlatform()
+	include("com.example.auctionmarket.restDocsTest.CouponRestDocsTest")
+	// filter { includeTestsMatching("com.example.**.RestDocs*") } // 클래스명 필터도 가능
+	outputs.dir snippetsDir
+}
+
+tasks.named("restDocsTest") {
+	useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile).configureEach {
+	options.compilerArgs += "-parameters"
+}
+
 asciidoctor {
-	dependsOn test
+	sourceDir = file("src/main/asciidoc")
+	outputDir = file("$buildDir/docs")// ✅ index.adoc 위치 기준으로 설정
 	inputs.dir snippetsDir
+	configurations 'asciidoctorExt'
+	dependsOn("restDocsTest")
 	sources {
-		include 'index.adoc'
+		include("index.adoc") // ✅ entry point 설정
 	}
 }
+
+
+
 //clean {
 //    delete file('src/main/generated')
 //}

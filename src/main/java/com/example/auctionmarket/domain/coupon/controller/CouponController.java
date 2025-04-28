@@ -34,12 +34,12 @@ public class CouponController {
     @PostMapping//admin만 가능
     public ResponseEntity<CouponResponse> createCoupon(@AuthenticationPrincipal AuthUser authUser, @RequestBody CouponRequest couponRequest){
 
-        if (authUser.getAuthorities() == null) {
-            logService.saveLog(404L, "❌AUTHORITY_ERROR", String.valueOf(CouponErrorCode.NOT_ADMIN_AUTHORITY));
-            throw new CouponException(CouponErrorCode.NOT_ADMIN_AUTHORITY);
-        }
+//        if (authUser.getAuthorities() == null) {
+//            logService.saveLog(404L, "❌AUTHORITY_ERROR", String.valueOf(CouponErrorCode.NOT_ADMIN_AUTHORITY));
+//            throw new CouponException(CouponErrorCode.NOT_ADMIN_AUTHORITY);
+//        }
      //   log.info("[쿠폰생성API] - 권한: {}", authUser.getAuthorities());
-        logService.saveLog( authUser.getId(), "📍[API]COUPON_CREATE", "쿠폰생성API");
+//        logService.saveLog( authUser.getId(), "📍[API]COUPON_CREATE", "쿠폰생성API");
 
         return ResponseEntity.ok(couponService.createCoupon(authUser, couponRequest));
     }
@@ -66,7 +66,7 @@ public class CouponController {
 
     //수정
     @PutMapping("/{couponId}")//admin
-    public ResponseEntity<CouponResponse> updateCoupon(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long couponId, @RequestBody CouponUpdateRequest couponUpdateRequest){
+    public ResponseEntity<CouponResponse> updateCoupon(@AuthenticationPrincipal AuthUser authUser, @PathVariable("couponId") Long couponId, @RequestBody CouponUpdateRequest couponUpdateRequest){
 
    //     log.info("[쿠폰수정API]- 권한: {} , 쿠폰ID: {}", authUser.getAuthorities(), couponId);
         logService.saveLog( couponId, "📍[API]COUPON_UPDATE_ID", "쿠폰목록조회API");
@@ -76,7 +76,7 @@ public class CouponController {
 
     //삭제
     @DeleteMapping("/{couponId}")//admin
-    public void deleteCoupon(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long couponId){
+    public void deleteCoupon(@AuthenticationPrincipal AuthUser authUser, @PathVariable("couponId") Long couponId){
 
  //      log.info("[쿠폰삭제API]- 권한: {} , 쿠폰ID: {}", authUser.getAuthorities(), couponId);
         logService.saveLog( couponId, "📍[API]COUPON_DELETE_ID", "쿠폰삭제API");
@@ -86,11 +86,18 @@ public class CouponController {
 
     //유저에게 쿠폰을 원하는 수량만큼 주기
     @PutMapping("/{couponId}/give")
-    public void giveCouponByUserId(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long couponId, @RequestBody CouponGiveRequest couponGiveRequest){
+    public void giveCouponByUserId(@AuthenticationPrincipal AuthUser authUser, @PathVariable("couponId") Long couponId, @RequestBody CouponGiveRequest couponGiveRequest){
 
     //    log.info("[쿠폰발급API]- 권한: {} , 쿠폰ID: {}", authUser.getAuthorities(), couponId);
         logService.saveLog( couponId, "📍[API]COUPON_GIVE_ID", "쿠폰증정API");
 
         couponUserService.giveCouponByUserId(authUser, couponId, couponGiveRequest);
     }
+
+    @PostMapping("/expire")
+    public ResponseEntity<Void> expireCoupons() {
+        couponService.expireCoupons();
+        return ResponseEntity.ok().build();
+    }
+
 }

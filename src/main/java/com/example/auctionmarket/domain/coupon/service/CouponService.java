@@ -1,7 +1,6 @@
 package com.example.auctionmarket.domain.coupon.service;
 
 import com.example.auctionmarket.common.auth.AuthUser;
-import com.example.auctionmarket.common.log.LogRepository;
 import com.example.auctionmarket.common.log.LogService;
 import com.example.auctionmarket.domain.coupon.dto.CouponRequest;
 import com.example.auctionmarket.domain.coupon.dto.CouponResponse;
@@ -11,7 +10,6 @@ import com.example.auctionmarket.domain.coupon.enums.CouponStatus;
 import com.example.auctionmarket.domain.coupon.exception.CouponErrorCode;
 import com.example.auctionmarket.domain.coupon.exception.CouponException;
 import com.example.auctionmarket.domain.coupon.repository.CouponRepository;
-import com.example.auctionmarket.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -60,7 +58,6 @@ public class CouponService {
             //쿠폰 생성과 동시에 redis에 추가
             LocalDateTime now = LocalDateTime.now();
             LocalDateTime expiredAt = couponRequest.getExpiredAt();
-
             String redisKey = "coupon_stock:" + savedCoupon.getId();
             redisTemplate.opsForValue().set(redisKey, String.valueOf(couponRequest.getAmount()), Duration.between(now, expiredAt).getSeconds());
 
@@ -157,7 +154,6 @@ public class CouponService {
         } catch (Exception e) {
             logService.saveLog(404L, "❌COUPON_UPDATE_ERROR", e.getMessage());
             //   log.error("❌쿠폰 수정 실패", e);
-
         }
         return new CouponResponse(coupon.getId(),
                 coupon.getCouponName(),
@@ -189,6 +185,17 @@ public class CouponService {
             logService.saveLog(404L, "❌COUPON_DELETE_ERROR", e.getMessage());
             //    log.error("❌쿠폰 삭제 실패", e);
         }
+    }
+
+    @Transactional
+    public void expireCoupons() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime yesterday = now.minusDays(1); // 어제 00:00:00
+
+        int updatedCount = couponRepository.expireCouponsBetween(yesterday, now);
+
+        log.info("만료된 쿠폰 수: {}", updatedCount);
+
     }
 
 }

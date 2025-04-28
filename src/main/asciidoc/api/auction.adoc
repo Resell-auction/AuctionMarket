@@ -1,0 +1,4 @@
+include::{snippets}/create-auction/request-headers.adoc[]
+include::{snippets}/create-auction/response-body.adoc[]
+
+

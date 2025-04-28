@@ -1,0 +1,17 @@
+=== 경매 참여 (PATCH /v1/auctions/{auctionId}/participation)
+
+요청
+
+include::{snippets}/post-product/http-request.adoc[]
+
+요청 필드
+
+include::{snippets}/post-product/request-fields.adoc[]
+
+응답
+
+include::{snippets}/post-product/http-response.adoc[]
+
+응답 필드
+
+include::{snippets}/post-product/response-fields.adoc[]

@@ -112,7 +112,6 @@ public class CouponUserService {
                 .anyMatch(auth -> auth.getAuthority().equals("ADMIN"))) {
             logService.saveLog(403L, "❌ERROR", "권한이 없습니다.");
             throw new CouponException(CouponErrorCode.NOT_ADMIN_AUTHORITY);
-
         }
 
         Coupon coupon = couponRepository.findById(id).orElseThrow(
@@ -133,9 +132,7 @@ public class CouponUserService {
         if (couponGiveRequest.getAmount() > 1){
             logService.saveLog(404L, "❌ERROR", "쿠폰은 1장만 발급 가능합니다.");
 
-
             throw new CouponException(CouponErrorCode.DUPLICATE_COUPON);
-
         }
 
         //user, coupon객체에 couponuser 객체 생성 후 저장.

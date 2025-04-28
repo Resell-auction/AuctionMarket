@@ -13,4 +13,6 @@ public class CouponGiveRequest {
     @NotNull
     private Integer amount;
 
+    public CouponGiveRequest() {} // 기본 생성자
+
 }

@@ -1,0 +1,18 @@
+= Spring REST Docs API Document
+내일배움캠프 최종 프로젝트 2조 경매앱 프로젝트
+:doctype: book
+:toc: left
+:toc-title: 목차
+:toclevels: 3
+:sectnums:
+:sectlinks:
+:icons: font
+:source-highlighter: highlightjs
+
+
+== 개요
+Spring REST Docs 도구를 이용해서 만든 API 문서입니다.
+
+
+include::{docdir}/src/main/asciidoc/api/coupon.adoc[]
+

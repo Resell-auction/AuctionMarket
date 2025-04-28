@@ -21,4 +21,7 @@ public class CouponRequest {
 
     private CouponType couponType;
 
+    public CouponRequest() {} // ✅ 기본 생성자 추가
+
+
 }

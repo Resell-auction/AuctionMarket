@@ -48,7 +48,8 @@ public class SecurityConfig {
 				.requestMatchers(new AntPathRequestMatcher("/api/*/auth/**")).permitAll()
 				.requestMatchers(new AntPathRequestMatcher("/v1/products/**")).permitAll()
 					.requestMatchers(new AntPathRequestMatcher("/v1/auction/**")).permitAll()
-				.anyRequest().authenticated()
+					.requestMatchers("/v1/coupons/expire").permitAll()  // ✅ 추가!!
+					.anyRequest().authenticated()
 			)
 			.build();
 	}

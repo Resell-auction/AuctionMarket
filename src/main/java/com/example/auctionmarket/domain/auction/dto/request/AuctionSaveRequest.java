@@ -26,4 +26,6 @@ public class AuctionSaveRequest {
     //분 단위로 입력 받는 경매 지속 시간
     @Min(value = 1, message = "경매 지속 시간은 최소 1분 이상이여야 합니다.")
     private Long progressTime;
+
+
 }
