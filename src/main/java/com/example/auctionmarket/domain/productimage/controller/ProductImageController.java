@@ -21,11 +21,11 @@ public class ProductImageController {
 
     // 제품 이미지 업로드
     @PostMapping(value = "v1/products/{productId}/product-images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Response<List<ProductImageResponse>> uploadProductImages (
+    public Response<List<ProductImageResponse>> uploadProductImages(
             @AuthenticationPrincipal AuthUser authUser,
             @PathVariable Long productId,
             @RequestPart("files") List<MultipartFile> files
-            ) throws IOException {
+    ) throws IOException {
         return Response.of(productImageService.uploadProductImages(authUser, productId, files));
     }
 

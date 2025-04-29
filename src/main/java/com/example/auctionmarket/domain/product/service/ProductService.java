@@ -101,14 +101,13 @@ public class ProductService {
 
         ProductCategory productCategory = ProductCategory.of(category);
 
-        Page<Product> productPage = productRepository.findProductsBySearch(keyword, /* category */ productCategory  , pageable);
+        Page<Product> productPage = productRepository.findProductsBySearch(keyword, productCategory, pageable);
 
         List<ProductResponse> dtoList = productPage.getContent().stream()
                 .map(ProductResponse::toDto)
                 .toList();
 
         return new PageImpl<>(dtoList, pageable, productPage.getTotalElements());
-
     }
 
     // 제품 정보 수정
@@ -138,7 +137,6 @@ public class ProductService {
         product.update(request.getProductName(), request.getProductContent(), category);
 
         return ProductResponse.toDto(product);
-
     }
 
     @Transactional
@@ -165,8 +163,4 @@ public class ProductService {
 
         productRepository.deleteById(productId);
     }
-
-    public void changeSoldStatus(Long productId) {}
-
-
 }

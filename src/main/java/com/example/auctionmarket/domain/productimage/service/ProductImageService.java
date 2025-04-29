@@ -50,7 +50,7 @@ public class ProductImageService {
     // 제품 이미지 업로드
     @Transactional
     public List<ProductImageResponse> uploadProductImages(AuthUser authUser, Long productId, List<MultipartFile> files) throws IOException {
-    // file.getBytes()는 IOException 발생 가능이 있으므로 uploadProductImages 메서드에 throws IOException 붙임
+        // file.getBytes()는 IOException 발생 가능이 있으므로 uploadProductImages 메서드에 throws IOException 붙임
 
         // 유저 검증 로직 (본인 확인)
         User user = userRepository.findById(authUser.getId()).orElseThrow(
@@ -100,7 +100,7 @@ public class ProductImageService {
 
             // 업로드 성공 시 파일 URL 반환
             String s3ImageUrl = "https://" + bucket + ".s3.amazonaws.com/" + key;
-            String cloudFrontImageUrl =  cloudFrontDomain + "/" + key;
+            String cloudFrontImageUrl = cloudFrontDomain + "/" + key;
 
 
             ProductImage productImage = new ProductImage(product, fileName, originFileName, s3ImageUrl, cloudFrontImageUrl);
@@ -162,15 +162,13 @@ public class ProductImageService {
     }
 
     // 업로드 가능한 이미지 파일 확인 메서드
-    private  boolean isImageFile(String fileExtension) {
+    private boolean isImageFile(String fileExtension) {
         String lowerExtension = fileExtension.toLowerCase();
-        return  lowerExtension.equals(".jpg") ||
+        return lowerExtension.equals(".jpg") ||
                 lowerExtension.equals(".jpeg") ||
                 lowerExtension.equals(".png") ||
                 lowerExtension.equals(".gif") ||
                 lowerExtension.equals(".pdf");
     }
-
-
 
 }

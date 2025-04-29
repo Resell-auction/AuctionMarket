@@ -81,5 +81,4 @@ public class ProductController {
         productService.deleteProduct(authUser, productId);
         return Response.of("제품이 삭제되었습니다.");
     }
-
 }
