@@ -1,6 +1,9 @@
 package com.example.auctionmarket.domain.auction.service;
 
 import com.example.auctionmarket.domain.auction.document.AuctionDocument;
+import com.example.auctionmarket.domain.auction.dto.response.AuctionOpenSearchPageResponse;
+import com.example.auctionmarket.domain.auction.dto.response.AuctionPageResponse;
+import com.example.auctionmarket.domain.auction.dto.response.AuctionResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +42,7 @@ public class AuctionOpenSearchService {
         restHighLevelClient.index(request, RequestOptions.DEFAULT);
     }
 
-    public List<AuctionDocument> search(String keyword, String category, int page, int size) throws IOException {
+    public AuctionOpenSearchPageResponse<AuctionDocument> search(String keyword, String category, int page, int size) throws IOException {
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
 
         if(keyword != null && !keyword.isBlank()){
@@ -68,6 +71,15 @@ public class AuctionOpenSearchService {
             result.add(auction);
         }
 
-        return result;
+        long totalHits = searchResponse.getHits().getTotalHits().value;
+        int totalPages = (int) Math.ceil((double)totalHits / size);
+
+        return new AuctionOpenSearchPageResponse<>(
+                page,
+                size,
+                totalHits,
+                totalPages,
+                result
+        );
     }
 }

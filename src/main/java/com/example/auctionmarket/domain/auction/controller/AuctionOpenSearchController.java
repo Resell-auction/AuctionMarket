@@ -1,6 +1,7 @@
 package com.example.auctionmarket.domain.auction.controller;
 
 import com.example.auctionmarket.domain.auction.document.AuctionDocument;
+import com.example.auctionmarket.domain.auction.dto.response.AuctionOpenSearchPageResponse;
 import com.example.auctionmarket.domain.auction.service.AuctionOpenSearchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +20,7 @@ public class AuctionOpenSearchController {
     private final AuctionOpenSearchService auctionOpenSearchService;
 
     @GetMapping("/search")
-    public List<AuctionDocument> searchAuctions(
+    public AuctionOpenSearchPageResponse<AuctionDocument> searchAuctions(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String category,
             @RequestParam(defaultValue = "1") int page,
