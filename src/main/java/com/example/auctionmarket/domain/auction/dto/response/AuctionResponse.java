@@ -2,24 +2,30 @@ package com.example.auctionmarket.domain.auction.dto.response;
 
 import com.example.auctionmarket.domain.auction.enums.AuctionStatus;
 import com.example.auctionmarket.domain.product.enums.ProductCategory;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Getter
+@Setter
+@NoArgsConstructor
 public class AuctionResponse {
 
-    private final Long id;
-    private final Long productId;
-    private final Long userId;
-    private final String productName;
-    private final ProductCategory category;
-    private final Long minPrice;
-    private final Long maxPrice;
-    private final LocalDateTime startTime;
-    private final LocalDateTime endTime;
-    private final AuctionStatus status;
-    private final String remainingTime;
+    private Long id;
+    private Long productId;
+    private Long userId;
+    private String productName;
+    private ProductCategory category;
+    private Long minPrice;
+    private Long maxPrice;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
+    private AuctionStatus status;
+    private String remainingTime;
+    private String websocketUrl;
 
     public AuctionResponse(Long id, Long productId, Long userId, String productName, ProductCategory category, Long minPrice, Long maxPrice,
                            LocalDateTime startTime, LocalDateTime endTime, AuctionStatus status, String remainingTime) {
