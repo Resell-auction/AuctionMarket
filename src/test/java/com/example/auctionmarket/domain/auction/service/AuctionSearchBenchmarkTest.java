@@ -1,6 +1,7 @@
 package com.example.auctionmarket.domain.auction.service;
 
 import com.example.auctionmarket.domain.auction.document.AuctionDocument;
+import com.example.auctionmarket.domain.auction.dto.response.AuctionOpenSearchPageResponse;
 import com.example.auctionmarket.domain.auction.entity.Auction;
 import com.example.auctionmarket.domain.auction.enums.AuctionStatus;
 import com.example.auctionmarket.domain.auction.mapper.AuctionMapper;
@@ -121,7 +122,7 @@ public class AuctionSearchBenchmarkTest {
 
         //OpenSearch를 사용한 검색 기능
         long startTime3 = System.currentTimeMillis();
-        List<AuctionDocument> result = auctionOpenSearchService.search(keyword, category, page, size);
+        AuctionOpenSearchPageResponse<AuctionDocument> result = auctionOpenSearchService.search(keyword, category, page, size);
         long endTime3 = System.currentTimeMillis();
         System.out.println("OpenSearch 검색 소요 시간: "+(endTime3-startTime3)+"ms");
     }

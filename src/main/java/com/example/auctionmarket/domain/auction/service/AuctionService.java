@@ -2,13 +2,15 @@ package com.example.auctionmarket.domain.auction.service;
 
 import com.example.auctionmarket.common.auth.AuthUser;
 import com.example.auctionmarket.common.websocket.WebSocketAuctionCreateRequest;
+import com.example.auctionmarket.common.websocket.WebSocketAuctionJoinRequest;
 import com.example.auctionmarket.common.websocket.WebSocketClient;
 import com.example.auctionmarket.domain.auction.document.AuctionDocument;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionSaveRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateMinPriceRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateTimeRequest;
-import com.example.auctionmarket.domain.auction.dto.response.AuctionIncreasePriceResponse;
+//import com.example.auctionmarket.domain.auction.dto.response.AuctionIncreasePriceResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionPageResponse;
+import com.example.auctionmarket.domain.auction.dto.response.AuctionJoinResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionSaveResponse;
 import com.example.auctionmarket.domain.auction.entity.Auction;
@@ -36,13 +38,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -56,6 +61,7 @@ public class AuctionService {
     private final ProductRepository productRepository;
     private final PaymentService paymentService;
     private final WebSocketClient webSocketClient;
+    private final RestTemplate restTemplate;
     private final RedisTemplate<String, Object> redisTemplate;
     private static final String AUCTION_CACHE_KEY = "auction::";
 
@@ -108,9 +114,12 @@ public class AuctionService {
                         saveAuction.getId(),
                         saveAuction.getProduct().getProductName(),
                         saveAuction.getMinPrice(),
+                        saveAuction.getStartTime(),
                         saveAuction.getEndTime()
                 )
         );
+
+        Duration ttl = Duration.between(LocalDateTime.now(), saveAuction.getEndTime());
 
         //저장한 경매 출력
         return new AuctionSaveResponse(
@@ -233,8 +242,34 @@ public class AuctionService {
 
     //경매 입찰
     @Transactional
-    public AuctionIncreasePriceResponse increasePrice(AuthUser authUser, Long auctionId, Long increasedPrice){
-        return processBid(authUser, auctionId, increasedPrice);
+    public AuctionJoinResponse join(AuthUser authUser, Long auctionId){
+        User user = userRepository.findById(authUser.getId())
+                .orElseThrow(()->new UserNotFoundException());
+
+        String websocketUrl = "http://localhost:8081/internal/auction/join";
+
+        Map<String, Object> request = new HashMap<>();
+        request.put("auctionId", auctionId);
+        request.put("nickname", authUser.getNickname());
+
+        Auction auction = auctionRepository.findById(auctionId)
+                .orElseThrow(()->new AuctionException(AuctionErrorCode.AUCTION_NOT_FOUND));
+
+        webSocketClient.joinAuctionRoom(
+                new WebSocketAuctionJoinRequest(
+                        auction.getId(),
+                        user.getNickname()
+                )
+        );
+
+        return new AuctionJoinResponse(
+                auction.getId(),
+                auction.getProduct().getProductName(),
+                auction.getMinPrice(),
+                auction.getStartTime(),
+                auction.getEndTime(),
+                "http://localhost:8081/auction.html?auctionId=" + auction.getId() + "&nickname=" + user.getNickname()
+        );
     }
 
     //경매 수정(시작 시간)
@@ -281,8 +316,7 @@ public class AuctionService {
                 auction.getStartTime(),
                 auction.getEndTime(),
                 auction.getStatus(),
-                auctionMessage,
-                "http://localhost:8081/auction.html?auctionId=" + auction.getId()
+                auctionMessage
         );
     }
 
@@ -329,8 +363,7 @@ public class AuctionService {
                 auction.getStartTime(),
                 auction.getEndTime(),
                 auction.getStatus(),
-                auctionMessage,
-                "http://localhost:8081/auction.html?auctionId=" + auction.getId()
+                auctionMessage
         );
     }
 
@@ -392,27 +425,49 @@ public class AuctionService {
                 duration.toMinutesPart());
     }
 
-    //경매 상태 변경 함수
-    @Transactional
-    @Scheduled(cron = "0 * * * * *")
-    public void updateStatus() {
+//    //경매 상태 변경 함수
+//    @Transactional
+//    @Scheduled(cron = "0 * * * * *")
+//    public void updateStatus() {
+//
+//        List<Auction> auctions = auctionRepository.findAll();
+//
+//        for(Auction auction : auctions){
+//            if(LocalDateTime.now().isAfter(auction.getStartTime()) && LocalDateTime.now().isBefore(auction.getEndTime())){
+//                auction.setStatus(AuctionStatus.ONGOING);
+//            }
+//            else if (LocalDateTime.now().isAfter(auction.getEndTime())) {
+//                auction.setStatus(AuctionStatus.ENDED);
+//
+//                if (auction.getConsumerId() != null && paymentService.shouldCreatePayment(auction.getId())) {
+//                    paymentService.createPayment(auction.getId());
+//
+//                    // 나중에 동기 비동기시 변형해서 사용
+////                    eventPublisher.publishEvent(new AuctionEndEvent(
+////                            auction.getId(),
+////                            auction.getConsumerId(),
+////                            auction.getMaxPrice()
+////                    ));
+////                    paymentService.createPayment(auction);
+//                }
+//            }
+//            else if(LocalDateTime.now().isBefore(auction.getStartTime())) {
+//                auction.setStatus(AuctionStatus.PENDING);
+//            }
+//        }
+//    }
 
-        List<Auction> auctions = auctionRepository.findAll();
+    public void endAuction (Long auctionId) {
+        Auction auction = auctionRepository.findById(auctionId)
+                .orElseThrow(()->new AuctionException(AuctionErrorCode.AUCTION_NOT_FOUND));
+        if (LocalDateTime.now().isAfter(auction.getEndTime())) {
+            auction.setStatus(AuctionStatus.ENDED);
 
-        for(Auction auction : auctions){
-            if(LocalDateTime.now().isAfter(auction.getStartTime()) && LocalDateTime.now().isBefore(auction.getEndTime())){
-                auction.setStatus(AuctionStatus.ONGOING);
+            if (auction.getConsumerId() != null && paymentService.shouldCreatePayment(auction.getId())) {
+                paymentService.createPayment(auction.getId());
             }
-            else if (LocalDateTime.now().isAfter(auction.getEndTime())) {
-                auction.setStatus(AuctionStatus.ENDED);
 
-                if (auction.getConsumerId() != null && paymentService.shouldCreatePayment(auction.getId())) {
-                    paymentService.createPayment(auction.getId());
-                }
-            }
-            else if(LocalDateTime.now().isBefore(auction.getStartTime())) {
-                auction.setStatus(AuctionStatus.PENDING);
-            }
+            auctionRepository.save(auction);
         }
     }
 
@@ -431,48 +486,47 @@ public class AuctionService {
                     auction.getStartTime(),
                     auction.getEndTime(),
                     auction.getStatus(),
-                    auctionMessage,
-                    "http://localhost:8081/auction.html?auctionId=" + auction.getId()
+                    auctionMessage
             );
         });
     }
 
-    //입찰 처리 공통 로직
-    private AuctionIncreasePriceResponse processBid(AuthUser authUser, Long auctionId, Long increasePrice){
-        Auction auction = auctionRepository.findById(auctionId)
-                .orElseThrow(()->new AuctionException(AuctionErrorCode.AUCTION_NOT_FOUND));
+//    //입찰 처리 공통 로직
+//    private AuctionIncreasePriceResponse processBid(AuthUser authUser, Long auctionId, Long increasePrice){
+//        Auction auction = auctionRepository.findById(auctionId)
+//                .orElseThrow(()->new AuctionException(AuctionErrorCode.AUCTION_NOT_FOUND));
+//
+//        validateBidConditions(authUser, auction);
+//
+//        auction.increaseMaxPrice(authUser.getId(), increasePrice);
+//
+//        return createBidResponse(auction);
+//    }
 
-        validateBidConditions(authUser, auction);
-
-        auction.increaseMaxPrice(authUser.getId(), increasePrice);
-
-        return createBidResponse(auction);
-    }
-
-    //입찰 유효성 검사 공통 로직
-    private void validateBidConditions(AuthUser authUser, Auction auction){
-        if(auction.getStatus() != AuctionStatus.ONGOING){
-            throw new AuctionException(AuctionErrorCode.AUCTION_NOT_STARTED);
-        }
-
-        User user = userRepository.findById(authUser.getId())
-                .orElseThrow(()->new UserNotFoundException());
-
-        if(Objects.equals(authUser.getId(), auction.getProduct().getUser().getId())){
-            throw new AuctionException(AuctionErrorCode.SELF_BID_NOT_ALLOWED);
-        }
-    }
-
-    //응답 생성 공통 로직
-    private AuctionIncreasePriceResponse createBidResponse(Auction auction){
-        return new AuctionIncreasePriceResponse(
-                auction.getId(),
-                auction.getProduct().getId(),
-                auction.getConsumerId(),
-                auction.getProduct().getProductName(),
-                auction.getProduct().getCategory(),
-                auction.getMinPrice(),
-                auction.getMaxPrice()
-        );
-    }
+//    //입찰 유효성 검사 공통 로직
+//    private void validateBidConditions(AuthUser authUser, Auction auction){
+//        if(auction.getStatus() != AuctionStatus.ONGOING){
+//            throw new AuctionException(AuctionErrorCode.AUCTION_NOT_STARTED);
+//        }
+//
+//        User user = userRepository.findById(authUser.getId())
+//                .orElseThrow(()->new UserNotFoundException());
+//
+//        if(Objects.equals(authUser.getId(), auction.getProduct().getUser().getId())){
+//            throw new AuctionException(AuctionErrorCode.SELF_BID_NOT_ALLOWED);
+//        }
+//    }
+//
+//    //응답 생성 공통 로직
+//    private AuctionIncreasePriceResponse createBidResponse(Auction auction){
+//        return new AuctionIncreasePriceResponse(
+//                auction.getId(),
+//                auction.getProduct().getId(),
+//                auction.getConsumerId(),
+//                auction.getProduct().getProductName(),
+//                auction.getProduct().getCategory(),
+//                auction.getMinPrice(),
+//                auction.getMaxPrice()
+//        );
+//    }
 }
