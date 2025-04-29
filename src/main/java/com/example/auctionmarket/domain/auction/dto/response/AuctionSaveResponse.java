@@ -17,8 +17,9 @@ public class AuctionSaveResponse {
     private final LocalDateTime startTime;
     private final LocalDateTime endTime;
     private final AuctionStatus status;
+    private final String websocketUrl;
 
-    public AuctionSaveResponse(Long id, Long productId, Long userId, String productName, ProductCategory category, Long minPrice, LocalDateTime startTime, LocalDateTime endTime, AuctionStatus status) {
+    public AuctionSaveResponse(Long id, Long productId, Long userId, String productName, ProductCategory category, Long minPrice, LocalDateTime startTime, LocalDateTime endTime, AuctionStatus status, String websocketUrl) {
         this.id = id;
         this.productId = productId;
         this.userId = userId;
@@ -28,5 +29,6 @@ public class AuctionSaveResponse {
         this.startTime = startTime;
         this.endTime = endTime;
         this.status = status;
+        this.websocketUrl = websocketUrl;
     }
 }

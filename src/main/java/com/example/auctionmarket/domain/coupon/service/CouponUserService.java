@@ -45,6 +45,7 @@ public class CouponUserService {
             CouponUser couponUser = new CouponUser();
             couponUser.setUsers(users);
             couponUser.setCoupons(coupon);
+            couponUser.setCouponType(coupon.getCouponType());
             couponUserRepository.save(couponUser);
         }
 

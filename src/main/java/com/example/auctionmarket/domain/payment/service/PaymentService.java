@@ -57,27 +57,32 @@ public class PaymentService {
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new PaymentException(PaymentErrorCode.NOT_FOUND_PAYMENT));
 
+        // 결제 하려는 유저가 낙찰자가 맞는지 확인
         if (!Objects.equals(authUser.getId(), payment.getUserId())) {
             throw new PaymentException(PaymentErrorCode.NOT_PAYMENT_OWNER);
         }
 
+        // 입력한 결제 금액이 실제 낙찰금액과 같은지 확인
         if (!payment.getAmount().equals(paymentRequest.getAmount())) {
             throw new PaymentException(PaymentErrorCode.INVALID_PAYMENT_AMOUNT);
         }
         // 후순위자에게 기회가 넘어간 경우
-        // 환불이 된 상태
+        // 환불이 된 상태인지 확인
         if (payment.getPayStatus().equals(PayStatus.REFUNDED)) {
             throw new PaymentException(PaymentErrorCode.PAYMENT_ALREADY_REFUNDED);
         }
 
+        // 쿠폰 로직
         if (paymentRequest.getCouponId() != null) {
             CouponUser couponUser = couponUserRepository.findById(paymentRequest.getCouponId())
                     .orElseThrow(()-> new PaymentException(PaymentErrorCode.NOT_FOUND_COUPON));
 
+            // 쿠폰을 가지고 있는 지 확인
             if (!Objects.equals(couponUser.getUsers().getId(), authUser.getId())) {
                 throw new IllegalArgumentException("쿠폰 사용자가 아닙니다");
             }
 
+            // 사용된 쿠폰인지 확인
             if (couponUser.isUsed()) {
                 throw new IllegalArgumentException("이미 사용된 쿠폰입니다");
             }
