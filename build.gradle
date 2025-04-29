@@ -39,7 +39,6 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'com.h2database:h2'
 	runtimeOnly 'com.h2database:h2'
 	testRuntimeOnly 'com.h2database:h2'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -90,6 +89,10 @@ dependencies {
 	implementation 'software.amazon.awssdk:auth:2.25.20'
 	implementation 'software.amazon.awssdk:core:2.25.20'
 	implementation 'software.amazon.awssdk:apache-client:2.25.20'
+
+	//aws
+	implementation(platform("software.amazon.awssdk:bom:2.27.21"))
+	implementation("software.amazon.awssdk:s3")
 }
 
 tasks.named('test') {
