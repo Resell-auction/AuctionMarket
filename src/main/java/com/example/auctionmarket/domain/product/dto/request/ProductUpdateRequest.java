@@ -3,9 +3,12 @@ package com.example.auctionmarket.domain.product.dto.request;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class ProductUpdateRequest {
 
     @NotBlank(message = "물건 이름은 필수 입력값입니다.")

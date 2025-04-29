@@ -1,12 +1,10 @@
 package com.example.auctionmarket.domain.auction.entity;
 
-import com.example.auctionmarket.common.entity.BaseEntity;
 import com.example.auctionmarket.common.entity.TimeStamped;
 import com.example.auctionmarket.domain.auction.enums.AuctionStatus;
 import com.example.auctionmarket.domain.auction.exception.AuctionErrorCode;
 import com.example.auctionmarket.domain.auction.exception.AuctionException;
 import com.example.auctionmarket.domain.product.entity.Product;
-import com.example.auctionmarket.domain.product.enums.ProductCategory;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -56,7 +54,6 @@ public class Auction extends TimeStamped {
     @Enumerated(EnumType.STRING)
     @Column(name = "Auction_Status")
     private AuctionStatus status;
-
     //경매 정보를 저장하기 위한 메서드
     public Auction(Product product, Long minPrice, LocalDateTime startTime, Long minutes) {
         this.product = product;

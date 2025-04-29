@@ -45,11 +45,12 @@ public class SecurityConfig {
 			.logout(AbstractHttpConfigurer::disable)
 			.rememberMe(AbstractHttpConfigurer::disable)
 			.authorizeHttpRequests(auth -> auth
-				.requestMatchers(new AntPathRequestMatcher("/api/*/auth/**")).permitAll()
-				.requestMatchers(new AntPathRequestMatcher("/v1/products/**")).permitAll()
-					.requestMatchers(new AntPathRequestMatcher("/v1/auction/**")).permitAll()
-					.requestMatchers("/v1/coupons/expire").permitAll()  // ✅ 추가!!
-					.anyRequest().authenticated()
+				.requestMatchers(
+						new AntPathRequestMatcher("/v1/auth/**"),
+						new AntPathRequestMatcher("/v1/auctions/end"),
+						new AntPathRequestMatcher("/v2/auctions/**"),
+						new AntPathRequestMatcher("/v3/auctions/**")).permitAll()
+				.anyRequest().authenticated()
 			)
 			.build();
 	}
