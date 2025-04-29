@@ -1,23 +1,18 @@
 package com.example.auctionmarket.domain.auction.controller;
 
 import com.example.auctionmarket.common.auth.AuthUser;
-import com.example.auctionmarket.common.response.Response;
-import com.example.auctionmarket.domain.auction.dto.request.AuctionIncreasePriceRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionSaveRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateMinPriceRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateTimeRequest;
-import com.example.auctionmarket.domain.auction.dto.response.AuctionIncreasePriceResponse;
+import com.example.auctionmarket.domain.auction.dto.response.AuctionJoinResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionSaveResponse;
-import com.example.auctionmarket.domain.auction.entity.Auction;
 import com.example.auctionmarket.domain.auction.service.AuctionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -64,15 +59,10 @@ public class AuctionController {
         return ResponseEntity.ok(result);
     }
 
-    //경매 참여
-    @PatchMapping("/{auctionId}/participation")
-    public ResponseEntity<AuctionIncreasePriceResponse> increaseAuction(
-            @PathVariable Long auctionId,
-            @RequestBody AuctionIncreasePriceRequest request,
-            @AuthenticationPrincipal AuthUser authUser
-    ){
-        AuctionIncreasePriceResponse response = auctionService.increasePrice(authUser, auctionId, request.getIncreasePrice());
-
+    // 경매 참여
+    @PostMapping("/{auctionId}/join")
+    public ResponseEntity<AuctionJoinResponse> joinAuction(@PathVariable Long auctionId, @AuthenticationPrincipal AuthUser authUser){
+        AuctionJoinResponse response = auctionService.join(authUser, auctionId);
         return ResponseEntity.ok(response);
     }
 
@@ -108,4 +98,11 @@ public class AuctionController {
     ){
         auctionService.deleteAuction(authUser, auctionId);
     }
+
+    @PostMapping("end")
+    public void handleAuctionEnd(@RequestBody AuctionEndRequest request) {
+        auctionService.endAuction(request.auctionId);
+    }
+
+    public record AuctionEndRequest(Long auctionId) {}
 }

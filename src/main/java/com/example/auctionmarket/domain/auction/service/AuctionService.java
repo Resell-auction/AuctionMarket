@@ -2,11 +2,12 @@ package com.example.auctionmarket.domain.auction.service;
 
 import com.example.auctionmarket.common.auth.AuthUser;
 import com.example.auctionmarket.common.websocket.WebSocketAuctionCreateRequest;
+import com.example.auctionmarket.common.websocket.WebSocketAuctionJoinRequest;
 import com.example.auctionmarket.common.websocket.WebSocketClient;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionSaveRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateMinPriceRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateTimeRequest;
-import com.example.auctionmarket.domain.auction.dto.response.AuctionIncreasePriceResponse;
+import com.example.auctionmarket.domain.auction.dto.response.AuctionJoinResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionSaveResponse;
 import com.example.auctionmarket.domain.auction.entity.Auction;
@@ -24,13 +25,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -42,6 +45,7 @@ public class AuctionService {
     private final ProductRepository productRepository;
     private final PaymentService paymentService;
     private final WebSocketClient webSocketClient;
+    private final RestTemplate restTemplate;
 
     @Transactional
     public AuctionSaveResponse createAuction(AuthUser authUser, AuctionSaveRequest request){
@@ -73,9 +77,12 @@ public class AuctionService {
                         saveAuction.getId(),
                         saveAuction.getProduct().getProductName(),
                         saveAuction.getMinPrice(),
+                        saveAuction.getStartTime(),
                         saveAuction.getEndTime()
                 )
         );
+
+        Duration ttl = Duration.between(LocalDateTime.now(), saveAuction.getEndTime());
 
         //저장한 경매 출력
         return new AuctionSaveResponse(
@@ -115,8 +122,7 @@ public class AuctionService {
                     auction.getStartTime(),
                     auction.getEndTime(),
                     auction.getStatus(),
-                    auctionMessage,
-                    "http://localhost:8081/auction.html?auctionId=" + auction.getId()
+                    auctionMessage
             );
         });
     }
@@ -150,44 +156,40 @@ public class AuctionService {
                     auction.getStartTime(),
                     auction.getEndTime(),
                     auction.getStatus(),
-                    auctionMessage,
-                    "http://localhost:8081/auction.html?auctionId=" + auction.getId()
+                    auctionMessage
             );
         });
     }
 
     //경매 참여
     @Transactional
-    public AuctionIncreasePriceResponse increasePrice(AuthUser authUser, Long auctionId, Long increasedPrice){
-
-        //해당하는 경매 찾기
-        Auction auction = auctionRepository.findById(auctionId)
-                .orElseThrow(()->new AuctionException(AuctionErrorCode.AUCTION_NOT_FOUND));
-
-        //경매가 진행 중인 상황이 아니라면 예외 처리
-        if(auction.getStatus() != AuctionStatus.ONGOING){
-            throw new AuctionException(AuctionErrorCode.AUCTION_NOT_STARTED);
-        }
-
-        //유저 예외처리
+    public AuctionJoinResponse join(AuthUser authUser, Long auctionId){
         User user = userRepository.findById(authUser.getId())
                 .orElseThrow(()->new UserNotFoundException());
 
-        //물품을 올린 사용자인 경우 불가
-        if(Objects.equals(authUser.getId(), auction.getProduct().getUser().getId())){
-            throw new AuctionException(AuctionErrorCode.SELF_BID_NOT_ALLOWED);
-        }
+        String websocketUrl = "http://localhost:8081/internal/auction/join";
 
-        auction.increaseMaxPrice(authUser.getId(), increasedPrice);
+        Map<String, Object> request = new HashMap<>();
+        request.put("auctionId", auctionId);
+        request.put("nickname", authUser.getNickname());
 
-        return new AuctionIncreasePriceResponse(
+        Auction auction = auctionRepository.findById(auctionId)
+                .orElseThrow(()->new AuctionException(AuctionErrorCode.AUCTION_NOT_FOUND));
+
+        webSocketClient.joinAuctionRoom(
+                new WebSocketAuctionJoinRequest(
+                        auction.getId(),
+                        user.getNickname()
+                )
+        );
+
+        return new AuctionJoinResponse(
                 auction.getId(),
-                auction.getProduct().getId(),
-                auction.getConsumerId(),
                 auction.getProduct().getProductName(),
-                auction.getProduct().getCategory(),
                 auction.getMinPrice(),
-                auction.getMaxPrice()
+                auction.getStartTime(),
+                auction.getEndTime(),
+                "http://localhost:8081/auction.html?auctionId=" + auction.getId() + "&nickname=" + user.getNickname()
         );
     }
 
@@ -232,8 +234,7 @@ public class AuctionService {
                 auction.getStartTime(),
                 auction.getEndTime(),
                 auction.getStatus(),
-                auctionMessage,
-                "http://localhost:8081/auction.html?auctionId=" + auction.getId()
+                auctionMessage
         );
     }
 
@@ -277,8 +278,7 @@ public class AuctionService {
                 auction.getStartTime(),
                 auction.getEndTime(),
                 auction.getStatus(),
-                auctionMessage,
-                "http://localhost:8081/auction.html?auctionId=" + auction.getId()
+                auctionMessage
         );
     }
 
@@ -340,35 +340,49 @@ public class AuctionService {
                 duration.toMinutesPart());
     }
 
-    //경매 상태 변경 함수
-    @Transactional
-    @Scheduled(cron = "0 * * * * *")
-    public void updateStatus() {
+//    //경매 상태 변경 함수
+//    @Transactional
+//    @Scheduled(cron = "0 * * * * *")
+//    public void updateStatus() {
+//
+//        List<Auction> auctions = auctionRepository.findAll();
+//
+//        for(Auction auction : auctions){
+//            if(LocalDateTime.now().isAfter(auction.getStartTime()) && LocalDateTime.now().isBefore(auction.getEndTime())){
+//                auction.setStatus(AuctionStatus.ONGOING);
+//            }
+//            else if (LocalDateTime.now().isAfter(auction.getEndTime())) {
+//                auction.setStatus(AuctionStatus.ENDED);
+//
+//                if (auction.getConsumerId() != null && paymentService.shouldCreatePayment(auction.getId())) {
+//                    paymentService.createPayment(auction.getId());
+//
+//                    // 나중에 동기 비동기시 변형해서 사용
+////                    eventPublisher.publishEvent(new AuctionEndEvent(
+////                            auction.getId(),
+////                            auction.getConsumerId(),
+////                            auction.getMaxPrice()
+////                    ));
+////                    paymentService.createPayment(auction);
+//                }
+//            }
+//            else if(LocalDateTime.now().isBefore(auction.getStartTime())) {
+//                auction.setStatus(AuctionStatus.PENDING);
+//            }
+//        }
+//    }
 
-        List<Auction> auctions = auctionRepository.findAll();
+    public void endAuction (Long auctionId) {
+        Auction auction = auctionRepository.findById(auctionId)
+                .orElseThrow(()->new AuctionException(AuctionErrorCode.AUCTION_NOT_FOUND));
+        if (LocalDateTime.now().isAfter(auction.getEndTime())) {
+            auction.setStatus(AuctionStatus.ENDED);
 
-        for(Auction auction : auctions){
-            if(LocalDateTime.now().isAfter(auction.getStartTime()) && LocalDateTime.now().isBefore(auction.getEndTime())){
-                auction.setStatus(AuctionStatus.ONGOING);
+            if (auction.getConsumerId() != null && paymentService.shouldCreatePayment(auction.getId())) {
+                paymentService.createPayment(auction.getId());
             }
-            else if (LocalDateTime.now().isAfter(auction.getEndTime())) {
-                auction.setStatus(AuctionStatus.ENDED);
 
-                if (auction.getConsumerId() != null && paymentService.shouldCreatePayment(auction.getId())) {
-                    paymentService.createPayment(auction.getId());
-
-                    // 나중에 동기 비동기시 변형해서 사용
-//                    eventPublisher.publishEvent(new AuctionEndEvent(
-//                            auction.getId(),
-//                            auction.getConsumerId(),
-//                            auction.getMaxPrice()
-//                    ));
-//                    paymentService.createPayment(auction);
-                }
-            }
-            else if(LocalDateTime.now().isBefore(auction.getStartTime())) {
-                auction.setStatus(AuctionStatus.PENDING);
-            }
+            auctionRepository.save(auction);
         }
     }
 }
