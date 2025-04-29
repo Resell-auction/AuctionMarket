@@ -1,6 +1,8 @@
 package com.example.auctionmarket.domain.coupon.service;
 
+import com.example.auctionmarket.common.aop.DistributedLock;
 import com.example.auctionmarket.common.auth.AuthUser;
+import com.example.auctionmarket.common.log.LogService;
 import com.example.auctionmarket.domain.coupon.dto.CouponGiveRequest;
 import com.example.auctionmarket.domain.coupon.entity.Coupon;
 import com.example.auctionmarket.domain.coupon.entity.CouponUser;
@@ -10,11 +12,22 @@ import com.example.auctionmarket.domain.coupon.repository.CouponRepository;
 import com.example.auctionmarket.domain.coupon.repository.CouponUserRepository;
 import com.example.auctionmarket.domain.user.entity.User;
 import com.example.auctionmarket.domain.user.repository.UserRepository;
+import jakarta.persistence.LockTimeoutException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.AccessDeniedException;
+import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
+import org.springframework.dao.CannotAcquireLockException;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.example.auctionmarket.common.redis.RedissonConfig;
 
+import java.util.concurrent.TimeUnit;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CouponUserService {
@@ -22,14 +35,24 @@ public class CouponUserService {
     private final CouponRepository couponRepository;
     private final CouponUserRepository couponUserRepository;
     private final UserRepository userRepository;
+    private final RedissonClient redissonClient;
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final LogService logService;
 
-    //admin - 해당유저에게 쿠폰주기
+
+    @Retryable(
+            value = {CannotAcquireLockException.class},
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 200)
+    )
+
+    //기본.락이 없을 때.
     @Transactional
-    public void giveCouponByUserId(AuthUser authUser, Long id, CouponGiveRequest couponGiveRequest){
+    public void giveCouponByUserId(AuthUser authUser, Long id, CouponGiveRequest couponGiveRequest) {
         if (!authUser.getAuthorities().stream()
                 .anyMatch(auth -> auth.getAuthority().equals("ADMIN"))) {
             throw new CouponException(CouponErrorCode.NOT_ADMIN_AUTHORITY);
-        };
+        }
 
         Coupon coupon = couponRepository.findById(id).orElseThrow(
                 () -> new CouponException(CouponErrorCode.NOT_FOUND_COUPON));
@@ -37,16 +60,43 @@ public class CouponUserService {
         User users = userRepository.findById(couponGiveRequest.getUserId()).orElseThrow(
                 () -> new CouponException(CouponErrorCode.NOT_FOUND_USER));//user는 쿠폰 리스트를 갖고 있음.
 
-        if(couponGiveRequest.getAmount()>coupon.getAmount())
-            throw new CouponException(CouponErrorCode.OUT_OF_COUPON);
+        if (couponGiveRequest.getAmount() > 1)
+            throw new CouponException(CouponErrorCode.DUPLICATE_COUPON);
 
         //user, coupon객체에 couponuser 객체 생성 후 저장.
-        for (int i = 0; i < couponGiveRequest.getAmount(); i++) {
-            CouponUser couponUser = new CouponUser();
-            couponUser.setUsers(users);
-            couponUser.setCoupons(coupon);
-            couponUserRepository.save(couponUser);
+        CouponUser couponUser = new CouponUser();
+        couponUser.setUsers(users);
+        couponUser.setCoupons(coupon);
+        couponUserRepository.save(couponUser);
+
+        coupon.assignUniqueCoupon();
+
+        coupon.discountCoupon(couponGiveRequest.getAmount());
+
+    }
+
+    //낙관적락
+    @Transactional
+    public void giveCouponByUserId2(AuthUser authUser, Long id, CouponGiveRequest couponGiveRequest) {
+        if (!authUser.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ADMIN"))) {
+            throw new CouponException(CouponErrorCode.NOT_ADMIN_AUTHORITY);
         }
+
+        Coupon coupon = couponRepository.findById(id).orElseThrow(
+                () -> new CouponException(CouponErrorCode.NOT_FOUND_COUPON));
+
+        User users = userRepository.findById(couponGiveRequest.getUserId()).orElseThrow(
+                () -> new CouponException(CouponErrorCode.NOT_FOUND_USER));//user는 쿠폰 리스트를 갖고 있음.
+
+        if (couponGiveRequest.getAmount() > 1)
+            throw new CouponException(CouponErrorCode.DUPLICATE_COUPON);
+
+        //user, coupon객체에 couponuser 객체 생성 후 저장.
+        CouponUser couponUser = new CouponUser();
+        couponUser.setUsers(users);
+        couponUser.setCoupons(coupon);
+        couponUserRepository.save(couponUser);
 
         coupon.assignUniqueCoupon();
         coupon.discountCoupon(couponGiveRequest.getAmount());
@@ -101,7 +151,7 @@ public class CouponUserService {
         }
 
         logService.saveLog((long) coupon.getId(), "✅INFO", "해당 쿠폰 수정을 성공했습니다.");
-     //   log.info("💾 쿠폰 저장 시도: coupon={}, version={}", coupon.getId(), coupon.getVersion());
+        //   log.info("💾 쿠폰 저장 시도: coupon={}, version={}", coupon.getId(), coupon.getVersion());
     }
 
     //비관적락
@@ -166,8 +216,6 @@ public class CouponUserService {
         coupon.assignUniqueCoupon();
         coupon.discountCoupon(couponGiveRequest.getAmount());
         couponRepository.save(coupon);
-
-
     }
 //
 //    @Transactional
@@ -186,3 +234,4 @@ public class CouponUserService {
 //    }
 
 }
+

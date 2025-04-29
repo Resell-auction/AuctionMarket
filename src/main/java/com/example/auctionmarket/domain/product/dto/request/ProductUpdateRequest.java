@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@AllArgsConstructor
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,5 +18,4 @@ public class ProductUpdateRequest {
     @NotBlank(message = "카테고리는 필수 입력값입니다.")
     private String category;
 
-    public ProductUpdateRequest(){}
 }

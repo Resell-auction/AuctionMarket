@@ -39,3 +39,7 @@ out/
 ### mysql&redis 보안 ###
 src/main/resources/application.properties
 src/main/resources/docker-compose.yml
+
+
+# QueryDSL generated Q-classes
+src/main/generated/
