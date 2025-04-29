@@ -21,6 +21,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static java.time.LocalTime.now;
 
@@ -56,10 +57,20 @@ public class CouponService {
             logService.saveLog(savedCoupon.getId(), "✅COUPON_SAVE_SUCCESS", "쿠폰등록성공.");
 
             //쿠폰 생성과 동시에 redis에 추가
+//            LocalDateTime now = LocalDateTime.now();
+//            LocalDateTime expiredAt = couponRequest.getExpiredAt();
+//            String redisKey = "coupon_stock:" + savedCoupon.getId();
+//            redisTemplate.opsForValue().set(redisKey, String.valueOf(couponRequest.getAmount()), Duration.between(now, expiredAt).getSeconds());
+
             LocalDateTime now = LocalDateTime.now();
             LocalDateTime expiredAt = couponRequest.getExpiredAt();
+
+            Duration duration = Duration.between(now, expiredAt);
+            long expireSeconds = Math.max(duration.getSeconds(), 0);
+
             String redisKey = "coupon_stock:" + savedCoupon.getId();
-            redisTemplate.opsForValue().set(redisKey, String.valueOf(couponRequest.getAmount()), Duration.between(now, expiredAt).getSeconds());
+            redisTemplate.opsForValue().set(redisKey, String.valueOf(couponRequest.getAmount()), expireSeconds, TimeUnit.SECONDS);
+
 
             return new CouponResponse(savedCoupon.getId(),
                     savedCoupon.getCouponName(),

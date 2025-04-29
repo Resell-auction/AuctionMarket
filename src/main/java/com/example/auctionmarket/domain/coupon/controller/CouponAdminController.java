@@ -60,7 +60,7 @@ public class CouponAdminController {
 
         logService.saveLog( couponId, "📍[API]COUPON_GIVE_BULK", "쿠폰대량발급API");
 
-        couponUserService.giveCouponByUserId(authUser, couponId, couponGiveRequest);
+        couponUserService.giveCouponByUserId4(authUser, couponId, couponGiveRequest);
 
         return ResponseEntity.ok("쿠폰 발급 완료");
     }
@@ -71,7 +71,7 @@ public class CouponAdminController {
 
         logService.saveLog( couponId, "📍[API]COUPON_GIVE_BULK", "쿠폰대량발급API");
 
-        couponUserService.giveCouponByUserId(authUser, couponId, couponGiveRequest);
+        couponUserService.giveCouponByUserId5(authUser, couponId, couponGiveRequest);
 
         return ResponseEntity.ok("쿠폰 발급 완료");
     }

@@ -4,6 +4,7 @@ import java.time.format.DateTimeFormatter;
 
 import com.example.auctionmarket.domain.user.entity.User;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Getter
 @Builder
+@AllArgsConstructor
 public class MyPageResponse {
 	private Long id;
 	private String email;

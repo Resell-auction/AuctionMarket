@@ -18,6 +18,7 @@ import com.example.auctionmarket.domain.product.enums.ProductCategory;
 import com.example.auctionmarket.domain.user.repository.UserRepository;
 import com.example.auctionmarket.global.jwt.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ser.Serializers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,31 +54,11 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RestDocsTest
 @WebMvcTest(AuctionController.class)
-public class AuctionRestDocsTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    ObjectMapper objectMapper;
+public class AuctionRestDocsTest extends BaseRestDocsTest {
 
     @MockBean
     private AuctionService auctionService;
-
-    @MockBean
-    private UserRepository userRepository;
-
-    @MockBean
-    private JwtUtil jwtUtil;
-
-    @BeforeEach
-    void setUp(WebApplicationContext context, RestDocumentationContextProvider provider) {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
-                .apply(documentationConfiguration(provider))
-                .build();
-    }
 
     @Test
     void 경매_생성_RestDocsAPI() throws Exception {
@@ -175,7 +156,7 @@ public class AuctionRestDocsTest {
                 .willReturn(result);
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/v1/auctions/search")
-                        .param("keyword", "test")
+                        .param("keyword", "adidas")
                         .param("category", "ACCESSORY")
                         .param("page", "1")
                         .param("size", "10")
@@ -211,7 +192,6 @@ public class AuctionRestDocsTest {
                                 fieldWithPath("empty").description("페이지가 비어 있는지 여부"),
                                 fieldWithPath("numberOfElements").description("현재 페이지 데이터")
                         )));
-
     }
 
     @Test

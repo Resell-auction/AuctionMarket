@@ -7,7 +7,7 @@ include::{snippets}/post-coupon/request-headers.adoc[]
 === 쿠폰등록
 
 
-==== 🔗 POST `/v1/coupons`
+//==== 🔗 POST `/v1/coupons`
 
 새로운 쿠폰을 생성합니다.
 
@@ -34,7 +34,7 @@ include::{snippets}/post-coupon/response-fields.adoc[]
 
 === 쿠폰목록조회
 
-==== 🔗 GET `/v1/coupons`
+//==== 🔗 GET `/v1/coupons`
 
 쿠폰 리스트를 전체 조회합니다.
 
@@ -60,7 +60,7 @@ include::{snippets}/get-coupons/response-fields.adoc[]
 
 === 쿠폰단건조회
 
-==== 🔗 GET `/v1/coupons/{couponId}`
+//==== 🔗 GET `/v1/coupons/{couponId}`
 
 특정 쿠폰을 조회합니다.
 
@@ -88,7 +88,7 @@ include::{snippets}/get-couponId/response-fields.adoc[]
 
 === 쿠폰수정
 
-==== 🔗 PUT `/v1/coupons/{couponId}`
+//==== 🔗 PUT `/v1/coupons/{couponId}`
 
 특정 쿠폰을 수정합니다.
 
@@ -115,7 +115,7 @@ include::{snippets}/update-coupon/response-fields.adoc[]
 
 === 쿠폰삭제
 
-==== 🔗 DELETE `/v1/coupons/{couponId}`
+//==== 🔗 DELETE `/v1/coupons/{couponId}`
 
 특정 쿠폰을 삭제합니다.
 
@@ -138,7 +138,7 @@ include::{snippets}/delete-coupon/http-response.adoc[]
 
 === 쿠폰발급
 
-==== 🔗 PUT `/v1/coupons/{couponId}/give`
+//==== 🔗 PUT `/v1/coupons/{couponId}/give`
 
 특정 유저에게 쿠폰을 발급합니다.
 

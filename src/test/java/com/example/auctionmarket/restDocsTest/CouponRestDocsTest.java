@@ -44,21 +44,9 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RestDocsTest
-@WebMvcTest(CouponController.class)
-public class CouponRestDocsTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-    //
-    @Autowired
-    ObjectMapper objectMapper;
-    //
-//    @Autowired
-//    private CouponController couponController;
-//
-    @MockBean
-    private JwtUtil jwtUtil;
+@WebMvcTest(CouponController.class)
+public class CouponRestDocsTest extends BaseRestDocsTest{
 
     @MockBean
     private CouponService couponService;
@@ -69,15 +57,6 @@ public class CouponRestDocsTest {
     @MockBean
     private LogService logService;
 
-    @MockBean
-    private UserRepository userRepository;
-
-    @BeforeEach
-    void setUp(WebApplicationContext context, RestDocumentationContextProvider provider) {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
-                .apply(documentationConfiguration(provider))
-                .build();
-    }
 
     @Test
     void 쿠폰_생성_RestDocsAPI() throws Exception {
