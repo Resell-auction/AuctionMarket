@@ -38,7 +38,3 @@ out/
 
 ### mysql&redis 보안 ###
 src/main/resources/application.properties
-
-### 서버 관련 파일 ###
-*.pem
-ubuntu@*
