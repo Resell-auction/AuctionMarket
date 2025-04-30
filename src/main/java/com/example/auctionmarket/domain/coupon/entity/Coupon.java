@@ -31,7 +31,11 @@ public class Coupon extends TimeStamped {
 
     private int amount;
 
+    @Enumerated(EnumType.STRING)
     private CouponStatus couponStatus;
+
+    @Version
+    private Long version; // 낙관적 락을 위한 필드
 
     @Enumerated(EnumType.STRING)
     private CouponType couponType;
@@ -63,8 +67,11 @@ public class Coupon extends TimeStamped {
     }
 
     public void setUsers(CouponUser couponUser){
-
         couponUserList.add(couponUser);
+    }
+
+    public void assignUniqueCoupon(){
+        this.amount--;
     }
 
     public void discountCoupon(int amount){

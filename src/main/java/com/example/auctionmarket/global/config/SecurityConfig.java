@@ -47,7 +47,10 @@ public class SecurityConfig {
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers(
 						new AntPathRequestMatcher("/v1/auth/**"),
-						new AntPathRequestMatcher("/v1/auctions/end")).permitAll()
+						new AntPathRequestMatcher("/v1/auctions/end"),
+						new AntPathRequestMatcher("/v2/auctions/**"),
+						new AntPathRequestMatcher("/v2/auctions/**"),
+						new AntPathRequestMatcher("/v3/auctions/**")).permitAll()
 				.anyRequest().authenticated()
 			)
 			.build();

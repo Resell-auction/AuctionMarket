@@ -5,10 +5,12 @@ import com.example.auctionmarket.domain.auction.dto.request.AuctionEndRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionSaveRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateMinPriceRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateTimeRequest;
+import com.example.auctionmarket.domain.auction.dto.response.AuctionPageResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionJoinResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionSaveResponse;
 import com.example.auctionmarket.domain.auction.service.AuctionService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +28,7 @@ public class AuctionController {
     @PostMapping
     public ResponseEntity<AuctionSaveResponse> createAuction(
             @AuthenticationPrincipal AuthUser authUser,
-            @RequestBody AuctionSaveRequest request
+            @Valid @RequestBody AuctionSaveRequest request
             ){
         AuctionSaveResponse auctionSaveResponse = auctionService.createAuction(authUser, request);
         return ResponseEntity.ok(auctionSaveResponse);
@@ -34,11 +36,11 @@ public class AuctionController {
 
     //경매 전체 조회
     @GetMapping
-    public ResponseEntity<Page<AuctionResponse>> getAuctions(
+    public ResponseEntity<AuctionPageResponse> getAuctions(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size
     ){
-        Page<AuctionResponse> result = auctionService.getAuctions(page, size);
+        AuctionPageResponse result = auctionService.getAuctionsRedis(page, size);
 
         return ResponseEntity.ok(result);
     }
@@ -71,7 +73,7 @@ public class AuctionController {
     @PatchMapping("/{auctionId}/update-starttime")
     public ResponseEntity<AuctionResponse> updateAuctionStartTime(
             @PathVariable Long auctionId,
-            @RequestBody AuctionUpdateTimeRequest request,
+            @Valid @RequestBody AuctionUpdateTimeRequest request,
             @AuthenticationPrincipal AuthUser authUser
             ){
         AuctionResponse response = auctionService.updateAuctionStartTime(authUser, auctionId, request);

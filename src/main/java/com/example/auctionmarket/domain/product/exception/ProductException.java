@@ -12,5 +12,4 @@ public class ProductException extends RuntimeException {
         super(errorCode.getDefaultMessage());
         this.errorCode = errorCode;
     }
-
 }

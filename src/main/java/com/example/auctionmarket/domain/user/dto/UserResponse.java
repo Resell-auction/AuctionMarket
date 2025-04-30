@@ -4,11 +4,13 @@ import java.time.format.DateTimeFormatter;
 
 import com.example.auctionmarket.domain.user.entity.User;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
+@AllArgsConstructor
 public class UserResponse {
 	private String email;
 	private String nickName;
@@ -25,4 +27,5 @@ public class UserResponse {
 			.modifiedAt(user.getUpdatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
 			.build();
 	}
+
 }
