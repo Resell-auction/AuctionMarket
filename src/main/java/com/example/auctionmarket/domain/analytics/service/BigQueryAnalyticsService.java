@@ -108,7 +108,7 @@ public class BigQueryAnalyticsService {
 		return hourlyAverageBid;
 	}
 
-	// 일자별 평균 낙찰가
+	// 일자별 평균 낙찰가 (최근 1년)
 	public List<DailyAverageBidResponse> getDailyAverageBidByCategory(DailyAverageBidRequest request) throws InterruptedException {
 		String category = String.valueOf(request.getCategory());
 
@@ -121,6 +121,8 @@ public class BigQueryAnalyticsService {
 				"  `%s.%s.%s` " +
 				"WHERE " +
 				"  product_category = @category " +
+				"  AND DATE(auction_start_time) >= DATE_SUB(CURRENT_DATE(), INTERVAL 1 YEAR) " +
+				"  AND DATE(auction_start_time) <= CURRENT_DATE() " +
 				"GROUP BY " +
 				"  auction_date " +
 				"ORDER BY " +
