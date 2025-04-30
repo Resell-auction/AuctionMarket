@@ -2,6 +2,8 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.4'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'org.asciidoctor.jvm.convert' version '3.3.2'
+
 }
 
 group = 'com.example'
@@ -19,6 +21,10 @@ configurations {
 	}
 }
 
+configurations {
+	asciidoctorExt
+}
+
 repositories {
 	mavenCentral()
 }
@@ -27,12 +33,15 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	//implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	// 레디스(가지고있으면 테스트 할때 실제 레디스 서버를 연결하지 않아도 만들어야함 ->  embedded redis 추가해야함)
-	// implementation 'org.redisson:redisson-spring-boot-starter:3.37.0' // 레디슨
-	// implementation group: 'it.ozimov', name: 'embedded-redis', version: '0.7.1' // embedded redis dependency 추가
+	implementation 'org.redisson:redisson-spring-boot-starter:3.37.0' // 레디슨
+//	implementation 'mysql:mysql-connector-java'
+	implementation 'mysql:mysql-connector-java:8.0.33' // 또는 버전 생략 시 BOM이 적용됨
+
+	implementation group: 'it.ozimov', name: 'embedded-redis', version: '0.7.1' // embedded redis dependency 추가
 	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'com.mysql:mysql-connector-j'
+//	runtimeOnly 'com.mysql:mysql-connector-j'
 
 	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
 	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
@@ -53,6 +62,7 @@ dependencies {
 
 	// AOP
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
+	implementation 'org.springframework.retry:spring-retry'
 
 	//QueryDSL
 	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
@@ -62,6 +72,10 @@ dependencies {
 
 	//spring security
 	implementation 'org.springframework.boot:spring-boot-starter-security'
+	testImplementation 'org.mockito:mockito-core:5.11.0'
+	testImplementation 'org.mockito:mockito-junit-jupiter:5.11.0'
+	testImplementation 'org.assertj:assertj-core:3.25.3'
+
 	testImplementation 'org.springframework.security:spring-security-test'
 
 	//Redis
@@ -93,11 +107,61 @@ dependencies {
 	//aws
 	implementation(platform("software.amazon.awssdk:bom:2.27.21"))
 	implementation("software.amazon.awssdk:s3")
+
+	//restdocs
+	asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+
+	//aws event bridge
+	implementation 'software.amazon.awssdk:eventbridge:2.20.0' // 최신 버전 확인
+	implementation 'com.amazonaws:aws-lambda-java-core:1.2.1'
+
+
 }
 
-tasks.named('test') {
+//docker
+tasks.named('bootJar') {
+	archiveFileName = 'my-app.jar'
+}
+
+ext {
+	snippetsDir = file('build/generated-snippets')
+}
+
+test {
+	outputs.dir snippetsDir
+}
+
+tasks.register("restDocsTest", Test) {
+	description = "REST Docs용 테스트만 실행"
+	group = "verification"
+
+	useJUnitPlatform()
+	include("com.example.auctionmarket.restDocsTest.CouponRestDocsTest")
+	// filter { includeTestsMatching("com.example.**.RestDocs*") } // 클래스명 필터도 가능
+	outputs.dir snippetsDir
+}
+
+tasks.named("restDocsTest") {
 	useJUnitPlatform()
 }
+
+tasks.withType(JavaCompile).configureEach {
+	options.compilerArgs += "-parameters"
+}
+
+asciidoctor {
+	sourceDir = file("src/main/asciidoc")
+	outputDir = file("$buildDir/docs")// ✅ index.adoc 위치 기준으로 설정
+	inputs.dir snippetsDir
+	configurations 'asciidoctorExt'
+	dependsOn("restDocsTest")
+	sources {
+		include("index.adoc") // ✅ entry point 설정
+	}
+}
+
+
 
 //clean {
 //    delete file('src/main/generated')
