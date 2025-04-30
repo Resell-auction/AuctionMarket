@@ -29,6 +29,24 @@ repositories {
 	mavenCentral()
 }
 
+ext {
+	// Spring Boot 버전을 명시적으로 관리
+	set('springBootVersion', "3.4.4")
+	// Spring Boot 버전에 맞춰서 Spring Cloud 사용
+	set('springCloudVersion', "2024.0.0")
+	// Spring Cloud 버전에 맞춰서 Spring Cloud GCP 사용
+	set('springCloudGcpVersion', "6.1.1")
+}
+
+dependencyManagement {
+	imports {
+		// Spring Cloud GCP BOM
+		mavenBom "com.google.cloud:spring-cloud-gcp-dependencies:${springCloudGcpVersion}"
+		// Spring Cloud BOM
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -116,6 +134,12 @@ dependencies {
 	implementation 'software.amazon.awssdk:eventbridge:2.20.0' // 최신 버전 확인
 	implementation 'com.amazonaws:aws-lambda-java-core:1.2.1'
 
+
+	// BigQuery 연동을 위한 의존성 => BigQuery 클라이언트 API 사용 시 필요
+	implementation 'com.google.cloud:google-cloud-bigquery'
+
+	// Spring Cloud GCP BigQuery Starter
+	implementation 'com.google.cloud:spring-cloud-gcp-starter-bigquery'
 
 }
 
