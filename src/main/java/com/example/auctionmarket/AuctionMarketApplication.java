@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableJpaAuditing
-@EnableScheduling // @Scheduled 사용을 위한 어노테이션
+// @EnableScheduling // @Scheduled 사용을 위한 어노테이션
 public class AuctionMarketApplication {
 
 	public static void main(String[] args) {

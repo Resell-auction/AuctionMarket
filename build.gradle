@@ -23,7 +23,11 @@ repositories {
 	mavenCentral()
 }
 
+
 dependencies {
+	// 구글 클라우드와 스프링을 연결해주는 라이브러리들의 호환되는 버전 목록(BOM)을 가져옴
+//	implementation platform("com.google.cloud:spring-cloud-gcp-dependencies:5.4.1")
+
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -63,6 +67,20 @@ dependencies {
 	//spring security
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	testImplementation 'org.springframework.security:spring-security-test'
+
+//	// 구글 BigQuery 라이브러리
+//	implementation "com.google.cloud:spring-cloud-gcp-starter-bigquery"
+//
+//	// 스프링 배치 라이브러리
+//	implementation "org.springframework.boot:spring-boot-starter-batch"
+//
+//	// OpenCSV 라이브러리 => 자바 코드로 CSV 파일 생성
+//	implementation "com.opencsv:opencsv:5.7.1"
+
+	// 테스트 데이터 생성
+//	implementation 'com.github.javafaker:javafaker:1.0.2'
+	implementation ('com.github.javafaker:javafaker:1.0.2') { exclude module: 'snakeyaml' }
+	implementation group: 'org.yaml', name: 'snakeyaml', version: '2.2'
 }
 
 tasks.named('test') {
