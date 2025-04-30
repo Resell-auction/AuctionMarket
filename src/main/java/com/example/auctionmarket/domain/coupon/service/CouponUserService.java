@@ -1,6 +1,8 @@
 package com.example.auctionmarket.domain.coupon.service;
 
+import com.example.auctionmarket.common.aop.DistributedLock;
 import com.example.auctionmarket.common.auth.AuthUser;
+import com.example.auctionmarket.common.log.LogService;
 import com.example.auctionmarket.domain.coupon.dto.CouponGiveRequest;
 import com.example.auctionmarket.domain.coupon.entity.Coupon;
 import com.example.auctionmarket.domain.coupon.entity.CouponUser;
@@ -11,6 +13,8 @@ import com.example.auctionmarket.domain.coupon.repository.CouponUserRepository;
 import com.example.auctionmarket.domain.user.entity.User;
 import com.example.auctionmarket.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +26,8 @@ public class CouponUserService {
     private final CouponRepository couponRepository;
     private final CouponUserRepository couponUserRepository;
     private final UserRepository userRepository;
+    private final LogService logService;
+    private final RedisTemplate<String, Object> redisTemplate;
 
 
     //기본.락이 없을 때(coupon-@Version삭제)
@@ -171,15 +177,13 @@ public class CouponUserService {
 
         // 수량 감소 및 유니크 쿠폰 설정
         coupon.assignUniqueCoupon();
-        coupon.discountCoupon(couponGiveRequest.getAmount());
-        couponRepository.save(coupon);
+
     }
 
     //분산락
     @DistributedLock(key = "'coupon:' + #id")
     @Transactional
     public void giveCouponByUserId5(AuthUser authUser,Long couponId, CouponGiveRequest couponGiveRequest){
-        RLock lock = redissonClient.getLock("coupon_lock");
 
         if (!authUser.getAuthorities().stream()
                 .anyMatch(auth -> auth.getAuthority().equals("ADMIN"))) {
