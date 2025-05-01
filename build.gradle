@@ -141,6 +141,9 @@ dependencies {
 	// Spring Cloud GCP BigQuery Starter
 	implementation 'com.google.cloud:spring-cloud-gcp-starter-bigquery'
 
+	// Logstash
+	implementation 'net.logstash.logback:logstash-logback-encoder:7.4' // 애플리케이션 로그를 JSON 형식으로 변환
+
 }
 
 //docker
@@ -150,9 +153,6 @@ tasks.named('bootJar') {
 
 ext {
 	snippetsDir = file('build/generated-snippets')
-
-	// Logstash
-	implementation 'net.logstash.logback:logstash-logback-encoder:7.4' // 애플리케이션 로그를 JSON 형식으로 변환
 }
 
 test {
