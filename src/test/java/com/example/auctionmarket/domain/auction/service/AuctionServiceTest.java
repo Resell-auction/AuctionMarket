@@ -149,29 +149,25 @@ public class AuctionServiceTest {
         assertEquals("testproduct", result.getContent().get(0).getProductName());
     }
 
+//    @Test
+//    @DisplayName("Redis 캐시된 경매 조회 - 성공")
+//    public void getAuctions_Redis_Success(){
+//        String key = "auction::1";
+//        AuctionResponse response = new
+//    }
+
     @Test
     @DisplayName("경매 최소 가격 수정 - 성공")
     public void updateMinPrice_Success(){
         //given
-        Long auctionId = 1L;
-        Long userId = 1L;
-
-        User user = mock(User.class);
-        given(user.getId()).willReturn(userId);
-
-        Product product = mock(Product.class);
-        given(product.getUser()).willReturn(user);
-
-        Auction auction = mock(Auction.class);
-        given(auctionRepository.findById(auctionId)).willReturn(Optional.of(auction));
-        given(auction.getProduct().getUser().getId()).willReturn(userId);
-
+        given(userRepository.findById(1L)).willReturn(Optional.of(user));
+        given(auctionRepository.findById(1L)).willReturn(Optional.of(auction));
         AuctionUpdateMinPriceRequest request = new AuctionUpdateMinPriceRequest(20000L);
 
         //when
-        auctionService.updateMinPrice(authUser, auctionId, request);
+        auctionService.updateMinPrice(authUser, auction.getId(), request);
 
         //then
-        verify(auction).updateMinPrice(20000L);
+        assertEquals(20000L, auction.getMinPrice());
     }
 }
