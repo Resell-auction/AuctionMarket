@@ -2,8 +2,6 @@ package com.example.auctionmarket.domain.analytics.dto.response;
 
 import java.time.LocalDate;
 
-import com.example.auctionmarket.domain.product.enums.ProductCategory;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

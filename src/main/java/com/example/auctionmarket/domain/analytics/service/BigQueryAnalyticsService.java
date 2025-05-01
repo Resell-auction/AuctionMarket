@@ -13,7 +13,6 @@ import com.example.auctionmarket.domain.analytics.dto.request.DailyAverageBidReq
 import com.example.auctionmarket.domain.analytics.dto.request.HourlyAverageBidRequest;
 import com.example.auctionmarket.domain.analytics.dto.response.DailyAverageBidResponse;
 import com.example.auctionmarket.domain.analytics.dto.response.HourlyAverageBidResponse;
-import com.example.auctionmarket.domain.product.enums.ProductCategory;
 import com.google.cloud.bigquery.BigQuery;
 import com.google.cloud.bigquery.FieldValueList;
 import com.google.cloud.bigquery.Job;
