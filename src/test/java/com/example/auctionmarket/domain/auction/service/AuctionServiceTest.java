@@ -1,7 +1,9 @@
 package com.example.auctionmarket.domain.auction.service;
 
 import com.example.auctionmarket.common.auth.AuthUser;
+import com.example.auctionmarket.common.websocket.WebSocketClient;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionSaveRequest;
+import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateMinPriceRequest;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionSaveResponse;
 import com.example.auctionmarket.domain.auction.entity.Auction;
@@ -36,6 +38,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -55,6 +58,12 @@ public class AuctionServiceTest {
 
     @Mock
     private RedisTemplate<String, Object> redisTemplate;
+
+    @Mock
+    private AuctionOpenSearchService auctionOpenSearchService;
+
+    @Mock
+    private WebSocketClient webSocketClient;
 
     @InjectMocks
     private AuctionService auctionService;
@@ -138,5 +147,31 @@ public class AuctionServiceTest {
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
         assertEquals("testproduct", result.getContent().get(0).getProductName());
+    }
+
+    @Test
+    @DisplayName("경매 최소 가격 수정 - 성공")
+    public void updateMinPrice_Success(){
+        //given
+        Long auctionId = 1L;
+        Long userId = 1L;
+
+        User user = mock(User.class);
+        given(user.getId()).willReturn(userId);
+
+        Product product = mock(Product.class);
+        given(product.getUser()).willReturn(user);
+
+        Auction auction = mock(Auction.class);
+        given(auctionRepository.findById(auctionId)).willReturn(Optional.of(auction));
+        given(auction.getProduct().getUser().getId()).willReturn(userId);
+
+        AuctionUpdateMinPriceRequest request = new AuctionUpdateMinPriceRequest(20000L);
+
+        //when
+        auctionService.updateMinPrice(authUser, auctionId, request);
+
+        //then
+        verify(auction).updateMinPrice(20000L);
     }
 }
