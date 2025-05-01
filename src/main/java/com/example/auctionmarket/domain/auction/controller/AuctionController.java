@@ -1,23 +1,20 @@
 package com.example.auctionmarket.domain.auction.controller;
 
 import com.example.auctionmarket.common.auth.AuthUser;
-import com.example.auctionmarket.common.response.Response;
-import com.example.auctionmarket.domain.auction.dto.request.AuctionIncreasePriceRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionSaveRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateMinPriceRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateTimeRequest;
-import com.example.auctionmarket.domain.auction.dto.response.AuctionIncreasePriceResponse;
+import com.example.auctionmarket.domain.auction.dto.response.AuctionPageResponse;
+import com.example.auctionmarket.domain.auction.dto.response.AuctionJoinResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionSaveResponse;
-import com.example.auctionmarket.domain.auction.entity.Auction;
 import com.example.auctionmarket.domain.auction.service.AuctionService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,7 +27,7 @@ public class AuctionController {
     @PostMapping
     public ResponseEntity<AuctionSaveResponse> createAuction(
             @AuthenticationPrincipal AuthUser authUser,
-            @RequestBody AuctionSaveRequest request
+            @Valid @RequestBody AuctionSaveRequest request
             ){
         AuctionSaveResponse auctionSaveResponse = auctionService.createAuction(authUser, request);
         return ResponseEntity.ok(auctionSaveResponse);
@@ -38,11 +35,11 @@ public class AuctionController {
 
     //경매 전체 조회
     @GetMapping
-    public ResponseEntity<Page<AuctionResponse>> getAuctions(
+    public ResponseEntity<AuctionPageResponse> getAuctions(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size
     ){
-        Page<AuctionResponse> result = auctionService.getAuctions(page, size);
+        AuctionPageResponse result = auctionService.getAuctionsRedis(page, size);
 
         return ResponseEntity.ok(result);
     }
@@ -64,15 +61,10 @@ public class AuctionController {
         return ResponseEntity.ok(result);
     }
 
-    //경매 참여
-    @PatchMapping("/{auctionId}/participation")
-    public ResponseEntity<AuctionIncreasePriceResponse> increaseAuction(
-            @PathVariable Long auctionId,
-            @RequestBody AuctionIncreasePriceRequest request,
-            @AuthenticationPrincipal AuthUser authUser
-    ){
-        AuctionIncreasePriceResponse response = auctionService.increasePrice(authUser, auctionId, request.getIncreasePrice());
-
+    // 경매 참여
+    @PostMapping("/{auctionId}/join")
+    public ResponseEntity<AuctionJoinResponse> joinAuction(@PathVariable Long auctionId, @AuthenticationPrincipal AuthUser authUser){
+        AuctionJoinResponse response = auctionService.join(authUser, auctionId);
         return ResponseEntity.ok(response);
     }
 
@@ -80,7 +72,7 @@ public class AuctionController {
     @PatchMapping("/{auctionId}/update-starttime")
     public ResponseEntity<AuctionResponse> updateAuctionStartTime(
             @PathVariable Long auctionId,
-            @RequestBody AuctionUpdateTimeRequest request,
+            @Valid @RequestBody AuctionUpdateTimeRequest request,
             @AuthenticationPrincipal AuthUser authUser
             ){
         AuctionResponse response = auctionService.updateAuctionStartTime(authUser, auctionId, request);
@@ -108,4 +100,11 @@ public class AuctionController {
     ){
         auctionService.deleteAuction(authUser, auctionId);
     }
+
+    @PostMapping("end")
+    public void handleAuctionEnd(@RequestBody AuctionEndRequest request) {
+        auctionService.endAuction(request.auctionId);
+    }
+
+    public record AuctionEndRequest(Long auctionId) {}
 }

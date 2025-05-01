@@ -1,5 +1,6 @@
 package com.example.auctionmarket.domain.auth.controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,7 +18,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -35,4 +35,15 @@ public class AuthController {
 		LoginResponse login = authService.signin(signinRequest.getEmail(), signinRequest.getPassword());
 		return Response.of(login);
 	}
+
+//	//더미데이터 유저 테스트용입니다.
+//	@PostMapping("/v1/auth/signup100")
+//    public Response<String> createBulkUsers(@Valid @RequestBody SignupRequest signupRequest) {
+//		System.out.println("로그");
+//        for (int i = 0; i < 1000; i++) {
+//			authService.signup(signupRequest.getEmail()+i, signupRequest.getPassword(),
+//					signupRequest.getNickname(), signupRequest.getPhoneNumber(), signupRequest.getRole());
+//        }
+//			return Response.of("1000유저 생성");
+//    }
 }

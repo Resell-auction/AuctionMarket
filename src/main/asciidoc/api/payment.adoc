@@ -1,0 +1,53 @@
+== 💳 결제(Payment)
+경매 낙찰 후 상품을 결제/환불하는 기능을 제공합니다.
+
+=== Header 인증
+include::{snippets}/confirm-payment/request-headers.adoc[]
+
+
+=== 결제
+
+//==== 🔗 POST `/v1/payments/{paymentId}`
+
+상품을 결제합니다.
+
+[.api-meta]
+|===
+| 메서드 | 경로 | 설명
+
+| POST
+| `/v1/payments/{paymentId}`
+| 결제
+|===
+
+
+
+==== 요청 예시
+
+include::{snippets}/confirm-payment/http-request.adoc[]
+==== 응답 예시
+
+include::{snippets}/confirm-payment/http-response.adoc[]
+
+
+=== 결제 실패
+
+//==== 🔗 POST `/v1/payments/{paymentId}/refund`
+
+결제가 실패할 경우 사용자가 지불한 금액을 환불합니다.
+
+[.api-meta]
+|===
+| 메서드 | 경로 | 설명
+
+| POST
+| `/v1/payments/{paymentId}/refund`
+| 결제 실패
+|===
+
+==== 요청 예시
+include::{snippets}/refund-payment/http-request.adoc[]
+
+==== 응답 예시
+
+include::{snippets}/refund-payment/http-response.adoc[]
