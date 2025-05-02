@@ -1,8 +1,7 @@
 package com.example.auctionmarket.restDocsTest;
 
-import com.example.auctionmarket.domain.product.service.ProductService;
 import com.example.auctionmarket.domain.user.repository.UserRepository;
-import com.example.auctionmarket.global.jwt.JwtUtil;
+import com.example.auctionmarket.common.jwt.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
