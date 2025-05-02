@@ -60,7 +60,7 @@ public class ProductService {
         );
 
         // 본인 제품만 조회 가능 로직
-        if (!authUser.getEmail().equals(user.getEmail())) {
+        if (!authUser.getEmail().equals(product.getUser().getEmail())) {
             throw new ProductException(ProductErrorCode.NOT_MY_PRODUCT);
         }
 
@@ -79,6 +79,29 @@ public class ProductService {
         int adjustPage = (page > 0) ? page - 1 : 0;
         Pageable pageable = PageRequest.of(adjustPage, size);
         Page<Product> productPage = productRepository.findAllMyProduct(pageable, user.getId());
+
+        List<ProductResponse> dtoList = productPage.getContent().stream()
+                .map(ProductResponse::toDto)
+                .toList();
+
+        return new PageImpl<>(dtoList, pageable, productPage.getTotalElements());
+    }
+
+    //경매 검색
+    @Transactional(readOnly = true)
+    public Page<ProductResponse> searchProducts(String keyword, String category, int page, int size, AuthUser authUser) {
+
+        // 유저 검증 로직 (본인 확인)
+        User user = userRepository.findById(authUser.getId()).orElseThrow(
+                () -> new UserNotFoundException()
+        );
+
+        int adjustPage = (page > 0) ? page - 1 : 0;
+        Pageable pageable = PageRequest.of(adjustPage, size);
+
+        ProductCategory productCategory = ProductCategory.of(category);
+
+        Page<Product> productPage = productRepository.findProductsBySearch(keyword, productCategory, pageable);
 
         List<ProductResponse> dtoList = productPage.getContent().stream()
                 .map(ProductResponse::toDto)
@@ -106,7 +129,7 @@ public class ProductService {
         }
 
         // 본인 제품만 수정 가능 로직
-        if (!authUser.getEmail().equals(user.getEmail())) {
+        if (!authUser.getEmail().equals(product.getUser().getEmail())) {
             throw new ProductException(ProductErrorCode.NOT_MY_PRODUCT);
         }
 
@@ -114,7 +137,6 @@ public class ProductService {
         product.update(request.getProductName(), request.getProductContent(), category);
 
         return ProductResponse.toDto(product);
-
     }
 
     @Transactional
@@ -135,12 +157,10 @@ public class ProductService {
         }
 
         // 본인 제품만 삭제 가능 로직
-        if (!authUser.getEmail().equals(user.getEmail())) {
+        if (!authUser.getEmail().equals(product.getUser().getEmail())) {
             throw new ProductException(ProductErrorCode.NOT_MY_PRODUCT);
         }
 
         productRepository.deleteById(productId);
     }
-
-    public void changeSoldStatus(Long productId) {}
 }

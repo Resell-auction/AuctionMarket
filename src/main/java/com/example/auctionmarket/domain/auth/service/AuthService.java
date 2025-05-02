@@ -14,7 +14,7 @@ import com.example.auctionmarket.domain.user.exception.AlreadyExistsEmailExcepti
 import com.example.auctionmarket.domain.user.exception.EmailAccessDeniedException;
 import com.example.auctionmarket.domain.user.exception.InvalidPasswordException;
 import com.example.auctionmarket.domain.user.repository.UserRepository;
-import com.example.auctionmarket.global.jwt.JwtUtil;
+import com.example.auctionmarket.common.jwt.JwtUtil;
 import com.example.auctionmarket.domain.user.exception.EmailNotFoundException;
 
 import lombok.RequiredArgsConstructor;

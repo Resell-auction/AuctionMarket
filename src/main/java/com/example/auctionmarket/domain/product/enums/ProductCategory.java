@@ -14,7 +14,7 @@ public enum ProductCategory {
         return Arrays.stream(ProductCategory.values())
                 .filter(productCategory -> productCategory.name().equalsIgnoreCase(category))
                 .findFirst()
-                .orElseThrow( () -> new IllegalStateException("카테고리가 일치하지 않습니다."));
+                .orElseThrow(() -> new IllegalStateException("카테고리가 일치하지 않습니다."));
     }
 }
 
