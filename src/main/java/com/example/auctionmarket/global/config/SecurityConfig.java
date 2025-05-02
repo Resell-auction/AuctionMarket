@@ -37,20 +37,29 @@ public class SecurityConfig {
 			.csrf(AbstractHttpConfigurer::disable)
 			.sessionManagement((session) -> session
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-			.addFilterBefore(jwtAuthenticationFilter, SecurityContextHolderAwareRequestFilter.class)
-			.addFilterBefore(exceptionHandlerFilter, JwtAuthenticationFilter.class)
+			// 커스텀 필터는 계속 주석 처리 (테스트 목적)
+			// .addFilterBefore(jwtAuthenticationFilter, SecurityContextHolderAwareRequestFilter.class)
+			// .addFilterBefore(exceptionHandlerFilter, JwtAuthenticationFilter.class)
 			.formLogin(AbstractHttpConfigurer::disable)
 			.anonymous(AbstractHttpConfigurer::disable)
 			.httpBasic(AbstractHttpConfigurer::disable)
 			.logout(AbstractHttpConfigurer::disable)
 			.rememberMe(AbstractHttpConfigurer::disable)
 			.authorizeHttpRequests(auth -> auth
+				// *** 여기를 원래대로 또는 로그인 경로를 포함하도록 수정 ***
 				.requestMatchers(
-						new AntPathRequestMatcher("/v1/auth/**"),
-						new AntPathRequestMatcher("/v1/auctions/end"),
-						new AntPathRequestMatcher("/v2/auctions/**"),
-						new AntPathRequestMatcher("/v2/auctions/**"),
-						new AntPathRequestMatcher("/v3/auctions/**")).permitAll()
+					// 예시: 원래 패턴으로 되돌리기
+					new AntPathRequestMatcher("/api/*/auth/**"),
+					// 또는 더 명시적으로
+					new AntPathRequestMatcher("/api/v1/auth/signin"),
+					// --- 다른 permitAll 경로들 ---
+					new AntPathRequestMatcher("/v1/auctions/end"),
+					new AntPathRequestMatcher("/v2/auctions/**"), // 중복된 것 같으니 하나는 제거해도 될 수 있음
+					new AntPathRequestMatcher("/v1/analytics/**"),
+					// new AntPathRequestMatcher("/v2/auctions/**"), // 중복
+					new AntPathRequestMatcher("/v3/auctions/**")
+					// ---------------------------
+				).permitAll()
 				.anyRequest().authenticated()
 			)
 			.build();

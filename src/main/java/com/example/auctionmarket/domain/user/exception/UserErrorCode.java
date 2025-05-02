@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 
 import com.example.auctionmarket.common.exception.ErrorCode;
 
-enum UserErrorCode implements ErrorCode {
+public enum UserErrorCode implements ErrorCode {
 	USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_NOT_FOUND", "User를 찾을 수 없습니다."),
 	ALREADY_DEACTIVATED(HttpStatus.BAD_REQUEST, "ALREADY_DEACTIVATED", "이미 탈퇴한 회원 입니다."),
 	SAME_PASSWORD_CHANGE(HttpStatus.BAD_REQUEST, "SAME_PASSWORD_CHANGE", "동일한 비밀번호로 변경할 수 없습니다."),

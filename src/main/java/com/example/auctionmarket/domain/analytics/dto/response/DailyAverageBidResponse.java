@@ -10,5 +10,5 @@ import lombok.Getter;
 public class DailyAverageBidResponse {
 
 	private LocalDate auctionDate;
-	private double averageWinningBid;
+	private Double averageWinningBid;
 }

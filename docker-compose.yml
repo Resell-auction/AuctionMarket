@@ -45,6 +45,7 @@ services:
       - app-network
     # restart: unless-stopped
 
+
 volumes:
   app-logs: # 메인 앱과 Filebeat 간 로그 공유를 위한 명명된 볼륨
 
