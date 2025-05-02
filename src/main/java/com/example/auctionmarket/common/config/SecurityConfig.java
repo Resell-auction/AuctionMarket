@@ -1,4 +1,4 @@
-package com.example.auctionmarket.global.config;
+package com.example.auctionmarket.common.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,8 +12,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-import com.example.auctionmarket.global.filter.ExceptionHandlerFilter;
-import com.example.auctionmarket.global.filter.JwtAuthenticationFilter;
+import com.example.auctionmarket.common.filter.ExceptionHandlerFilter;
+import com.example.auctionmarket.common.filter.JwtAuthenticationFilter;
 
 import lombok.RequiredArgsConstructor;
 

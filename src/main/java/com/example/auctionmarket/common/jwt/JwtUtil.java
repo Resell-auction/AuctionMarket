@@ -1,4 +1,4 @@
-package com.example.auctionmarket.global.jwt;
+package com.example.auctionmarket.common.jwt;
 
 import java.io.IOException;
 import java.security.Key;
