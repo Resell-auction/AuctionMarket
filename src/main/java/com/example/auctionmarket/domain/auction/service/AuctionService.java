@@ -11,10 +11,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
 import com.example.auctionmarket.common.auth.AuthUser;
 import com.example.auctionmarket.common.websocket.WebSocketAuctionCreateRequest;
@@ -55,9 +53,6 @@ public class AuctionService {
     private final ProductRepository productRepository;
     private final PaymentService paymentService;
     private final WebSocketClient webSocketClient;
-    private final RestTemplate restTemplate;
-    private final RedisTemplate<String, Object> redisTemplate;
-    private static final String AUCTION_CACHE_KEY = "auction::";
 
     @Transactional
     public AuctionSaveResponse createAuction(AuthUser authUser, AuctionSaveRequest request){
@@ -415,43 +410,11 @@ public class AuctionService {
                 duration.toMinutesPart());
     }
 
-//    //경매 상태 변경 함수
-//    @Transactional
-//    @Scheduled(cron = "0 * * * * *")
-//    public void updateStatus() {
-//
-//        List<Auction> auctions = auctionRepository.findAll();
-//
-//        for(Auction auction : auctions){
-//            if(LocalDateTime.now().isAfter(auction.getStartTime()) && LocalDateTime.now().isBefore(auction.getEndTime())){
-//                auction.setStatus(AuctionStatus.ONGOING);
-//            }
-//            else if (LocalDateTime.now().isAfter(auction.getEndTime())) {
-//                auction.setStatus(AuctionStatus.ENDED);
-//
-//                if (auction.getConsumerId() != null && paymentService.shouldCreatePayment(auction.getId())) {
-//                    paymentService.createPayment(auction.getId());
-//
-//                    // 나중에 동기 비동기시 변형해서 사용
-////                    eventPublisher.publishEvent(new AuctionEndEvent(
-////                            auction.getId(),
-////                            auction.getConsumerId(),
-////                            auction.getMaxPrice()
-////                    ));
-////                    paymentService.createPayment(auction);
-//                }
-//            }
-//            else if(LocalDateTime.now().isBefore(auction.getStartTime())) {
-//                auction.setStatus(AuctionStatus.PENDING);
-//            }
-//        }
-//    }
-
     public void endAuction (Long auctionId) {
         Auction auction = auctionRepository.findById(auctionId)
                 .orElseThrow(()->new AuctionException(AuctionErrorCode.AUCTION_NOT_FOUND));
         if (LocalDateTime.now().isAfter(auction.getEndTime())) {
-            auction.setStatus(AuctionStatus.ENDED);
+            auction.updateStatus(AuctionStatus.ENDED);
 
             if (auction.getConsumerId() != null && paymentService.shouldCreatePayment(auction.getId())) {
                 paymentService.createPayment(auction.getId());
@@ -480,43 +443,4 @@ public class AuctionService {
             );
         });
     }
-
-//    //입찰 처리 공통 로직
-//    private AuctionIncreasePriceResponse processBid(AuthUser authUser, Long auctionId, Long increasePrice){
-//        Auction auction = auctionRepository.findById(auctionId)
-//                .orElseThrow(()->new AuctionException(AuctionErrorCode.AUCTION_NOT_FOUND));
-//
-//        validateBidConditions(authUser, auction);
-//
-//        auction.increaseMaxPrice(authUser.getId(), increasePrice);
-//
-//        return createBidResponse(auction);
-//    }
-
-//    //입찰 유효성 검사 공통 로직
-//    private void validateBidConditions(AuthUser authUser, Auction auction){
-//        if(auction.getStatus() != AuctionStatus.ONGOING){
-//            throw new AuctionException(AuctionErrorCode.AUCTION_NOT_STARTED);
-//        }
-//
-//        User user = userRepository.findById(authUser.getId())
-//                .orElseThrow(()->new UserNotFoundException());
-//
-//        if(Objects.equals(authUser.getId(), auction.getProduct().getUser().getId())){
-//            throw new AuctionException(AuctionErrorCode.SELF_BID_NOT_ALLOWED);
-//        }
-//    }
-//
-//    //응답 생성 공통 로직
-//    private AuctionIncreasePriceResponse createBidResponse(Auction auction){
-//        return new AuctionIncreasePriceResponse(
-//                auction.getId(),
-//                auction.getProduct().getId(),
-//                auction.getConsumerId(),
-//                auction.getProduct().getProductName(),
-//                auction.getProduct().getCategory(),
-//                auction.getMinPrice(),
-//                auction.getMaxPrice()
-//        );
-//    }
 }

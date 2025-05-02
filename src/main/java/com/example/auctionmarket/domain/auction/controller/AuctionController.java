@@ -1,6 +1,7 @@
 package com.example.auctionmarket.domain.auction.controller;
 
 import com.example.auctionmarket.common.auth.AuthUser;
+import com.example.auctionmarket.common.response.Response;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionSaveRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateMinPriceRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateTimeRequest;
@@ -25,28 +26,28 @@ public class AuctionController {
 
     //경매 생성
     @PostMapping
-    public ResponseEntity<AuctionSaveResponse> createAuction(
+    public Response<AuctionSaveResponse> createAuction(
             @AuthenticationPrincipal AuthUser authUser,
             @Valid @RequestBody AuctionSaveRequest request
             ){
         AuctionSaveResponse auctionSaveResponse = auctionService.createAuction(authUser, request);
-        return ResponseEntity.ok(auctionSaveResponse);
+        return Response.of(auctionSaveResponse);
     }
 
     //경매 전체 조회
     @GetMapping
-    public ResponseEntity<AuctionPageResponse> getAuctions(
+    public Response<AuctionPageResponse> getAuctions(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size
     ){
         AuctionPageResponse result = auctionService.getAuctionsRedis(page, size);
 
-        return ResponseEntity.ok(result);
+        return Response.of(result);
     }
 
     //경매 검색
     @GetMapping("/search")
-    public ResponseEntity<Page<AuctionResponse>> searchAuctions(
+    public Response<Page<AuctionResponse>> searchAuctions(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String category,
             @RequestParam(defaultValue = "1") int page,
@@ -58,38 +59,38 @@ public class AuctionController {
                 keyword, category, /*authUser,*/ page, size
         );
 
-        return ResponseEntity.ok(result);
+        return Response.of(result);
     }
 
     // 경매 참여
     @PostMapping("/{auctionId}/join")
-    public ResponseEntity<AuctionJoinResponse> joinAuction(@PathVariable Long auctionId, @AuthenticationPrincipal AuthUser authUser){
+    public Response<AuctionJoinResponse> joinAuction(@PathVariable Long auctionId, @AuthenticationPrincipal AuthUser authUser){
         AuctionJoinResponse response = auctionService.join(authUser, auctionId);
-        return ResponseEntity.ok(response);
+        return Response.of(response);
     }
 
     //경매 수정(시작 시간)
     @PatchMapping("/{auctionId}/update-starttime")
-    public ResponseEntity<AuctionResponse> updateAuctionStartTime(
+    public Response<AuctionResponse> updateAuctionStartTime(
             @PathVariable Long auctionId,
             @Valid @RequestBody AuctionUpdateTimeRequest request,
             @AuthenticationPrincipal AuthUser authUser
             ){
         AuctionResponse response = auctionService.updateAuctionStartTime(authUser, auctionId, request);
 
-        return ResponseEntity.ok(response);
+        return Response.of(response);
     }
 
     //경매 수정(초기 가격)
     @PatchMapping("/{auctionId}/update-minprice")
-    public ResponseEntity<AuctionResponse> updateMinPrice(
+    public Response<AuctionResponse> updateMinPrice(
             @PathVariable Long auctionId,
             @RequestBody AuctionUpdateMinPriceRequest request,
             @AuthenticationPrincipal AuthUser authUser
             ){
         AuctionResponse response = auctionService.updateMinPrice(authUser, auctionId, request);
 
-        return ResponseEntity.ok(response);
+        return Response.of(response);
     }
 
     //경매 삭제
