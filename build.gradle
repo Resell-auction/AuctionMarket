@@ -158,7 +158,6 @@ ext {
 test {
 	useJUnitPlatform()
 	outputs.dir snippetsDir
-	useJUnitPlatform()
 }
 
 tasks.register("restDocsTest", Test) {

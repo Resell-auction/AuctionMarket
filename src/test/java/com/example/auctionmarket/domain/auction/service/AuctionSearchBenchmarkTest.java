@@ -8,6 +8,7 @@ import com.example.auctionmarket.domain.auction.enums.AuctionStatus;
 import com.example.auctionmarket.domain.auction.mapper.AuctionMapper;
 import com.example.auctionmarket.domain.auction.repository.AuctionRepository;
 //import com.example.auctionmarket.domain.auction.repository.AuctionSearchRepository;
+import com.example.auctionmarket.domain.auction.repository.AuctionSearchRepository;
 import com.example.auctionmarket.domain.product.entity.Product;
 import com.example.auctionmarket.domain.product.enums.ProductCategory;
 import com.example.auctionmarket.domain.product.repository.ProductRepository;
@@ -28,14 +29,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @SpringBootTest
-@ActiveProfiles("test")
 public class AuctionSearchBenchmarkTest {
 
     @Autowired
     private AuctionRepository auctionRepository;
 
-//    @Autowired
-//    private AuctionSearchRepository auctionSearchRepository;
+    @Autowired
+    private AuctionSearchRepository auctionSearchRepository;
 
     @Autowired
     private ProductRepository productRepository;
@@ -43,8 +43,8 @@ public class AuctionSearchBenchmarkTest {
     @Autowired
     private UserRepository userRepository;
 
-//    @Autowired
-//    private AuctionSearchService auctionSearchService;
+    @Autowired
+    private AuctionSearchService auctionSearchService;
 
     @Autowired
     private AuctionOpenSearchService auctionOpenSearchService;
@@ -52,7 +52,7 @@ public class AuctionSearchBenchmarkTest {
     @BeforeEach
     void cleanUp(){
         auctionRepository.deleteAll();
-//        auctionSearchRepository.deleteAll();
+        auctionSearchRepository.deleteAll();
         productRepository.deleteAll();
     }
 
@@ -79,7 +79,7 @@ public class AuctionSearchBenchmarkTest {
                     60L
             );
             auctionRepository.save(auction);
-//            auctionSearchRepository.save(AuctionMapper.toDucument(auction));
+            auctionSearchRepository.save(AuctionMapper.toDucument(auction));
 
             //OpenSearch 인덱싱 추가
             AuctionDocument document = AuctionDocument.builder()
@@ -91,11 +91,7 @@ public class AuctionSearchBenchmarkTest {
                     .endTime(auction.getEndTime().toString())
                     .build();
 
-            try{
-                auctionOpenSearchService.save(document);
-            }catch (IOException e){
-                System.out.println("OpenSearch 인덱싱 실패: {"+e.getMessage()+"}");
-            }
+            auctionOpenSearchService.save(document);
         }
 
         System.out.println("10000건의 더미 경매가 생성되었습니다.");
@@ -117,10 +113,10 @@ public class AuctionSearchBenchmarkTest {
         System.out.println("QueryDSL 검색 소요 시간: "+(endTime1-startTime1)+"ms");
 
         //Elastic Search를 사용한 검색 기능
-//        long startTime2 = System.currentTimeMillis();
-//        auctionSearchService.searchAuctions(keyword, category, pageable);
-//        long endTime2 = System.currentTimeMillis();
-//        System.out.println("Elastic Search 검색 소요 시간: "+(endTime2-startTime2)+"ms");
+        long startTime2 = System.currentTimeMillis();
+        auctionSearchService.searchAuctions(keyword, category, pageable);
+        long endTime2 = System.currentTimeMillis();
+        System.out.println("Elastic Search 검색 소요 시간: "+(endTime2-startTime2)+"ms");
 
         //OpenSearch를 사용한 검색 기능
         long startTime3 = System.currentTimeMillis();

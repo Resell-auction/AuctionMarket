@@ -20,6 +20,7 @@ import com.example.auctionmarket.domain.auction.exception.AuctionException;
 import com.example.auctionmarket.domain.auction.mapper.AuctionMapper;
 import com.example.auctionmarket.domain.auction.repository.AuctionRepository;
 //import com.example.auctionmarket.domain.auction.repository.AuctionSearchRepository;
+import com.example.auctionmarket.domain.auction.repository.AuctionSearchRepository;
 import com.example.auctionmarket.domain.payment.service.PaymentService;
 import com.example.auctionmarket.domain.product.entity.Product;
 import com.example.auctionmarket.domain.product.repository.ProductRepository;
@@ -54,7 +55,7 @@ import java.util.Objects;
 public class AuctionService {
 
     private final AuctionRepository auctionRepository;
-//    private final AuctionSearchRepository auctionSearchRepository;
+    private final AuctionSearchRepository auctionSearchRepository;
     private final AuctionOpenSearchService auctionOpenSearchService;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
@@ -90,7 +91,7 @@ public class AuctionService {
         Auction saveAuction = auctionRepository.save(auction);
 
         //ES 색인
-//        auctionSearchRepository.save(AuctionMapper.toDucument(saveAuction));
+        auctionSearchRepository.save(AuctionMapper.toDucument(saveAuction));
 
         //OpenSearch 인덱싱 추가
         AuctionDocument document = AuctionDocument.builder()
@@ -102,11 +103,7 @@ public class AuctionService {
                                                                 .endTime(auction.getEndTime().toString())
                                                                         .build();
 
-        try{
-            auctionOpenSearchService.save(document);
-        }catch (IOException e){
-            System.out.println("OpenSearch 인덱싱 실패: {"+e.getMessage()+"}");
-        }
+        auctionOpenSearchService.save(document);
 
         webSocketClient.createAuctionRoom(
                 new WebSocketAuctionCreateRequest(
@@ -192,52 +189,52 @@ public class AuctionService {
         Page<Auction> auctions = auctionRepository.findBySearch(keyword, category, pageable);
         return mapToAuctionResponsePage(auctions);
     }
-
-    //경매 검색 기능(redis)
-    @Transactional(readOnly = true)
-    @Cacheable(value = "auctions::search", key = "'search:'+#keyword+':category:'+#category+':page:'+#page+':size:'+#size",
-    cacheManager = "redisCacheManager")
-    public AuctionPageResponse searchAuctionsRedis(
-            String keyword,
-            String category,
-            int page,
-            int size
-    ){
-        Pageable pageable = PageRequest.of(page-1, size);
-        Page<Auction> auctions = auctionRepository.findBySearch(keyword, category, pageable);
-        Page<AuctionResponse> responses = mapToAuctionResponsePage(auctions);
-
-        return new AuctionPageResponse(
-                responses.getContent(),
-                responses.getNumber(),
-                responses.getSize(),
-                responses.getTotalElements(),
-                responses.getTotalPages()
-        );
-    }
-
-    //경매 검색 기능(caffeine)
-    @Transactional(readOnly = true)
-    @Cacheable(value = "auctions::search", key = "'search:'+#keyword+':category:'+#category+':page:'+#page+':size:'+#size",
-            cacheManager = "caffeineCacheManager")
-    public AuctionPageResponse searchAuctionsCaffeine(
-            String keyword,
-            String category,
-            int page,
-            int size
-    ){
-        Pageable pageable = PageRequest.of(page-1, size);
-        Page<Auction> auctions = auctionRepository.findBySearch(keyword, category, pageable);
-        Page<AuctionResponse> responses = mapToAuctionResponsePage(auctions);
-
-        return new AuctionPageResponse(
-                responses.getContent(),
-                responses.getNumber(),
-                responses.getSize(),
-                responses.getTotalElements(),
-                responses.getTotalPages()
-        );
-    }
+//
+//    //경매 검색 기능(redis)
+//    @Transactional(readOnly = true)
+//    @Cacheable(value = "auctions::search", key = "'search:'+#keyword+':category:'+#category+':page:'+#page+':size:'+#size",
+//    cacheManager = "redisCacheManager")
+//    public AuctionPageResponse searchAuctionsRedis(
+//            String keyword,
+//            String category,
+//            int page,
+//            int size
+//    ){
+//        Pageable pageable = PageRequest.of(page-1, size);
+//        Page<Auction> auctions = auctionRepository.findBySearch(keyword, category, pageable);
+//        Page<AuctionResponse> responses = mapToAuctionResponsePage(auctions);
+//
+//        return new AuctionPageResponse(
+//                responses.getContent(),
+//                responses.getNumber(),
+//                responses.getSize(),
+//                responses.getTotalElements(),
+//                responses.getTotalPages()
+//        );
+//    }
+//
+//    //경매 검색 기능(caffeine)
+//    @Transactional(readOnly = true)
+//    @Cacheable(value = "auctions::search", key = "'search:'+#keyword+':category:'+#category+':page:'+#page+':size:'+#size",
+//            cacheManager = "caffeineCacheManager")
+//    public AuctionPageResponse searchAuctionsCaffeine(
+//            String keyword,
+//            String category,
+//            int page,
+//            int size
+//    ){
+//        Pageable pageable = PageRequest.of(page-1, size);
+//        Page<Auction> auctions = auctionRepository.findBySearch(keyword, category, pageable);
+//        Page<AuctionResponse> responses = mapToAuctionResponsePage(auctions);
+//
+//        return new AuctionPageResponse(
+//                responses.getContent(),
+//                responses.getNumber(),
+//                responses.getSize(),
+//                responses.getTotalElements(),
+//                responses.getTotalPages()
+//        );
+//    }
 
     //경매 입찰
     @Transactional
@@ -299,7 +296,7 @@ public class AuctionService {
         auction.updateStartTime(request.getUpdateTime());
 
         //elastic search 색인도 업데이트
-//        auctionSearchRepository.save(AuctionMapper.toDucument(auction));
+        auctionSearchRepository.save(AuctionMapper.toDucument(auction));
 
         String auctionMessage = remainingTimeOfAuctionStatus(auction.getStatus(), auction.getEndTime());
 
@@ -346,7 +343,7 @@ public class AuctionService {
         auction.updateMinPrice(request.getMinPrice());
 
         //elastic search 색인도 업데이트
-//        auctionSearchRepository.save(AuctionMapper.toDucument(auction));
+        auctionSearchRepository.save(AuctionMapper.toDucument(auction));
 
         String auctionMessage = remainingTimeOfAuctionStatus(auction.getStatus(), auction.getEndTime());
 

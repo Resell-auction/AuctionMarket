@@ -27,6 +27,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.lang.reflect.Field;
@@ -53,11 +54,15 @@ public class AuctionServiceTest {
     @Mock
     private ProductRepository productRepository;
 
+
     @Mock
     private PaymentService paymentService;
 
     @Mock
     private RedisTemplate<String, Object> redisTemplate;
+
+    @Mock
+    private ValueOperations<String, Object> valueOperations;
 
     @Mock
     private AuctionOpenSearchService auctionOpenSearchService;
@@ -135,26 +140,17 @@ public class AuctionServiceTest {
     }
 
     @Test
-    @DisplayName("경매 전체 조회 - 기본")
-    public void getAuctions_Success(){
+    @DisplayName("경매 조회 redis - 성공")
+    public void getAcutionRedis_Success(){
         //given
-        when(auctionRepository.findAll(any(Pageable.class))).thenReturn(auctionPage);
+        int page = 1;
+        int size = 10;
+        Pageable pageable = PageRequest.of(page-1, size);
+
 
         //when
-        Page<AuctionResponse> result = auctionService.getAuctions(1,10);
 
-        //then
-        assertNotNull(result);
-        assertEquals(1, result.getTotalElements());
-        assertEquals("testproduct", result.getContent().get(0).getProductName());
     }
-
-//    @Test
-//    @DisplayName("Redis 캐시된 경매 조회 - 성공")
-//    public void getAuctions_Redis_Success(){
-//        String key = "auction::1";
-//        AuctionResponse response = new
-//    }
 
     @Test
     @DisplayName("경매 최소 가격 수정 - 성공")

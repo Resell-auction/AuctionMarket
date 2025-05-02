@@ -32,15 +32,6 @@ public class OpenSearchConfig {
     @Value("${opensearch.password}")
     private String password;
 
-//    @Value("${cloud.aws.credentials.access-key}")
-//    private String accessKey;
-//
-//    @Value("${cloud.aws.credentials.secret-key}")
-//    private String secretKey;
-//
-//    @Value("${cloud.aws.region.static}")
-//    private String region;
-
     @Bean
     public RestHighLevelClient restHighLevelClient() {
         final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
@@ -52,29 +43,4 @@ public class OpenSearchConfig {
 
         return new RestHighLevelClient(builder);
     }
-
-//    @Bean
-//    public RestHighLevelClient restHighLevelClient() {
-//        Aws4Signer signer = Aws4Signer.create();
-//        StaticCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(
-//                AwsBasicCredentials.create(accessKey, secretKey)
-//        );
-//
-//        HttpHost host = HttpHost.create(openSearchUrl);
-//
-//        RestClientBuilder restClient = RestClient.builder(host)
-//                .setHttpClientConfigCallback(httpClientBuilder -> {
-//                    ApacheHttpClient.Builder apacheClientBuilder = ApacheHttpClient.builder();
-//                    return httpClientBuilder
-//                            .addInterceptorLast(new AWSReqeustSigningApacheInterceptor(
-//                                    "es",
-//                                    signer,
-//                                    credentialsProvider,
-//                                    Region.of(region),
-//                                    openSearchUrl
-//                            ));
-//                });
-//
-//        return new RestHighLevelClient(restClient);
-//    }
 }
