@@ -1,4 +1,4 @@
-package com.example.auctionmarket.global.filter;
+package com.example.auctionmarket.common.filter;
 
 import java.io.IOException;
 import java.io.PrintWriter;
