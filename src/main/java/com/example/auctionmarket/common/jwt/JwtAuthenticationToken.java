@@ -1,4 +1,4 @@
-package com.example.auctionmarket.global.jwt;
+package com.example.auctionmarket.common.jwt;
 
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 

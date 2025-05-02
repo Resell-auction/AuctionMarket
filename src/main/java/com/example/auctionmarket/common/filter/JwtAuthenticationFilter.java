@@ -1,7 +1,6 @@
-package com.example.auctionmarket.global.filter;
+package com.example.auctionmarket.common.filter;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 import com.example.auctionmarket.domain.user.enums.Role;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,8 +13,8 @@ import com.example.auctionmarket.domain.auth.exception.InvalidJwtSignatureExcept
 import com.example.auctionmarket.domain.auth.exception.InvalidTokenException;
 import com.example.auctionmarket.domain.auth.exception.UnsupportedJwtTokenException;
 import com.example.auctionmarket.domain.user.repository.UserRepository;
-import com.example.auctionmarket.global.jwt.JwtAuthenticationToken;
-import com.example.auctionmarket.global.jwt.JwtUtil;
+import com.example.auctionmarket.common.jwt.JwtAuthenticationToken;
+import com.example.auctionmarket.common.jwt.JwtUtil;
 import com.example.auctionmarket.domain.auth.exception.TokenNotFoundException;
 
 import io.jsonwebtoken.Claims;
@@ -23,7 +22,6 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
