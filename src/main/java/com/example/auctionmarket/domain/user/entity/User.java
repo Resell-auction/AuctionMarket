@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.message.ParameterizedMessage;
+
 import com.example.auctionmarket.common.entity.BaseEntity;
 import com.example.auctionmarket.domain.coupon.entity.CouponUser;
 import com.example.auctionmarket.domain.user.enums.Role;
@@ -25,7 +27,6 @@ import lombok.Getter;
 @Getter
 @Table(name = "users")
 public class User extends BaseEntity {
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -40,10 +41,6 @@ public class User extends BaseEntity {
 
 	@OneToMany(mappedBy = "users", cascade = CascadeType.ALL)
 	private List<CouponUser> couponUserList = new ArrayList<>();
-
-	// @OneToOne
-	// @JoinColumn(name = "payment_id")
-	// private Payment payment;
 
 	@Enumerated(EnumType.STRING)
 	private Role role;
@@ -84,13 +81,4 @@ public class User extends BaseEntity {
 	public void updateRefreshToken(String refreshToken) {
 		this.refreshToken = refreshToken;
 	}
-
-	public String getNickname(){
-		return  this.nickname = nickname;
-	}
-
-	public void setCouponUser(CouponUser couponUser){
-		couponUserList.add(couponUser);
-	}
-
 }
