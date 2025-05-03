@@ -1,79 +1,178 @@
-name: CI/CD Pipeline for AuctionMarketApp
+name: Java CI/CD with Gradle, Docker, AWS ECR & EC2 App Deployment (using RDS & ElastiCache)
 
 on:
+  pull_request:
+    branches:
+      - dev
+      - main
   push:
-    branches: [ main ]
+    branches:
+      - main
+      - dev
+      - feat/cicd
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  ECR_REPOSITORY: ${{ secrets.AWS_ECR_REPOSITORY_URI }}
+  APP_CONTAINER_NAME: auction-market-app
 
 jobs:
-  build-and-test:
+  build-and-push-image:
+    name: 작업1 - 도커 이미지 빌드 + ECR 푸시
     runs-on: ubuntu-latest
+    outputs:
+      image_uri: ${{ steps.build-image.outputs.image }}
+
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: JDK 17 설치
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-      - name: Build with Gradle
-        run: ./gradlew build
-      # 테스트 단계 추가 (예: ./gradlew test)
 
-  deploy:
-    needs: build-and-test # build-and-test Job 성공 시 실행
-    runs-on: ubuntu-latest
-    permissions: # OIDC 사용 시 필요
-      id-token: write
-      contents: read
-    steps:
-      - uses: actions/checkout@v3
-      - name: Configure AWS Credentials # OIDC 사용 예시
+      - name: gradlew 실행 권한 부여
+        run: chmod +x ./gradlew
+
+      - name: Gradle 캐시 설정
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Gradle 테스트 실행
+        run: ./gradlew test
+
+      - name: AWS IAM 설정
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::ACCOUNT-ID:role/GitHubAction-DeployRole # 미리 생성된 IAM 역할 ARN
-          aws-region: ${{ secrets.AWS_REGION }} # GitHub Secret 사용
-      - name: Login to Amazon ECR
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: AWS ECR 로그인
+        id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
-      - name: Build, tag, and push image to Amazon ECR
+
+      - name: Docker 이미지 빌드 + 태그 + ECR 에 푸시
+        id: build-image
+        if: github.event_name == 'push'
         env:
-          ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
-          ECR_REPOSITORY: auction-market-app
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
-      - name: Download task definition & Create new revision & Update ECS Service
-        env:
-          ECS_CLUSTER_NAME: my-spring-infra-cluster # Terraform에서 생성한 클러스터 이름
-          ECS_SERVICE_NAME: my-spring-infra-service # Terraform에서 생성한 서비스 이름
-          ECS_TASK_DEFINITION_FAMILY: my-spring-infra-app-task # Terraform에서 생성한 Task Definition 패밀리 이름
-          CONTAINER_NAME: spring-app-1 # 업데이트할 컨테이너 이름
-          ECR_REPO_URI: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/auction-market-app
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          # 현재 Task Definition 가져오기
-          aws ecs describe-task-definition --task-definition $ECS_TASK_DEFINITION_FAMILY --query taskDefinition > task-definition.json
+          FULL_IMAGE_NAME=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "이미지 빌드: $FULL_IMAGE_NAME"
+          docker build -t $FULL_IMAGE_NAME .
+          echo "이미지 PUSH: $FULL_IMAGE_NAME"
+          docker push $FULL_IMAGE_NAME
+          echo "image=$FULL_IMAGE_NAME" >> $GITHUB_OUTPUT
+          echo "GITHUB_OUTPUT 값 = $GITHUB_OUTPUT"
 
-          # 새 이미지 URI로 업데이트하여 새 Task Definition 등록 (jq 사용 예시)
-          # containerDefinitions 필드만 추출하여 새 파일로 저장 (등록 시 불필요 필드 제거 목적)
-          jq '.containerDefinitions' task-definition.json > container-definitions.json
-          # 이미지 URI 업데이트 (jq 복잡하므로 스크립트 사용 고려)
-          # ... (sed 또는 다른 스크립트로 container-definitions.json 내 image 값 변경) ...
-          # 예시: sed -i "s|image\": \"[^\"]*\"|image\": \"$ECR_REPO_URI:$IMAGE_TAG\"|g" container-definitions.json # 이 부분은 주의 필요
+  deploy-app-to-ec2:
+    name: 작업2 - EC2 인스턴스에 SSH 로 배포
+    runs-on: ubuntu-latest
+    # 의존성 설정 => build-and-push-image 완료 후 실행
+    needs: build-and-push-image
+    # push 일 때만 실행 => PR 시에는 실행 안 함
+    if: github.event_name == 'push'
 
-          # 위 스크립트 대신, 아래처럼 주요 정보만으로 새 Task Definition을 생성하는 것이 더 안정적일 수 있음
-          # aws ecs register-task-definition --family $ECS_TASK_DEFINITION_FAMILY --cli-input-json file://updated-task-definition.json
-          # -> 이 부분은 실제 구현 시 더 많은 스크립팅이 필요합니다.
+    steps:
 
-          # ** 더 간편한 방법: aws ecs update-service --force-new-deployment 사용 (단, latest 태그 의존)**
-          # 만약 항상 :latest 태그만 사용하고, 새 이미지가 푸시되면 자동으로 반영되길 원한다면,
-          # Task Definition 업데이트 없이 아래 명령어로 강제 재배포만 할 수도 있습니다.
-          # (단, Task Definition에 명시된 image가 '...:latest' 이어야 함)
-           aws ecs update-service --cluster $ECS_CLUSTER_NAME --service $ECS_SERVICE_NAME --force-new-deployment
+      - name: AWS IAM 설정
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
-          # ** 권장 방식: 새 Task Definition 등록 후 서비스 업데이트 **
-          # (위에 언급한 스크립팅 필요)
-          # NEW_TASK_DEF_ARN=$(aws ecs register-task-definition --cli-input-json file://updated-task-definition.json --query taskDefinition.taskDefinitionArn --output text)
-          # aws ecs update-service --cluster $ECS_CLUSTER_NAME --service $ECS_SERVICE_NAME --task-definition $NEW_TASK_DEF_ARN
+      - name: AWS ECR 로그인
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: SSH 를 통해 EC2 인스턴스에 접속하여 배포 스크립트 실행
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_SSH_HOST }}
+          username: ${{ secrets.EC2_SSH_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            echo "변수에 직접 할당 시작"
+            ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
+            APP_IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ secrets.AWS_ECR_REPOSITORY_URI }}:${{ github.sha }}
+            AWS_REGION=${{ env.AWS_REGION }}
+            APP_CONTAINER_NAME=${{ env.APP_CONTAINER_NAME }}
+            SPRING_PROFILES_ACTIVE=dev
+            SPRING_DATASOURCE_URL=${{ secrets.RDS_URL }}
+            SPRING_DATASOURCE_USERNAME=${{ secrets.RDS_USERNAME }}
+            SPRING_DATASOURCE_PASSWORD=${{ secrets.RDS_PASSWORD }}
+            SPRING_DATA_REDIS_HOST=${{ secrets.ELASTICACHE_HOST }}
+            SPRING_DATA_REDIS_PORT=${{ secrets.ELASTICACHE_PORT }}
+            
+            echo "=====================" 
+            
+            # ECR 로그인
+            echo "ECR 로그인 중..."
+            aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}
+            if [ $? -ne 0 ]; then
+              echo "ECR 로그인 실패"
+              exit 1
+            fi
+            echo "ECR 로그인 성공."
+            
+            echo "=====================" 
+            
+            # 기존 컨테이너 중지 및 제거
+            echo "기존 컨테이너 중지 및 제거 시도...: ${APP_CONTAINER_NAME}"
+            docker stop ${APP_CONTAINER_NAME} || true
+            docker rm ${APP_CONTAINER_NAME} || true
+            echo "기존 컨테이너 중지 및 제거 성공"
+            
+            echo "=====================" 
+            
+            # 최신 이미지 받기
+            echo "최신 이미지 받는 중...: ${APP_IMAGE_URI}"
+            docker pull ${APP_IMAGE_URI}
+            if [ $? -ne 0 ]; then
+              echo "이미지 받기 실패: ${APP_IMAGE_URI}"
+              exit 1
+            fi
+            echo "이미지 받기 완료: ${APP_IMAGE_URI}"
+            
+            echo "=====================" 
+            
+            # 애플리케이션 컨테이너 실행
+            echo "컨테이너 실행 중...: ${APP_CONTAINER_NAME}"
+            docker run -d \
+              --name ${APP_CONTAINER_NAME} \
+              -p 8080:8080 \
+              -e SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE} \
+              -e SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL} \
+              -e SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME} \
+              -e SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD} \
+              -e SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST} \
+              -e SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT} \
+              ${APP_IMAGE_URI}
+              # --restart unless-stopped \
+            
+            if [ $? -ne 0 ]; then
+              echo "컨테이너 실행 실패: ${APP_CONTAINER_NAME}"
+              exit 1
+            fi
+            echo "컨테이너 실행 성공: ${APP_CONTAINER_NAME}"
+            
+            echo "=====================" 
+            
+            # 오래된 Docker 이미지 정리
+            echo "오래된 도커 이미지 정리 중..."
+            docker image prune -af
+            
+            echo "=====================" 
+            
+            echo "배포 성공"

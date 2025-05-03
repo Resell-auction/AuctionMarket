@@ -30,7 +30,7 @@ public class MyPageResponse {
 			.userRole(user.getRole().name())
 			.phoneNumber(user.getPhoneNumber())
 			.createdAt(user.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
-			.modifiedAt(user.getUpdatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
+			.modifiedAt(user.getModifiedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
 			.build();
 	}
 }

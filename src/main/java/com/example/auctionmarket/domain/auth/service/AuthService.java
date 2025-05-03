@@ -2,11 +2,9 @@ package com.example.auctionmarket.domain.auth.service;
 
 import java.util.Objects;
 import java.util.Optional;
-
 import com.example.auctionmarket.domain.user.enums.Role;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import com.example.auctionmarket.domain.auth.dto.LoginResponse;
 import com.example.auctionmarket.domain.auth.dto.SignupResponse;
 import com.example.auctionmarket.domain.user.entity.User;
@@ -16,7 +14,6 @@ import com.example.auctionmarket.domain.user.exception.InvalidPasswordException;
 import com.example.auctionmarket.domain.user.repository.UserRepository;
 import com.example.auctionmarket.common.jwt.JwtUtil;
 import com.example.auctionmarket.domain.user.exception.EmailNotFoundException;
-
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -35,7 +32,6 @@ public class AuthService {
 		String encodedPassword = bCryptPasswordEncoder.encode(password);
 		User User = new User(email, encodedPassword, nickname, phoneNumber, Role.of(role));
 		User saveUser = userRepository.save(User);
-
 		String accessToken = jwtUtil.createAccessToken(saveUser.getId(), saveUser.getEmail(), saveUser.getRole(), saveUser.getNickname());
 		String refreshToken = jwtUtil.createRefreshToken(saveUser.getId());
 		saveUser.updateRefreshToken(refreshToken);
@@ -50,16 +46,13 @@ public class AuthService {
 			.ifPresent(deletedAt -> {
 				throw new EmailAccessDeniedException();
 			});
-
 		if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
 			throw new InvalidPasswordException();
 		}
 		String accessToken = jwtUtil.createAccessToken(user.getId(), user.getEmail(), user.getRole(), user.getNickname());
-
 		String refreshToken = jwtUtil.createRefreshToken(user.getId());
 		user.updateRefreshToken(refreshToken);
 		userRepository.save(user);
 		return new LoginResponse(accessToken, refreshToken);
 	}
-
 }

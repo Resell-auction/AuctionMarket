@@ -1,12 +1,8 @@
 package com.example.auctionmarket.domain.user.service;
 
-import java.util.Objects;
-import java.util.Optional;
-
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-
 import com.example.auctionmarket.domain.user.dto.MyPageResponse;
 import com.example.auctionmarket.domain.user.dto.UserResponse;
 import com.example.auctionmarket.domain.user.entity.User;
@@ -15,7 +11,6 @@ import com.example.auctionmarket.domain.user.exception.SamePasswordChangeExcepti
 import com.example.auctionmarket.domain.user.exception.UserAlreadyDeactivatedException;
 import com.example.auctionmarket.domain.user.exception.UserNotFoundException;
 import com.example.auctionmarket.domain.user.repository.UserRepository;
-
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -29,7 +24,6 @@ public class UserService {
 		User user = invalidCheckUser(id);
 		return MyPageResponse.from(user);
 	}
-
 
 	@Transactional
 	public UserResponse updateUser(Long id, String nickname, String phoneNumber) {
@@ -69,13 +63,9 @@ public class UserService {
 
 	private User invalidCheckUser(Long id) {
 		User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
-		Optional.ofNullable(user.getDeletedAt())
-			.filter(Objects::nonNull)
-			.ifPresent(deletedAt -> {
-				throw new UserAlreadyDeactivatedException();
-			});
-
+		if (user.getDeletedAt() != null) {
+			throw new UserAlreadyDeactivatedException();
+		}
 		return user;
 	}
-
 }
