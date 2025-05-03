@@ -21,14 +21,13 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
-@Setter
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "auctions")
 public class Auction extends BaseEntity {
     @Id
@@ -66,7 +65,9 @@ public class Auction extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "Auction_Status")
     private AuctionStatus status;
+
     //경매 정보를 저장하기 위한 메서드
+    @Builder
     public Auction(Product product, Long minPrice, LocalDateTime startTime, Long minutes) {
         this.product = product;
         this.minPrice = minPrice;
