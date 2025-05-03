@@ -7,8 +7,6 @@ import com.example.auctionmarket.domain.auction.entity.Auction;
 import com.example.auctionmarket.domain.auction.enums.AuctionStatus;
 import com.example.auctionmarket.domain.auction.mapper.AuctionMapper;
 import com.example.auctionmarket.domain.auction.repository.AuctionRepository;
-//import com.example.auctionmarket.domain.auction.repository.AuctionSearchRepository;
-import com.example.auctionmarket.domain.auction.repository.AuctionSearchRepository;
 import com.example.auctionmarket.domain.product.entity.Product;
 import com.example.auctionmarket.domain.product.enums.ProductCategory;
 import com.example.auctionmarket.domain.product.repository.ProductRepository;
@@ -34,8 +32,8 @@ public class AuctionSearchBenchmarkTest {
     @Autowired
     private AuctionRepository auctionRepository;
 
-    @Autowired
-    private AuctionSearchRepository auctionSearchRepository;
+//    @Autowired
+//    private AuctionSearchRepository auctionSearchRepository;
 
     @Autowired
     private ProductRepository productRepository;
@@ -43,8 +41,8 @@ public class AuctionSearchBenchmarkTest {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private AuctionSearchService auctionSearchService;
+//    @Autowired
+//    private AuctionSearchService auctionSearchService;
 
     @Autowired
     private AuctionOpenSearchService auctionOpenSearchService;
@@ -52,7 +50,7 @@ public class AuctionSearchBenchmarkTest {
     @BeforeEach
     void cleanUp(){
         auctionRepository.deleteAll();
-        auctionSearchRepository.deleteAll();
+//        auctionSearchRepository.deleteAll();
         productRepository.deleteAll();
     }
 

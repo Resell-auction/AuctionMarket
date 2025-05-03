@@ -13,7 +13,6 @@ import com.example.auctionmarket.domain.auction.service.AuctionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,23 +40,6 @@ public class AuctionController {
             @RequestParam(defaultValue = "10") int size
     ){
         AuctionPageResponse result = auctionService.getAuctionsRedis(page, size);
-
-        return Response.of(result);
-    }
-
-    //경매 검색
-    @GetMapping("/search")
-    public Response<Page<AuctionResponse>> searchAuctions(
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String category,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @AuthenticationPrincipal AuthUser authUser
-    ){
-
-        Page<AuctionResponse> result = auctionService.SearchAuctions(
-                keyword, category, /*authUser,*/ page, size
-        );
 
         return Response.of(result);
     }

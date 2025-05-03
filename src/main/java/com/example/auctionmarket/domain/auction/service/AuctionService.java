@@ -1,6 +1,5 @@
 package com.example.auctionmarket.domain.auction.service;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -30,9 +29,7 @@ import com.example.auctionmarket.domain.auction.entity.Auction;
 import com.example.auctionmarket.domain.auction.enums.AuctionStatus;
 import com.example.auctionmarket.domain.auction.exception.AuctionErrorCode;
 import com.example.auctionmarket.domain.auction.exception.AuctionException;
-import com.example.auctionmarket.domain.auction.mapper.AuctionMapper;
 import com.example.auctionmarket.domain.auction.repository.AuctionRepository;
-import com.example.auctionmarket.domain.auction.repository.AuctionSearchRepository;
 import com.example.auctionmarket.domain.payment.service.PaymentService;
 import com.example.auctionmarket.domain.product.entity.Product;
 import com.example.auctionmarket.domain.product.repository.ProductRepository;
@@ -47,7 +44,6 @@ import lombok.RequiredArgsConstructor;
 public class AuctionService {
 
     private final AuctionRepository auctionRepository;
-    private final AuctionSearchRepository auctionSearchRepository;
     private final AuctionOpenSearchService auctionOpenSearchService;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
@@ -78,9 +74,6 @@ public class AuctionService {
         );
 
         Auction saveAuction = auctionRepository.save(auction);
-
-        //ES 색인
-        auctionSearchRepository.save(AuctionMapper.toDucument(saveAuction));
 
         //OpenSearch 인덱싱 추가
         AuctionDocument document = AuctionDocument.builder()
@@ -122,14 +115,6 @@ public class AuctionService {
         );
     }
 
-    //경매 전체 조회
-    @Transactional
-    public Page<AuctionResponse> getAuctions(int page, int size){
-        Pageable pageable = PageRequest.of(page-1, size);
-        Page<Auction> auctions = auctionRepository.findAll(pageable);
-        return mapToAuctionResponsePage(auctions);
-    }
-
     //경매 전체 조회(redis)
     @Transactional(readOnly = true)
     @Cacheable(value = "auctions::list", key = "'page:'+#page+':size:'+#size", cacheManager = "redisCacheManager")
@@ -147,83 +132,6 @@ public class AuctionService {
                 responses.getTotalPages()
         );
     }
-
-    //경매 전체 조회(caffeine)
-    @Transactional(readOnly = true)
-    @Cacheable(value = "auctions::list", key = "'page:'+#page+':size:'+#size", cacheManager = "caffeineCacheManager")
-    public AuctionPageResponse getAuctionsCaffeine(int page, int size){
-        Pageable pageable = PageRequest.of(page-1, size);
-        Page<Auction> auctions = auctionRepository.findAll(pageable);
-
-        Page<AuctionResponse> responses = mapToAuctionResponsePage(auctions);
-
-        return new AuctionPageResponse(
-                responses.getContent(),
-                responses.getNumber(),
-                responses.getSize(),
-                responses.getTotalElements(),
-                responses.getTotalPages()
-        );
-    }
-
-    //경매 검색 기능
-    @Transactional
-    public Page<AuctionResponse> SearchAuctions(
-        String keyword,
-        String category,
-//        AuthUser authUser,
-        int page, int size
-    ){
-        Pageable pageable = PageRequest.of(page-1, size);
-        Page<Auction> auctions = auctionRepository.findBySearch(keyword, category, pageable);
-        return mapToAuctionResponsePage(auctions);
-    }
-//
-//    //경매 검색 기능(redis)
-//    @Transactional(readOnly = true)
-//    @Cacheable(value = "auctions::search", key = "'search:'+#keyword+':category:'+#category+':page:'+#page+':size:'+#size",
-//    cacheManager = "redisCacheManager")
-//    public AuctionPageResponse searchAuctionsRedis(
-//            String keyword,
-//            String category,
-//            int page,
-//            int size
-//    ){
-//        Pageable pageable = PageRequest.of(page-1, size);
-//        Page<Auction> auctions = auctionRepository.findBySearch(keyword, category, pageable);
-//        Page<AuctionResponse> responses = mapToAuctionResponsePage(auctions);
-//
-//        return new AuctionPageResponse(
-//                responses.getContent(),
-//                responses.getNumber(),
-//                responses.getSize(),
-//                responses.getTotalElements(),
-//                responses.getTotalPages()
-//        );
-//    }
-//
-//    //경매 검색 기능(caffeine)
-//    @Transactional(readOnly = true)
-//    @Cacheable(value = "auctions::search", key = "'search:'+#keyword+':category:'+#category+':page:'+#page+':size:'+#size",
-//            cacheManager = "caffeineCacheManager")
-//    public AuctionPageResponse searchAuctionsCaffeine(
-//            String keyword,
-//            String category,
-//            int page,
-//            int size
-//    ){
-//        Pageable pageable = PageRequest.of(page-1, size);
-//        Page<Auction> auctions = auctionRepository.findBySearch(keyword, category, pageable);
-//        Page<AuctionResponse> responses = mapToAuctionResponsePage(auctions);
-//
-//        return new AuctionPageResponse(
-//                responses.getContent(),
-//                responses.getNumber(),
-//                responses.getSize(),
-//                responses.getTotalElements(),
-//                responses.getTotalPages()
-//        );
-//    }
 
     //경매 입찰
     @Transactional
@@ -284,9 +192,6 @@ public class AuctionService {
         //입력 받은 수정할 시작 시간 저장
         auction.updateStartTime(request.getUpdateTime());
 
-        //elastic search 색인도 업데이트
-        auctionSearchRepository.save(AuctionMapper.toDucument(auction));
-
         String auctionMessage = remainingTimeOfAuctionStatus(auction.getStatus(), auction.getEndTime());
 
         //수정한 후의 경매 내용 출력
@@ -330,9 +235,6 @@ public class AuctionService {
 
         //입력 받은 최소가 저장
         auction.updateMinPrice(request.getMinPrice());
-
-        //elastic search 색인도 업데이트
-        auctionSearchRepository.save(AuctionMapper.toDucument(auction));
 
         String auctionMessage = remainingTimeOfAuctionStatus(auction.getStatus(), auction.getEndTime());
 
