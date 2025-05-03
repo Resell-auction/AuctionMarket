@@ -1,12 +1,12 @@
 package com.example.auctionmarket.domain.auction.service;
 
+import com.example.auctionmarket.common.config.S3Config;
 import com.example.auctionmarket.domain.auction.document.AuctionDocument;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionOpenSearchPageResponse;
 import com.example.auctionmarket.domain.auction.entity.Auction;
 import com.example.auctionmarket.domain.auction.enums.AuctionStatus;
 import com.example.auctionmarket.domain.auction.mapper.AuctionMapper;
 import com.example.auctionmarket.domain.auction.repository.AuctionRepository;
-import com.example.auctionmarket.domain.auction.repository.AuctionSearchRepository;
 import com.example.auctionmarket.domain.product.entity.Product;
 import com.example.auctionmarket.domain.product.enums.ProductCategory;
 import com.example.auctionmarket.domain.product.repository.ProductRepository;
@@ -15,6 +15,7 @@ import com.example.auctionmarket.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,14 +27,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @SpringBootTest
-@ActiveProfiles("test")
 public class AuctionSearchBenchmarkTest {
 
     @Autowired
     private AuctionRepository auctionRepository;
 
-    @Autowired
-    private AuctionSearchRepository auctionSearchRepository;
+//    @Autowired
+//    private AuctionSearchRepository auctionSearchRepository;
 
     @Autowired
     private ProductRepository productRepository;
@@ -41,8 +41,8 @@ public class AuctionSearchBenchmarkTest {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private AuctionSearchService auctionSearchService;
+//    @Autowired
+//    private AuctionSearchService auctionSearchService;
 
     @Autowired
     private AuctionOpenSearchService auctionOpenSearchService;
@@ -50,7 +50,7 @@ public class AuctionSearchBenchmarkTest {
     @BeforeEach
     void cleanUp(){
         auctionRepository.deleteAll();
-        auctionSearchRepository.deleteAll();
+//        auctionSearchRepository.deleteAll();
         productRepository.deleteAll();
     }
 
@@ -89,11 +89,7 @@ public class AuctionSearchBenchmarkTest {
                     .endTime(auction.getEndTime().toString())
                     .build();
 
-            try{
-                auctionOpenSearchService.save(document);
-            }catch (IOException e){
-                System.out.println("OpenSearch 인덱싱 실패: {"+e.getMessage()+"}");
-            }
+            auctionOpenSearchService.save(document);
         }
 
         System.out.println("10000건의 더미 경매가 생성되었습니다.");

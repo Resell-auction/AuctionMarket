@@ -1,24 +1,35 @@
 package com.example.auctionmarket.domain.auction.entity;
 
-import com.example.auctionmarket.common.entity.TimeStamped;
+import java.time.Duration;
+import java.time.LocalDateTime;
+
+import com.example.auctionmarket.common.entity.BaseEntity;
 import com.example.auctionmarket.domain.auction.enums.AuctionStatus;
 import com.example.auctionmarket.domain.auction.exception.AuctionErrorCode;
 import com.example.auctionmarket.domain.auction.exception.AuctionException;
 import com.example.auctionmarket.domain.product.entity.Product;
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+import lombok.*;
 
 @Getter
-@Setter
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "auctions")
-public class Auction extends TimeStamped {
+public class Auction extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -54,7 +65,9 @@ public class Auction extends TimeStamped {
     @Enumerated(EnumType.STRING)
     @Column(name = "Auction_Status")
     private AuctionStatus status;
+
     //경매 정보를 저장하기 위한 메서드
+    @Builder
     public Auction(Product product, Long minPrice, LocalDateTime startTime, Long minutes) {
         this.product = product;
         this.minPrice = minPrice;

@@ -12,5 +12,4 @@ public class DailyAverageBidRequest {
 
 	@NotNull(message = "카테고리를 반드시 입력해주세요")
 	private ProductCategory category;
-
 }

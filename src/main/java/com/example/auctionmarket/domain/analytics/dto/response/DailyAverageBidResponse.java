@@ -2,8 +2,6 @@ package com.example.auctionmarket.domain.analytics.dto.response;
 
 import java.time.LocalDate;
 
-import com.example.auctionmarket.domain.product.enums.ProductCategory;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -12,5 +10,6 @@ import lombok.Getter;
 public class DailyAverageBidResponse {
 
 	private LocalDate auctionDate;
-	private double averageWinningBid;
+
+	private Integer averageWinningBid;
 }

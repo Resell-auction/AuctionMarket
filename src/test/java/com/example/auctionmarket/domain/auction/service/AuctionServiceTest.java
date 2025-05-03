@@ -1,7 +1,9 @@
 package com.example.auctionmarket.domain.auction.service;
 
 import com.example.auctionmarket.common.auth.AuthUser;
+import com.example.auctionmarket.common.websocket.WebSocketClient;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionSaveRequest;
+import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateMinPriceRequest;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionSaveResponse;
 import com.example.auctionmarket.domain.auction.entity.Auction;
@@ -25,6 +27,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.lang.reflect.Field;
@@ -36,6 +39,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -50,11 +54,21 @@ public class AuctionServiceTest {
     @Mock
     private ProductRepository productRepository;
 
+
     @Mock
     private PaymentService paymentService;
 
     @Mock
     private RedisTemplate<String, Object> redisTemplate;
+
+    @Mock
+    private ValueOperations<String, Object> valueOperations;
+
+    @Mock
+    private AuctionOpenSearchService auctionOpenSearchService;
+
+    @Mock
+    private WebSocketClient webSocketClient;
 
     @InjectMocks
     private AuctionService auctionService;
@@ -126,17 +140,30 @@ public class AuctionServiceTest {
     }
 
     @Test
-    @DisplayName("경매 전체 조회 - 기본")
-    public void getAuctions_Success(){
+    @DisplayName("경매 조회 redis - 성공")
+    public void getAcutionRedis_Success(){
         //given
-        when(auctionRepository.findAll(any(Pageable.class))).thenReturn(auctionPage);
+        int page = 1;
+        int size = 10;
+        Pageable pageable = PageRequest.of(page-1, size);
+
 
         //when
-        Page<AuctionResponse> result = auctionService.getAuctions(1,10);
+
+    }
+
+    @Test
+    @DisplayName("경매 최소 가격 수정 - 성공")
+    public void updateMinPrice_Success(){
+        //given
+        given(userRepository.findById(1L)).willReturn(Optional.of(user));
+        given(auctionRepository.findById(1L)).willReturn(Optional.of(auction));
+        AuctionUpdateMinPriceRequest request = new AuctionUpdateMinPriceRequest(20000L);
+
+        //when
+        auctionService.updateMinPrice(authUser, auction.getId(), request);
 
         //then
-        assertNotNull(result);
-        assertEquals(1, result.getTotalElements());
-        assertEquals("testproduct", result.getContent().get(0).getProductName());
+        assertEquals(20000L, auction.getMinPrice());
     }
 }

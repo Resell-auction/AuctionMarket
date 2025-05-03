@@ -4,21 +4,29 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.auctionmarket.domain.coupon.entity.CouponUser;
-import com.example.auctionmarket.domain.user.enums.Role;
-import jakarta.persistence.*;
-import lombok.Setter;
 import org.apache.logging.log4j.message.ParameterizedMessage;
 
+import com.example.auctionmarket.common.entity.BaseEntity;
+import com.example.auctionmarket.domain.coupon.entity.CouponUser;
+import com.example.auctionmarket.domain.user.enums.Role;
+
 import jakarta.annotation.Nullable;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.Getter;
 
 @Entity
 @Getter
-@Setter
 @Table(name = "users")
-public class User extends TimeStamped{
-
+public class User extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -33,10 +41,6 @@ public class User extends TimeStamped{
 
 	@OneToMany(mappedBy = "users", cascade = CascadeType.ALL)
 	private List<CouponUser> couponUserList = new ArrayList<>();
-
-	// @OneToOne
-	// @JoinColumn(name = "payment_id")
-	// private Payment payment;
 
 	@Enumerated(EnumType.STRING)
 	private Role role;
@@ -77,13 +81,4 @@ public class User extends TimeStamped{
 	public void updateRefreshToken(String refreshToken) {
 		this.refreshToken = refreshToken;
 	}
-
-	public String getNickname(){
-		return  this.nickname = nickname;
-	}
-
-	public void setCouponUser(CouponUser couponUser){
-		couponUserList.add(couponUser);
-	}
-
 }

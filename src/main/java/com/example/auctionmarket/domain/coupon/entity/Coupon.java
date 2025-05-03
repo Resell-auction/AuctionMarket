@@ -1,21 +1,27 @@
 package com.example.auctionmarket.domain.coupon.entity;
 
-import com.example.auctionmarket.common.entity.BaseEntity;
-import com.example.auctionmarket.common.entity.TimeStamped;
-import com.example.auctionmarket.domain.coupon.enums.CouponStatus;
-import com.example.auctionmarket.domain.coupon.enums.CouponType;
-import com.example.auctionmarket.domain.user.entity.User;
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.auctionmarket.common.entity.BaseEntity;
+import com.example.auctionmarket.domain.coupon.enums.CouponStatus;
+import com.example.auctionmarket.domain.coupon.enums.CouponType;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.Version;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 @Getter
-@Setter
 @Entity
 @NoArgsConstructor
 @Table(name="coupons")

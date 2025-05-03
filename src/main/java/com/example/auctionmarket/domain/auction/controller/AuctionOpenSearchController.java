@@ -19,6 +19,7 @@ public class AuctionOpenSearchController {
 
     private final AuctionOpenSearchService auctionOpenSearchService;
 
+    //opensearch 경매 검색 기능
     @GetMapping("/search")
     public AuctionOpenSearchPageResponse<AuctionDocument> searchAuctions(
             @RequestParam(required = false) String keyword,
