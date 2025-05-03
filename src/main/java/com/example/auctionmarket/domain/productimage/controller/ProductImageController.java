@@ -10,7 +10,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -25,7 +24,7 @@ public class ProductImageController {
             @AuthenticationPrincipal AuthUser authUser,
             @PathVariable Long productId,
             @RequestPart("files") List<MultipartFile> files
-    ) throws IOException {
+    ) {
         return Response.of(productImageService.uploadProductImages(authUser, productId, files));
     }
 
