@@ -7,8 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class HourlyAverageBidResponse {
 
-	private int hourOfDay;
+	private Integer hourOfDay;
 
-	private double averageWinningBid;
-
+	private Integer averageWinningBid;
 }
