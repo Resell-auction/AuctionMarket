@@ -30,19 +30,14 @@ repositories {
 }
 
 ext {
-	// Spring Boot 버전을 명시적으로 관리
 	set('springBootVersion', "3.4.4")
-	// Spring Boot 버전에 맞춰서 Spring Cloud 사용
 	set('springCloudVersion', "2024.0.0")
-	// Spring Cloud 버전에 맞춰서 Spring Cloud GCP 사용
 	set('springCloudGcpVersion', "6.1.1")
 }
 
 dependencyManagement {
 	imports {
-		// Spring Cloud GCP BOM
 		mavenBom "com.google.cloud:spring-cloud-gcp-dependencies:${springCloudGcpVersion}"
-		// Spring Cloud BOM
 		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
 	}
 }
@@ -52,19 +47,13 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-	// 레디스(가지고있으면 테스트 할때 실제 레디스 서버를 연결하지 않아도 만들어야함 ->  embedded redis 추가해야함)
-	implementation 'org.redisson:redisson-spring-boot-starter:3.37.0' // 레디슨
-//	implementation 'mysql:mysql-connector-java'
-	implementation 'mysql:mysql-connector-java:8.0.33' // 또는 버전 생략 시 BOM이 적용됨
-
-	implementation group: 'it.ozimov', name: 'embedded-redis', version: '0.7.1' // embedded redis dependency 추가
+	implementation 'org.redisson:redisson-spring-boot-starter:3.37.0'
+	implementation 'mysql:mysql-connector-java:8.0.33'
+	implementation group: 'it.ozimov', name: 'embedded-redis', version: '0.7.1'
 	compileOnly 'org.projectlombok:lombok'
-//	runtimeOnly 'com.mysql:mysql-connector-j'
-
 	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
 	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 	annotationProcessor 'org.projectlombok:lombok'
-
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	runtimeOnly 'com.h2database:h2'
 	testRuntimeOnly 'com.h2database:h2'
@@ -93,7 +82,6 @@ dependencies {
 	testImplementation 'org.mockito:mockito-core:5.11.0'
 	testImplementation 'org.mockito:mockito-junit-jupiter:5.11.0'
 	testImplementation 'org.assertj:assertj-core:3.25.3'
-
 	testImplementation 'org.springframework.security:spring-security-test'
 
 	//Redis
@@ -117,7 +105,7 @@ dependencies {
 	implementation 'co.elastic.clients:elasticsearch-java:8.15.0'
 
 	//aws opensearch
-	implementation 'org.opensearch.client:opensearch-rest-high-level-client:2.17.0' // OpenSearch Java 클라이언트
+	implementation 'org.opensearch.client:opensearch-rest-high-level-client:2.17.0'
 	implementation 'software.amazon.awssdk:auth:2.25.20'
 	implementation 'software.amazon.awssdk:core:2.25.20'
 	implementation 'software.amazon.awssdk:apache-client:2.25.20'
@@ -131,19 +119,17 @@ dependencies {
 	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 
 	//aws event bridge
-	implementation 'software.amazon.awssdk:eventbridge:2.20.0' // 최신 버전 확인
+	implementation 'software.amazon.awssdk:eventbridge:2.20.0'
 	implementation 'com.amazonaws:aws-lambda-java-core:1.2.1'
 
-
-	// BigQuery 연동을 위한 의존성 => BigQuery 클라이언트 API 사용 시 필요
+	// BigQuery 연동을 위한 의존성
 	implementation 'com.google.cloud:google-cloud-bigquery'
 
 	// Spring Cloud GCP BigQuery Starter
 	implementation 'com.google.cloud:spring-cloud-gcp-starter-bigquery'
 
 	// Logstash
-	implementation 'net.logstash.logback:logstash-logback-encoder:7.4' // 애플리케이션 로그를 JSON 형식으로 변환
-
+	implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
 }
 
 //docker
@@ -166,7 +152,6 @@ tasks.register("restDocsTest", Test) {
 
 	useJUnitPlatform()
 	include("com.example.auctionmarket.restDocsTest.CouponRestDocsTest")
-	// filter { includeTestsMatching("com.example.**.RestDocs*") } // 클래스명 필터도 가능
 	outputs.dir snippetsDir
 }
 
@@ -180,17 +165,11 @@ tasks.withType(JavaCompile).configureEach {
 
 asciidoctor {
 	sourceDir = file("src/main/asciidoc")
-	outputDir = file("$buildDir/docs")// ✅ index.adoc 위치 기준으로 설정
+	outputDir = file("$buildDir/docs")
 	inputs.dir snippetsDir
 	configurations 'asciidoctorExt'
 	dependsOn("restDocsTest")
 	sources {
-		include("index.adoc") // ✅ entry point 설정
+		include("index.adoc")
 	}
 }
-
-
-
-//clean {
-//    delete file('src/main/generated')
-//}
