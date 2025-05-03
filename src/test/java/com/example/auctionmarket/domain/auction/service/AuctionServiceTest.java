@@ -4,6 +4,9 @@ import com.example.auctionmarket.common.auth.AuthUser;
 import com.example.auctionmarket.common.websocket.WebSocketClient;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionSaveRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateMinPriceRequest;
+import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateTimeRequest;
+import com.example.auctionmarket.domain.auction.dto.response.AuctionJoinResponse;
+import com.example.auctionmarket.domain.auction.dto.response.AuctionPageResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionSaveResponse;
 import com.example.auctionmarket.domain.auction.entity.Auction;
@@ -53,7 +56,6 @@ public class AuctionServiceTest {
 
     @Mock
     private ProductRepository productRepository;
-
 
     @Mock
     private PaymentService paymentService;
@@ -111,9 +113,8 @@ public class AuctionServiceTest {
     }
 
     @Test
-    @DisplayName("경매 생성 성공")
-    public void createAuction_Success(){
-        //given
+    public void 경매_생성_성공(){
+        // given
         AuctionSaveRequest request = new AuctionSaveRequest(
                 1L, 10000L, LocalDateTime.now().plusHours(1), 2L
         );
@@ -130,40 +131,76 @@ public class AuctionServiceTest {
             return saved;
         });
 
-        //when
+        // when
         AuctionSaveResponse response = auctionService.createAuction(authUser, request);
 
-        //then
+        // then
         assertNotNull(response);
         assertEquals(1L, response.getUserId());
         assertEquals(1L, response.getProductId());
     }
 
     @Test
-    @DisplayName("경매 조회 redis - 성공")
-    public void getAcutionRedis_Success(){
-        //given
+    public void 경매_조회_성공(){
+        // given
         int page = 1;
         int size = 10;
         Pageable pageable = PageRequest.of(page-1, size);
 
+        given(auctionRepository.findAll(pageable)).willReturn(auctionPage);
 
-        //when
+        // when
+        AuctionPageResponse response = auctionService.getAuctionsRedis(page, size);
 
+        // then
+        assertNotNull(response);
+        assertEquals(1, response.getContent().size());
+        assertEquals(1, response.getTotalElements());
+        assertEquals(1L, response.getContent().get(0).getId());
     }
 
     @Test
-    @DisplayName("경매 최소 가격 수정 - 성공")
-    public void updateMinPrice_Success(){
-        //given
+    public void 경매_참여_성공(){
+        // given
+        given(userRepository.findById(1L)).willReturn(Optional.of(user));
+        given(auctionRepository.findById(1L)).willReturn(Optional.of(auction));
+
+        // when
+        AuctionJoinResponse response = auctionService.join(authUser, 1L);
+
+        // then
+        assertNotNull(response);
+        assertEquals(auction.getId(), response.getAuctionId());
+        assertEquals(product.getProductName(), response.getProductName());
+    }
+
+    @Test
+    public void 경매_최소_가격_수정_성공(){
+        // given
         given(userRepository.findById(1L)).willReturn(Optional.of(user));
         given(auctionRepository.findById(1L)).willReturn(Optional.of(auction));
         AuctionUpdateMinPriceRequest request = new AuctionUpdateMinPriceRequest(20000L);
 
-        //when
+        // when
         auctionService.updateMinPrice(authUser, auction.getId(), request);
 
-        //then
+        // then
         assertEquals(20000L, auction.getMinPrice());
+    }
+
+    @Test
+    public void 경매_시작_시간_수정_성공(){
+        // given
+        given(userRepository.findById(1L)).willReturn(Optional.of(user));
+        given(auctionRepository.findById(1L)).willReturn(Optional.of(auction));
+
+        AuctionUpdateTimeRequest request = new AuctionUpdateTimeRequest(LocalDateTime.now().plusHours(3));
+
+        // when
+        AuctionResponse response = auctionService.updateAuctionStartTime(authUser, auction.getId(), request);
+
+        // then
+        assertNotNull(response);
+        assertEquals(request.getUpdateTime(), auction.getStartTime());
     }
 }

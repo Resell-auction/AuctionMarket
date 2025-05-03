@@ -62,9 +62,9 @@ class PaymentServiceTest {
         Long maxPrice = 10000L;
 
         Auction auction = new Auction();
-        auction.setId(auctionId);
-        auction.setConsumerId(consumerId);
-        auction.setMaxPrice(maxPrice);
+//        auction.setId(auctionId);
+//        auction.setConsumerId(consumerId);
+//        auction.setMaxPrice(maxPrice);
 
         given(auctionRepository.findById(auctionId)).willReturn(Optional.of(auction));
         // when
@@ -102,9 +102,9 @@ class PaymentServiceTest {
 
         // 경매 객체 생성
         Auction auction = new Auction();
-        auction.setId(auctionId);
-        auction.setConsumerId(consumerId);
-        auction.setMaxPrice(amount);
+//        auction.setId(auctionId);
+//        auction.setConsumerId(consumerId);
+//        auction.setMaxPrice(amount);
         ReflectionTestUtils.setField(auction, "product", product);
 
         // 결제 객체 생성

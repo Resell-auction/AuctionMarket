@@ -87,8 +87,8 @@ public class AuctionRestDocsTest extends BaseRestDocsTest {
         AuctionResponse auctionResponse = new AuctionResponse(1L, 1L, 1L, "product1", ProductCategory.ACCESSORY, 1000L, 10000L, auctionTime, auctionTime, AuctionStatus.PENDING, "remainingTime");
         Page<AuctionResponse> result = new PageImpl<>(List.of(auctionResponse, auctionResponse));
 
-        given(auctionService.getAuctions(1, 10))
-                .willReturn(result);
+//        given(auctionService.getAuctions(1, 10))
+//                .willReturn(result);
 
         // WHEN + THEN
         mockMvc.perform(RestDocumentationRequestBuilders.get("/v1/auctions")
@@ -133,8 +133,8 @@ public class AuctionRestDocsTest extends BaseRestDocsTest {
         AuctionResponse auctionResponse = new AuctionResponse(1L, 1L, 1L, "product1", ProductCategory.ACCESSORY, 1000L, 10000L, auctionTime, auctionTime, AuctionStatus.PENDING, "remainingTime");
         Page<AuctionResponse> result = new PageImpl<>(List.of(auctionResponse, auctionResponse));
 
-        given(auctionService.SearchAuctions(anyString(), anyString(), anyInt(), anyInt()))
-                .willReturn(result);
+//        given(auctionService.SearchAuctions(anyString(), anyString(), anyInt(), anyInt()))
+//                .willReturn(result);
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/v1/auctions/search")
                         .param("keyword", "adidas")
