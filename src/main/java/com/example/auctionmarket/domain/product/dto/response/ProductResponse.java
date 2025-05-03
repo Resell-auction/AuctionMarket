@@ -1,20 +1,15 @@
 package com.example.auctionmarket.domain.product.dto.response;
 
 import com.example.auctionmarket.domain.product.entity.Product;
-import com.example.auctionmarket.domain.product.enums.ProductCategory;
 import lombok.Getter;
 
 @Getter
 public class ProductResponse {
 
     private final Long id;
-
     private final String productName;
-
     private final String productContent;
-
     private final String category;
-
     private final String soldStatus;
 
     public ProductResponse(Long id, String productName, String productContent, String category, String soldStatus) {

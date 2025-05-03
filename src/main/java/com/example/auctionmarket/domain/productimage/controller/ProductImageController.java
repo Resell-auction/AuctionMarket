@@ -20,7 +20,7 @@ public class ProductImageController {
     private final ProductImageService productImageService;
 
     // 제품 이미지 업로드
-    @PostMapping(value = "v1/products/{productId}/product-images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/v1/products/{productId}/product-images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Response<List<ProductImageResponse>> uploadProductImages(
             @AuthenticationPrincipal AuthUser authUser,
             @PathVariable Long productId,
@@ -30,7 +30,7 @@ public class ProductImageController {
     }
 
     // 제품 이미지 삭제
-    @DeleteMapping("v1/products/{productId}/product-images/{productImageId}")
+    @DeleteMapping("/v1/products/{productId}/product-images/{productImageId}")
     public Response<String> deleteImage(
             @AuthenticationPrincipal AuthUser authUser,
             @PathVariable Long productId,
