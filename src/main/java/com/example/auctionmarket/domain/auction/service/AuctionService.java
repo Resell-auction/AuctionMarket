@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import com.example.auctionmarket.domain.auction.mapper.AuctionMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -192,6 +193,9 @@ public class AuctionService {
         //입력 받은 수정할 시작 시간 저장
         auction.updateStartTime(request.getUpdateTime());
 
+        AuctionDocument document = AuctionMapper.toDucument(auction);
+        auctionOpenSearchService.save(document);
+
         String auctionMessage = remainingTimeOfAuctionStatus(auction.getStatus(), auction.getEndTime());
 
         //수정한 후의 경매 내용 출력
@@ -235,6 +239,9 @@ public class AuctionService {
 
         //입력 받은 최소가 저장
         auction.updateMinPrice(request.getMinPrice());
+
+        AuctionDocument document = AuctionMapper.toDucument(auction);
+        auctionOpenSearchService.save(document);
 
         String auctionMessage = remainingTimeOfAuctionStatus(auction.getStatus(), auction.getEndTime());
 
