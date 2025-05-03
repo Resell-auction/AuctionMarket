@@ -4,6 +4,7 @@ import com.example.auctionmarket.domain.auction.document.AuctionDocument;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionOpenSearchPageResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionPageResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,12 +35,21 @@ public class AuctionOpenSearchService {
 
     private static final String INDEX_NAME = "auctions";
 
-    public void save(AuctionDocument auction) throws IOException {
-        IndexRequest request = new IndexRequest(INDEX_NAME)
-                .id(String.valueOf(auction.getId()))
-                .source(objectMapper.writeValueAsString(auction), XContentType.JSON);
+    public void save(AuctionDocument auction) {
+        try{
+            IndexRequest request = new IndexRequest(INDEX_NAME)
+                    .id(String.valueOf(auction.getId()))
+                    .source(objectMapper.writeValueAsString(auction), XContentType.JSON);
 
-        restHighLevelClient.index(request, RequestOptions.DEFAULT);
+            restHighLevelClient.index(request, RequestOptions.DEFAULT);
+        }catch (JsonProcessingException e){
+            log.error("AuctionDocument 직렬화 실패: {}", e.getMessage());
+            throw new RuntimeException("JSON 직렬화 실패",e);
+        }catch (IOException e){
+            log.error("OpenSearch 인덱싱 실패: {}", e.getMessage());
+            throw new RuntimeException("OpenSearch 인덱싱 실패",e);
+        }
+
     }
 
     public AuctionOpenSearchPageResponse<AuctionDocument> search(String keyword, String category, int page, int size) throws IOException {

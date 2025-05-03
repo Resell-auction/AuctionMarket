@@ -37,16 +37,4 @@ public class CacheConfig {
                         redisCacheConfiguration.entryTtl(Duration.ofMinutes(30)))
                 .build();
     }
-
-    @Bean(name = "caffeineCacheManager")
-    public CacheManager caffeineCacheManager(){
-        Caffeine<Object, Object> caffeine = Caffeine.newBuilder()
-                .expireAfterWrite(Duration.ofMinutes(5))
-                .maximumSize(1000)
-                .recordStats(); //캐시 히트율 모니터링 활성화
-
-        CaffeineCacheManager caffeineCacheManager = new CaffeineCacheManager("auctions::list", "auctions::search");
-        caffeineCacheManager.setCaffeine(caffeine);
-        return caffeineCacheManager;
-    }
 }
