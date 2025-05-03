@@ -122,7 +122,7 @@ public class CouponServiceTest {
         LocalDateTime expiredAt = LocalDateTime.parse("2025-05-05T00:00:00");
         Coupon coupon = new Coupon("coupon1","description1",10L,expiredAt,10,CouponType.PERCENT);
 
-        coupon.setId(1L);
+      //  coupon.setId(1L);
 
         given(couponRepository.findById(coupon.getId())).willReturn(Optional.of(coupon));
 

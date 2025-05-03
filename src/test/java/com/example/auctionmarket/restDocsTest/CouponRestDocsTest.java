@@ -1,8 +1,6 @@
 package com.example.auctionmarket.restDocsTest;
 
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import com.example.auctionmarket.domain.auction.repository.AuctionSearchRepository;
 import com.example.auctionmarket.domain.coupon.controller.CouponController;
 import com.example.auctionmarket.domain.coupon.dto.CouponGiveRequest;
 import com.example.auctionmarket.domain.coupon.dto.CouponRequest;
@@ -14,7 +12,6 @@ import com.example.auctionmarket.domain.coupon.service.CouponService;
 import com.example.auctionmarket.domain.coupon.service.CouponUserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;

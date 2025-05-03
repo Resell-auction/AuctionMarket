@@ -1,8 +1,7 @@
 package com.example.auctionmarket.restDocsTest;
 
-import com.example.auctionmarket.domain.auction.repository.AuctionSearchRepository;
+import com.example.auctionmarket.common.jwt.JwtUtil;
 import com.example.auctionmarket.domain.user.repository.UserRepository;
-import com.example.auctionmarket.global.jwt.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +27,9 @@ public abstract class BaseRestDocsTest {
 
     @MockitoBean
     protected JwtUtil jwtUtil;
-
-    @MockitoBean
-    private AuctionSearchRepository auctionSearchRepository;
+//
+//    @MockitoBean
+//    private AuctionSearchRepository auctionSearchRepository;
 
     @BeforeEach
     void setUp(WebApplicationContext context, RestDocumentationContextProvider provider) {
