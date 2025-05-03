@@ -52,6 +52,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	// 레디스(가지고있으면 테스트 할때 실제 레디스 서버를 연결하지 않아도 만들어야함 ->  embedded redis 추가해야함)
 	implementation 'org.redisson:redisson-spring-boot-starter:3.37.0' // 레디슨
 //	implementation 'mysql:mysql-connector-java'
