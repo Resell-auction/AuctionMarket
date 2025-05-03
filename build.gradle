@@ -30,19 +30,14 @@ repositories {
 }
 
 ext {
-	// Spring Boot 버전을 명시적으로 관리
 	set('springBootVersion', "3.4.4")
-	// Spring Boot 버전에 맞춰서 Spring Cloud 사용
 	set('springCloudVersion', "2024.0.0")
-	// Spring Cloud 버전에 맞춰서 Spring Cloud GCP 사용
 	set('springCloudGcpVersion', "6.1.1")
 }
 
 dependencyManagement {
 	imports {
-		// Spring Cloud GCP BOM
 		mavenBom "com.google.cloud:spring-cloud-gcp-dependencies:${springCloudGcpVersion}"
-		// Spring Cloud BOM
 		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
 	}
 }
@@ -52,15 +47,13 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-	// 레디스(가지고있으면 테스트 할때 실제 레디스 서버를 연결하지 않아도 만들어야함 ->  embedded redis 추가해야함)
-	implementation 'org.redisson:redisson-spring-boot-starter:3.37.0' // 레디슨
-	implementation 'mysql:mysql-connector-java:8.0.33' // 또는 버전 생략 시 BOM이 적용됨
-	implementation group: 'it.ozimov', name: 'embedded-redis', version: '0.7.1' // embedded redis dependency 추가
+	implementation 'org.redisson:redisson-spring-boot-starter:3.37.0'
+	implementation 'mysql:mysql-connector-java:8.0.33'
+	implementation group: 'it.ozimov', name: 'embedded-redis', version: '0.7.1'
 	implementation 'org.redisson:redisson-spring-boot-starter:3.37.0'
 	implementation 'mysql:mysql-connector-java:8.0.33'
 	implementation group: 'it.ozimov', name: 'embedded-redis', version: '0.7.1'
 	compileOnly 'org.projectlombok:lombok'
-
 
 	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
 	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
