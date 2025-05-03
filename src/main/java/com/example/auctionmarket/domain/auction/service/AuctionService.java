@@ -52,11 +52,10 @@ public class AuctionService {
     private final ProductRepository productRepository;
     private final PaymentService paymentService;
     private final WebSocketClient webSocketClient;
-    private static final String AUCTION_CACHE_KEY = "auction::";
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public AuctionSaveResponse createAuction(AuthUser authUser, AuctionSaveRequest request){
+    public AuctionSaveResponse createAuction(AuthUser authUser, AuctionSaveRequest request) {
         //유저 예외처리
         User user = userRepository.findById(authUser.getId())
                 .orElseThrow(()->new UserNotFoundException());
@@ -92,17 +91,7 @@ public class AuctionService {
 
         auctionOpenSearchService.save(document);
 
-        webSocketClient.createAuctionRoom(
-                new WebSocketAuctionCreateRequest(
-                        saveAuction.getId(),
-                        saveAuction.getProduct().getProductName(),
-                        saveAuction.getMinPrice(),
-                        saveAuction.getStartTime(),
-                        saveAuction.getEndTime()
-                )
-        );
-
-        Duration ttl = Duration.between(LocalDateTime.now(), saveAuction.getEndTime());
+        eventPublisher.publishEvent(new AuctionCreatedEvent(saveAuction));
 
         //저장한 경매 출력
         return new AuctionSaveResponse(
@@ -123,7 +112,7 @@ public class AuctionService {
     //경매 전체 조회(redis)
     @Transactional(readOnly = true)
     @Cacheable(value = "auctions::list", key = "'page:'+#page+':size:'+#size", cacheManager = "redisCacheManager")
-    public AuctionPageResponse getAuctionsRedis(int page, int size){
+    public AuctionPageResponse getAuctionsRedis(int page, int size) {
         Pageable pageable = PageRequest.of(page-1, size);
         Page<Auction> auctions = auctionRepository.findAll(pageable);
 

@@ -9,5 +9,6 @@ import java.util.Optional;
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     Optional<Payment> findByAuctionId(Long auctionId);
-//    Optional<Product> findByProductId(Long productId);
+
+    boolean existsByAuctionId(Long auctionId);
 }
