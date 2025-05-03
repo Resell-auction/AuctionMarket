@@ -154,8 +154,8 @@ ext {
 }
 
 test {
-	outputs.dir snippetsDir
 	useJUnitPlatform()
+	outputs.dir snippetsDir
 }
 
 tasks.register("restDocsTest", Test) {
