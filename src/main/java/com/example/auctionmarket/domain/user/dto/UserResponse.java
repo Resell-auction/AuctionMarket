@@ -24,7 +24,7 @@ public class UserResponse {
 			.nickName(user.getNickname())
 			.userRole(user.getRole().name())
 			.phoneNumber(user.getPhoneNumber())
-			.modifiedAt(user.getModifiedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
+			.modifiedAt(user.getUpdateAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
 			.build();
 	}
 }
