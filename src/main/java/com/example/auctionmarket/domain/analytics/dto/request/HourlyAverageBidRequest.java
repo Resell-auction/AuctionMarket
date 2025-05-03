@@ -2,6 +2,7 @@ package com.example.auctionmarket.domain.analytics.dto.request;
 
 import com.example.auctionmarket.domain.product.enums.ProductCategory;
 
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
@@ -15,5 +16,6 @@ public class HourlyAverageBidRequest {
 	private ProductCategory category;
 
 	@Min(value = 1, message = "조회 기간은 최소 1일 이상이어야 합니다.")
-	private int days;
+	@Max(value = 90, message = "조회 기간은 최대 90일을 초과할 수 없습니다.")
+	private Integer days;
 }
