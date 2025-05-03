@@ -1,9 +1,7 @@
 package com.example.auctionmarket.restDocsTest;
 
 
-import com.example.auctionmarket.common.log.LogService;
 import com.example.auctionmarket.domain.auction.controller.AuctionController;
-import com.example.auctionmarket.domain.auction.dto.request.AuctionIncreasePriceRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionSaveRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateMinPriceRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateTimeRequest;
@@ -11,32 +9,17 @@ import com.example.auctionmarket.domain.auction.dto.response.AuctionResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionSaveResponse;
 import com.example.auctionmarket.domain.auction.enums.AuctionStatus;
 import com.example.auctionmarket.domain.auction.service.AuctionService;
-import com.example.auctionmarket.domain.coupon.controller.CouponController;
-import com.example.auctionmarket.domain.coupon.dto.CouponResponse;
 import com.example.auctionmarket.domain.product.enums.ProductCategory;
-import com.example.auctionmarket.domain.user.repository.UserRepository;
-import com.example.auctionmarket.global.jwt.JwtUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ser.Serializers;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -45,9 +28,7 @@ import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -56,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(AuctionController.class)
 public class AuctionRestDocsTest extends BaseRestDocsTest {
 
-    @MockBean
+    @MockitoBean
     private AuctionService auctionService;
 
     @Test
@@ -100,7 +81,6 @@ public class AuctionRestDocsTest extends BaseRestDocsTest {
 
     @Test
     void 경매_전체_조회_RestDocsAPI() throws Exception {
-        // GIVEN
         LocalDateTime auctionTime = LocalDateTime.parse("2025-05-05T00:00:00");
         AuctionResponse auctionResponse = new AuctionResponse(1L, 1L, 1L, "product1", ProductCategory.ACCESSORY, 1000L, 10000L, auctionTime, auctionTime, AuctionStatus.PENDING, "remainingTime");
         Page<AuctionResponse> result = new PageImpl<>(List.of(auctionResponse, auctionResponse));
@@ -108,7 +88,6 @@ public class AuctionRestDocsTest extends BaseRestDocsTest {
         given(auctionService.getAuctions(1, 10))
                 .willReturn(result);
 
-        // WHEN + THEN
         mockMvc.perform(RestDocumentationRequestBuilders.get("/v1/auctions")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -141,7 +120,6 @@ public class AuctionRestDocsTest extends BaseRestDocsTest {
                                 fieldWithPath("sort.unsorted").description("정렬되지 않았는지 여부"),
                                 fieldWithPath("empty").description("페이지가 비어 있는지 여부"),
                                 fieldWithPath("numberOfElements").description("현재 페이지 데이터")
-
                         )));
     }
 
@@ -289,7 +267,6 @@ public class AuctionRestDocsTest extends BaseRestDocsTest {
                                 fieldWithPath("remainingTime").description("남은 시간")
                         )
                 ));
-
     }
 
     @Test
@@ -301,6 +278,5 @@ public class AuctionRestDocsTest extends BaseRestDocsTest {
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andDo(document("delete-auction"));
-
     }
 }

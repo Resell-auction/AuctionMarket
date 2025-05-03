@@ -1,9 +1,7 @@
 package com.example.auctionmarket.domain.coupon.controller;
 
 import com.example.auctionmarket.common.auth.AuthUser;
-import com.example.auctionmarket.common.log.LogService;
 import com.example.auctionmarket.domain.coupon.dto.CouponGiveRequest;
-import com.example.auctionmarket.domain.coupon.dto.CouponRequest;
 import com.example.auctionmarket.domain.coupon.service.CouponService;
 import com.example.auctionmarket.domain.coupon.service.CouponUserService;
 import lombok.RequiredArgsConstructor;
@@ -15,12 +13,11 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/v1/coupons/admin")
+@RequestMapping("/v1/admin/coupons")
 public class CouponAdminController {
 
     private final CouponUserService couponUserService;
     private final CouponService couponService;
-    private final LogService logService;
 
     //대량 쿠폰 생성: 테스트용으로 삭제 예정
 //    @PostMapping("/bulk/{count}")
@@ -35,9 +32,6 @@ public class CouponAdminController {
     @PostMapping("/no-lock/{couponId}")
     public ResponseEntity<String> giveBulkCoupons(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long couponId, @RequestBody CouponGiveRequest couponGiveRequest) {
 
-      //  log.info("[쿠폰대량발급API]- 권한:", authUser.getAuthorities(), "쿠폰ID",couponId);
-        logService.saveLog( couponId, "📍[API]COUPON_GIVE_BULK", "쿠폰대량발급API");
-
         couponUserService.giveCouponByUserId(authUser, couponId, couponGiveRequest);
 
         return ResponseEntity.ok("쿠폰 발급 완료");
@@ -46,8 +40,6 @@ public class CouponAdminController {
     //대량 쿠폰 발급(낙관적락)
     @PostMapping("/optimistic-lock/{couponId}")
     public ResponseEntity<String> giveBulkCoupons2(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long couponId, @RequestBody CouponGiveRequest couponGiveRequest) {
-
-        logService.saveLog( couponId, "📍[API]COUPON_GIVE_BULK", "쿠폰대량발급API");
 
         couponUserService.giveCouponByUserId2(authUser, couponId, couponGiveRequest);
 
@@ -58,18 +50,14 @@ public class CouponAdminController {
     @PostMapping("/pessimistic-lock/{couponId}")
     public ResponseEntity<String> giveBulkCoupons3(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long couponId, @RequestBody CouponGiveRequest couponGiveRequest) {
 
-        logService.saveLog( couponId, "📍[API]COUPON_GIVE_BULK", "쿠폰대량발급API");
-
         couponUserService.giveCouponByUserId4(authUser, couponId, couponGiveRequest);
 
         return ResponseEntity.ok("쿠폰 발급 완료");
     }
 
-    //대량 쿠폰 발급(분산락)
+    //대량 쿠폰 발급(분산락)//version지울것
     @PostMapping("/distributed-lock/{couponId}")
     public ResponseEntity<String> giveBulkCoupons4(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long couponId, @RequestBody CouponGiveRequest couponGiveRequest) {
-
-        logService.saveLog( couponId, "📍[API]COUPON_GIVE_BULK", "쿠폰대량발급API");
 
         couponUserService.giveCouponByUserId5(authUser, couponId, couponGiveRequest);
 
@@ -80,11 +68,11 @@ public class CouponAdminController {
     @PostMapping("/disoptimis/{couponId}")
     public ResponseEntity<String> giveBulkCoupons5(@AuthenticationPrincipal AuthUser authUser, @PathVariable Long couponId, @RequestBody CouponGiveRequest couponGiveRequest) {
 
-        logService.saveLog( couponId, "📍[API]COUPON_GIVE_BULK", "쿠폰대량발급API");
-
-        couponUserService.giveCouponByUserId3(authUser, couponId, couponGiveRequest);
+        couponUserService.giveCouponByUserId5(authUser, couponId, couponGiveRequest);
 
         return ResponseEntity.ok("쿠폰 발급 완료");
     }
 }
+
+//test후 나머지 메서드 모두 삭제
 

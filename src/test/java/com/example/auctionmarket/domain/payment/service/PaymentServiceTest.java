@@ -118,7 +118,7 @@ class PaymentServiceTest {
         // 유저 객체 생성
         AuthUser authUser = new AuthUser(2L, "1234", Role.USER, "tester");
         // 결제 요청 생성
-        PaymentRequest request = new PaymentRequest();
+        PaymentRequest request = new PaymentRequest("CREDIT", 10L,1L);
         ReflectionTestUtils.setField(request, "amount", amount);
         ReflectionTestUtils.setField(request, "payType", "POINT");
         ReflectionTestUtils.setField(request, "couponId", couponId);

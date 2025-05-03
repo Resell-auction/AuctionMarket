@@ -1,62 +1,55 @@
 2조.Auction Market
 ----
 
-![img.png](img.png)
+![img.png](image/img.png)
 
 ---
 
 ## 🏷️목차
 
----
 
-📄[프로젝트 소개](https://www.notion.so/2-AuctionMarket-1e22dc3ef51480c8ae7cef082afa5911?pvs=21)
+📄[프로젝트 소개](#프로젝트-소개)
 
-⚙️[시스템 아키텍쳐](https://www.notion.so/2-AuctionMarket-1e22dc3ef51480c8ae7cef082afa5911?pvs=21)
+⚙️[시스템 아키텍쳐](#시스템-아키텍쳐)
 
-⛓️ [ERD](https://www.notion.so/2-AuctionMarket-1e22dc3ef51480c8ae7cef082afa5911?pvs=21)
+⛓️ [ERD](#erd)
 
-🎲 [주요기능](https://www.notion.so/2-AuctionMarket-1e22dc3ef51480c8ae7cef082afa5911?pvs=21)
+🎲 [주요기능](#주요기능)
 
-🛠️[기술스택](https://www.notion.so/2-AuctionMarket-1e22dc3ef51480c8ae7cef082afa5911?pvs=21)
+🛠️[기술스택](#기술스택)
 
-🚨 [트러블슈팅](https://www.notion.so/2-AuctionMarket-1e22dc3ef51480c8ae7cef082afa5911?pvs=21)
+🚨 [트러블슈팅](#트러블슈팅)
 
-👥[팀원소개](https://www.notion.so/2-AuctionMarket-1e22dc3ef51480c8ae7cef082afa5911?pvs=21)
+👥[팀원소개](#팀원소개)
 
 ## 📄프로젝트 소개
 
----
 
 > 당근 마켓 + 경매를 합쳐서 소비자들이 물건을 경매 형식으로 사고 팔 수 있는 마켓
 >
 
 ## **❓ 왜 만들었는가**
 
----
 
 한정된 수량의 물품인 경우 일반 마켓에서는 온전히 선착순에 따라서 주인이 결정되기에 돈이 있음에도 불구하고 살 수가 없습니다. 그렇기에 경매 방식을 도입하여 선착순이 아닌 제한된 시간 안에 경매를 통해서 원하는 사람이 해당 물품을 얻을 수 있는 그런 구매 방식을 만들고 싶었습니다.
 
 ## ⚙️ 시스템 아키텍쳐
 
----
 
 - **ARCHITECTURE**
 
 
 ## ⛓️ ERD
 
----
- ![AuctionMarket.png](AuctionMarket.png)
+ ![AuctionMarket.png](image/AuctionMarket.png)
 
 ## 와이어프레임
 
----
 
 [와이어프레임](https://docs.google.com/presentation/d/1J85rLEqN8q-g5gu4F7oyU-kvXNy68qDt/edit#slide=id.p6)
 
 ## API 명세서
 
-----
 
 - 추가 예정
 
@@ -65,7 +58,6 @@
 
 ## 🎲 주요 기능
 
----
 
 ### 물품 등록
 
@@ -91,11 +83,9 @@
 - 결제 완료시 제품의 물품, 쿠폰(사용 시), 결제 상태변경
 - 환불 시 결제 완료와 같이 상태 변경
 
----
 
 ## 🛠️ 기술 스택
 
----
 
 ### 🧱 기본 개발 환경
 
@@ -104,7 +94,6 @@
 - **IntelliJ IDEA**
 - **Gradle**
 
----
 
 ### 🗄️ 백엔드 기술 스택
 
@@ -123,7 +112,6 @@
 - **Elasticsearch**
 - **AWS OpenSearch**
 
----
 
 ### ☁️ 클라우드 & 인프라
 
@@ -138,7 +126,6 @@
 - **Terraform**
 - **Fargate**
 
----
 
 ### 🐳 컨테이너 & 배포
 
@@ -147,7 +134,6 @@
 - **GitHub**
 - **GitHub Action**
 
----
 
 ### 📈 테스트& 모니터링
 
@@ -158,14 +144,12 @@
 - **Prometheus**
 - **Grafana**
 
----
 
 ### 📊 데이터 분석 & 트래킹
 
 - **Google Analytics 4 (GA4)**
 - **BigQuery**
 
----
 
 ### 🧰 협업 및 문서화 도구
 
@@ -173,7 +157,6 @@
 - **Stack 문서**
 - **Zep**
 
----
 
 [https://velog.io/@cyjtr357/스프링-프로젝트-개요-및-목표-아키텍쳐](https://velog.io/@cyjtr357/%EC%8A%A4%ED%94%84%EB%A7%81-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EA%B0%9C%EC%9A%94-%EB%B0%8F-%EB%AA%A9%ED%91%9C-%EC%95%84%ED%82%A4%ED%85%8D%EC%B3%90)
 
@@ -181,7 +164,6 @@
 
 ## 🚨 트러블 슈팅
 
----
 
 - redis캐시를 통한 조회 시 직렬화 문제
     - 문제 상황
@@ -408,7 +390,6 @@
 
 ## 👥 팀원 소개
 
----
 
 <aside>
 

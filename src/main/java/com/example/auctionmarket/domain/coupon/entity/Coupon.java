@@ -1,5 +1,6 @@
 package com.example.auctionmarket.domain.coupon.entity;
 
+import com.example.auctionmarket.common.entity.BaseEntity;
 import com.example.auctionmarket.common.entity.TimeStamped;
 import com.example.auctionmarket.domain.coupon.enums.CouponStatus;
 import com.example.auctionmarket.domain.coupon.enums.CouponType;
@@ -7,16 +8,18 @@ import com.example.auctionmarket.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Setter
 @Entity
 @NoArgsConstructor
 @Table(name="coupons")
-public class Coupon extends TimeStamped {
+public class Coupon extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -42,8 +45,6 @@ public class Coupon extends TimeStamped {
 
     @OneToMany(mappedBy = "coupons", cascade = CascadeType.ALL)
     private List<CouponUser> couponUserList = new ArrayList<>();
-
-    //   private String condition;
 
     public Coupon(String couponName, String description, Long discountAmount, LocalDateTime expiredAt, int amount, CouponType couponType) {
         this.couponName=couponName;
@@ -71,6 +72,9 @@ public class Coupon extends TimeStamped {
     }
 
     public void assignUniqueCoupon(){
+        if (this.amount <= 0) {
+            throw new IllegalStateException("쿠폰이 더 이상 남아있지 않습니다.");
+        }
         this.amount--;
     }
 

@@ -18,7 +18,4 @@ public class RedissonConfig {
                 .setPassword("stockage");
         return Redisson.create(config);
     }
-//
-//    private void setPassword(String stockage) {
-//    }
 }

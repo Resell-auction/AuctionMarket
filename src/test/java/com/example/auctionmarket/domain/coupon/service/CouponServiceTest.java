@@ -12,23 +12,29 @@ import com.example.auctionmarket.domain.coupon.repository.CouponRepository;
 import com.example.auctionmarket.domain.user.enums.Role;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class CouponServiceTest {
@@ -42,6 +48,19 @@ public class CouponServiceTest {
     @Mock
     private Authentication authUser;
 
+    @Mock
+    private RedisTemplate<String, Object> redisTemplate;
+
+
+    @Mock
+    private ValueOperations<String, Object> valueOperations;
+
+    //    @BeforeEach
+//    void setUp() {
+//        // opsForValue() 호출 시 valueOperations 리턴되게 설정
+//        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+//
+//    }
     @Test
     void 쿠폰_생성_성공(){
         //given
@@ -52,6 +71,9 @@ public class CouponServiceTest {
         List<GrantedAuthority> authorities = List.of(
                 new SimpleGrantedAuthority("ADMIN")
         );
+
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+
         given(couponRepository.save(Mockito.<Coupon>any())).willReturn(coupon);
 
         //when
@@ -99,6 +121,8 @@ public class CouponServiceTest {
         // given
         LocalDateTime expiredAt = LocalDateTime.parse("2025-05-05T00:00:00");
         Coupon coupon = new Coupon("coupon1","description1",10L,expiredAt,10,CouponType.PERCENT);
+
+        coupon.setId(1L);
 
         given(couponRepository.findById(coupon.getId())).willReturn(Optional.of(coupon));
 
@@ -200,5 +224,42 @@ public class CouponServiceTest {
         assertThrows(CouponException.class, ()->couponService.deleteById(authUser,1L));
     }
 
+    @Test
+    void 설정된_유효시간이_지나면_쿠폰설정이_바뀐다(){
+//        LocalDateTime now = LocalDateTime.now();
+//        LocalDateTime yesterday = now.minusDays(1);
+//        LocalDateTime expiredAt = now.minusHours(1);//now-yesterday사이로 설정
+//        Coupon coupon = new Coupon("가입기념쿠폰", "설명", (long) 20.0, expiredAt, 3, CouponType.FIXED);
+//
+//
+//        given(couponRepository.expireCouponsBetween(yesterday, now)).willReturn(1);
+//
+//        couponService.expireCoupons();
+//
+//        //when&then
+//        assertThat(coupon.getCouponStatus()).isEqualTo(CouponStatus.EXPIRED);
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime yesterday = now.minusDays(1);
 
+        // couponRepository의 expireCouponsBetween 호출 시 5개 만료됐다고 가정
+        when(couponRepository.expireCouponsBetween(
+                (LocalDateTime) any(),
+                (LocalDateTime) any()
+        )).thenReturn(5);
+
+        // when
+        couponService.expireCoupons();
+
+        // then
+        ArgumentCaptor<LocalDateTime> fromCaptor = ArgumentCaptor.forClass(LocalDateTime.class);
+        ArgumentCaptor<LocalDateTime> toCaptor = ArgumentCaptor.forClass(LocalDateTime.class);
+
+        verify(couponRepository, times(1)).expireCouponsBetween(fromCaptor.capture(), toCaptor.capture());
+
+        // 타임 윈도우 확인 (너무 정확하지 않게, 대략 어제부터 지금까지면 OK)
+        LocalDateTime from = fromCaptor.getValue();
+        LocalDateTime to = toCaptor.getValue();
+
+        assertThat(Duration.between(from, to).toHours()).isBetween(23L, 25L);
+    }
 }

@@ -15,6 +15,10 @@ java {
 	}
 }
 
+ext {
+	set('testcontainers.version', "1.19.8")
+}
+
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
@@ -134,7 +138,6 @@ dependencies {
 	implementation 'software.amazon.awssdk:eventbridge:2.20.0' // 최신 버전 확인
 	implementation 'com.amazonaws:aws-lambda-java-core:1.2.1'
 
-
 	// BigQuery 연동을 위한 의존성 => BigQuery 클라이언트 API 사용 시 필요
 	implementation 'com.google.cloud:google-cloud-bigquery'
 
@@ -144,6 +147,16 @@ dependencies {
 	// Logstash
 	implementation 'net.logstash.logback:logstash-logback-encoder:7.4' // 애플리케이션 로그를 JSON 형식으로 변환
 
+	//testContainers
+//	testImplementation 'org.testcontainers:junit-jupiter'
+//	testImplementation 'org.testcontainers:mysql:1.19.3'
+//	testImplementation "org.testcontainers:testcontainers:1.21.0"
+//	testImplementation 'org.testcontainers:postgresql:1.19.3'
+//	testImplementation 'org.testcontainers:redis:1.19.3'
+
+//	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+//	implementation 'com.fasterxml.jackson.core:jackson-core:2.15.2'
+//	implementation 'com.fasterxml.jackson.core:jackson-annotations:2.15.2'
 }
 
 //docker
@@ -179,12 +192,12 @@ tasks.withType(JavaCompile).configureEach {
 
 asciidoctor {
 	sourceDir = file("src/main/asciidoc")
-	outputDir = file("$buildDir/docs")// ✅ index.adoc 위치 기준으로 설정
+	outputDir = file("$buildDir/docs")//
 	inputs.dir snippetsDir
 	configurations 'asciidoctorExt'
 	dependsOn("restDocsTest")
 	sources {
-		include("index.adoc") // ✅ entry point 설정
+		include("index.adoc") //
 	}
 }
 

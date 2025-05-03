@@ -24,6 +24,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<List<ValidResponse>> invalidRequestExceptionException(
 		MethodArgumentNotValidException ex) {
+
 		List<ValidResponse> errors = new ArrayList<>();
 
 		List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
@@ -34,16 +35,18 @@ public class GlobalExceptionHandler {
 
 		return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
 	}
+
 	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
 	@ExceptionHandler(Exception.class)
 	public ErrorResponse handleGlobalException(Exception e) {
+
 		log.error("Exception : {}", e.getMessage(), e);
 		return ErrorResponse.of("INTERNAL_SERVER_ERROR", "서버 오류가 발생했습니다.");
 	}
 
-
 	@ExceptionHandler(AuctionException.class)
 	public ResponseEntity<ErrorResponse> handleAuctionException(AuctionException e) {
+
 		ErrorCode errorCode = e.getErrorCode();
 		return ResponseEntity
 				.status(errorCode.getHttpStatus())

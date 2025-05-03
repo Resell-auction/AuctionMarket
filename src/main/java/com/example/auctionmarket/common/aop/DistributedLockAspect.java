@@ -31,23 +31,14 @@ public class DistributedLockAspect {
         boolean locked = false;
 
         try {
-            log.info("🔐 [락 시도] 키: {}", key); // 로그 1 - 락 시도
-
             locked = lock.tryLock(3, 1, TimeUnit.SECONDS); // 3초 동안 시도, 성공 시 1초 락 유지
             if (!locked) {
-                log.warn("❌ [락 실패] 키: {}", key);
-
                 throw new RuntimeException("[락 실패] 다른 사용자가 사용 중입니다: " + key);
             }
-            log.info("✅ [락 성공] 키: {}", key); // 로그 2 - 락 성공
-
             return joinPoint.proceed(); // 락을 가진 상태에서 원래 메서드 실행
-
         } finally {
             if (locked) {
                 lock.unlock(); // 락을 획득했을 때만 해제
-                log.info("🔓 [락 해제] 키: {}", key); // 로그 3 - 락 해제
-
             }
         }
     }

@@ -12,7 +12,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import static org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO;
 
 @SpringBootApplication
-@EnableJpaAuditing
+//@EnableJpaAuditing
 @EnableScheduling // @Scheduled 사용을 위한 어노테이션
 @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO) //page 직렬화를 위한 어노테이션
 @EnableElasticsearchRepositories(basePackages = "com.example.auctionmarket.domain.auction.repository")

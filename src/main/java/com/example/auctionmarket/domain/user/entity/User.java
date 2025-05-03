@@ -7,6 +7,7 @@ import java.util.List;
 import com.example.auctionmarket.domain.coupon.entity.CouponUser;
 import com.example.auctionmarket.domain.user.enums.Role;
 import jakarta.persistence.*;
+import lombok.Setter;
 import org.apache.logging.log4j.message.ParameterizedMessage;
 
 import jakarta.annotation.Nullable;
@@ -14,6 +15,7 @@ import lombok.Getter;
 
 @Entity
 @Getter
+@Setter
 @Table(name = "users")
 public class User extends TimeStamped{
 

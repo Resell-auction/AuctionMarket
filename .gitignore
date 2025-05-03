@@ -43,3 +43,5 @@ src/main/resources/docker-compose.yml
 
 # QueryDSL generated Q-classes
 src/main/generated/
+
+filter-repo
