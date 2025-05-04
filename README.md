@@ -254,6 +254,105 @@
 - **평균 응답 시간**: 6262ms → 2903ms (약 54% 개선)
 - **처리량**: 72.2 req/s -> 76.5 req/s (약 6% 개선)
 
+<br>
 
+### 2. 캐시별 조회 기능 개선
+캐시가 미적용된 조회 기능과 Redis, Caffeine이 적용된 조회 기능을 테스트
+- **테스트 주제**: 조회를 100번 시도 했을 때의 평균 응답 속도
+- **테스트 결과**<br>
+  <img src="https://github.com/user-attachments/assets/ee3f0b4d-4ad1-41b2-b61b-bc9ae1951f39" width="400" height="250"><br>
+<table>
+  <tr>
+    <td align="center">
+      <dev><b> </b></dev>
+    </td>
+    <td align="center">
+      <dev><b>No Cache</b></dev>
+    </td>
+    <td align="center">
+      <dev><b>Redis</b></dev>
+    </td>
+    <td align="center">
+      <dev><b>Caffeine</b></dev>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <dev><b>Avg(ms)</b></dev>
+    </td>
+    <td align="center">
+      <dev><b>5.26</b></dev>
+    </td>
+    <td align="center">
+      <dev><b>10.05</b></dev>
+    </td>
+    <td align="center">
+      <dev><b>0.12</b></dev>
+    </td>
+  </tr>
+</table>
 
+Caffeine → No Cache → Redis 순으로 응답 속도가 빠름
 
+- **의문점**
+  1. 왜 Redis가 느린가?<br>
+     Redis는 기본적으로 외부 서버와 TCP 통신을 하기 때문<br>
+     1. Java 객체 → JSON 직렬화
+     2. Redis로 네트워크 전송
+     3. 다시 역질렬화해서 Java 객체로 복구
+  반면 Caffeine은 직접 JVM 메모리에서 객체를 바로 꺼내기 때문에 Redis보다 훨씬 빠름
+
+  2. 그럼 No Cache보다 느린가?
+     - 데이터가 작고 DB가 로컬에 있으면 단순 쿼리 실행이 Redis 통신보다 빠를 수도 있음
+     - Redis는 캐시할 때 Jackson 직렬화/역직렬화가 항상 개임하기 때문에 그만큼 시간이 더 걸리게 됨
+     - 캐시 미스가 발생해서 Redis가 무의미하게 조회되고 있을 수도 있음
+
+  즉, 속도만 비교하면 Redis보다 Caffeine이 좀 더 우위에 있음을 알 수 있음
+
+<br>
+
+### 3. 캐시별 조회 기능 개선
+MySQL vs 로컬 Elasticsearch vs AWS OpenSearch(퍼블릭 도메인)
+- **테스트 방식**: 10000건의 더미 경매 생성 후 경매 목록 검색 속도 비교
+- **테스트 결과**<br>
+  <img src="https://github.com/user-attachments/assets/2e353298-8c71-4b04-b677-313303d1cb1b" width="400" height="250"><br>
+<table>
+  <tr>
+    <td align="center">
+      <dev><b> </b></dev>
+    </td>
+    <td align="center">
+      <dev><b>MySQL</b></dev>
+    </td>
+    <td align="center">
+      <dev><b>Elasticsearch</b></dev>
+    </td>
+    <td align="center">
+      <dev><b>OpenSearch</b></dev>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <dev><b>Avg(ms)</b></dev>
+    </td>
+    <td align="center">
+      <dev><b>388</b></dev>
+    </td>
+    <td align="center">
+      <dev><b>245</b></dev>
+    </td>
+    <td align="center">
+      <dev><b>528</b></dev>
+    </td>
+  </tr>
+</table>
+
+- **의문점**
+  - 어째서 OpenSearch의 소요 시간이 남들보다 훨씬 더 걸리는가?
+
+  - 원인 분석
+    원인은 AWS 외부와 통신이필요한 구조이기 때문임<br>
+    로컬 Elasticsearch는 로컬이기 때문에 네트워크 지연이 없지만<br>
+    AWS OpenSearch의 경우 AWS 외부와 통신을 하기 때문에 외부 호출로 인해서 시간 소요가 증가함
+
+<br>
