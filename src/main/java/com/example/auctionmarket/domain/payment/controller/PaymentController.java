@@ -1,6 +1,7 @@
 package com.example.auctionmarket.domain.payment.controller;
 
 import com.example.auctionmarket.common.auth.AuthUser;
+import com.example.auctionmarket.common.response.Response;
 import com.example.auctionmarket.domain.payment.dto.request.PaymentRequest;
 import com.example.auctionmarket.domain.payment.dto.request.RefundRequest;
 import com.example.auctionmarket.domain.payment.service.PaymentService;
@@ -17,20 +18,20 @@ public class PaymentController {
 
     // 유저에게 결제하라고 요청이 들어온 상황
     @PostMapping
-    public ResponseEntity<Void> pay(
+    public Response<Void> pay(
             @PathVariable Long paymentId,
             @RequestBody PaymentRequest request,
             @AuthenticationPrincipal AuthUser authUser) {
         paymentService.confirmPayment(paymentId, request, authUser);
-        return ResponseEntity.ok().build();
+        return Response.empty();
     }
 
     @PostMapping("/refund")
-    public ResponseEntity<Void> refund(
+    public Response<Void> refund(
             @PathVariable Long paymentId,
             @RequestBody RefundRequest request,
             @AuthenticationPrincipal AuthUser authUser) {
         paymentService.refundPayment(paymentId, request, authUser);
-        return ResponseEntity.ok().build();
+        return Response.empty();
     }
 }
