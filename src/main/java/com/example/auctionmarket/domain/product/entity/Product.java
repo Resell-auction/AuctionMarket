@@ -28,7 +28,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor
-@Table(name = "product", indexes = {
+@Table(name = "products", indexes = {
         @Index(name = "idx_product_name", columnList = "category, productName")
 })
 public class Product extends BaseEntity {

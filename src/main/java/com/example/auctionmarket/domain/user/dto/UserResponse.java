@@ -27,4 +27,5 @@ public class UserResponse {
 			.modifiedAt(user.getUpdateAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
 			.build();
 	}
+
 }

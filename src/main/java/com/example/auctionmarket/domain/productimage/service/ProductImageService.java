@@ -49,8 +49,7 @@ public class ProductImageService {
 
     // 제품 이미지 업로드
     @Transactional
-    public List<ProductImageResponse> uploadProductImages(AuthUser authUser, Long productId, List<MultipartFile> files) throws IOException {
-        // file.getBytes()는 IOException 발생 가능이 있으므로 uploadProductImages 메서드에 throws IOException 붙임
+    public List<ProductImageResponse> uploadProductImages(AuthUser authUser, Long productId, List<MultipartFile> files) {
 
         // 유저 검증 로직 (본인 확인)
         User user = userRepository.findById(authUser.getId()).orElseThrow(
@@ -92,16 +91,18 @@ public class ProductImageService {
                     .contentType(file.getContentType())
                     .build();
 
-            // 파일 데이터를 RequestBody로 변환
-            RequestBody requestBody = RequestBody.fromBytes(file.getBytes()); // MultipartFile로 받은 파일의 내용을 byte배열로
-
-            // S3에 파일 업로드 실행 (requestBody를 S3에 전송)
-            s3Client.putObject(putObjectRequest, requestBody);
+            try {
+                // 파일 데이터를 RequestBody로 변환
+                RequestBody requestBody = RequestBody.fromBytes(file.getBytes()); // MultipartFile로 받은 파일의 내용을 byte배열로
+                // S3에 파일 업로드 실행 (requestBody를 S3에 전송)
+                s3Client.putObject(putObjectRequest, requestBody);
+            } catch (IOException e) {
+                throw new ProductImageException(ProductImageErrorCode.FILE_UPLOAD_FAILED);
+            }
 
             // 업로드 성공 시 파일 URL 반환
             String s3ImageUrl = "https://" + bucket + ".s3.amazonaws.com/" + key;
             String cloudFrontImageUrl = cloudFrontDomain + "/" + key;
-
 
             ProductImage productImage = new ProductImage(product, fileName, originFileName, s3ImageUrl, cloudFrontImageUrl);
             productImageRepository.save(productImage);
@@ -170,5 +171,4 @@ public class ProductImageService {
                 lowerExtension.equals(".gif") ||
                 lowerExtension.equals(".pdf");
     }
-
 }
