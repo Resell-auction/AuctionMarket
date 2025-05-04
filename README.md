@@ -6,15 +6,70 @@
 <br>
 
 ## 🙋‍♂️팀원 소개
-|    본인 이미지 <br> [이름](https://github.com/hyeons22) <br> 사진 <br> 한 일<br>     |          |          |           |         |        |
-| :------: | :------:|:------:|:------:|:------:|:------:|
+<div align="center">
+<table>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/184fcc50-d6b3-4d9e-8b43-2bb0406f2f80" width="200" height="200"><br>
+      <div><b>팀장</b></div>
+      <div><a href="https://github.com/lh991117">이한빈</a></div>
+      <div>경매</div>
+      <div>Redis와 Caffeine 성능 비교</div>
+      <div>검색 기능 강화</div>
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/692bd79e-2d9b-4faa-824a-70547c8b48a6" width="200" height="200"><br>
+      <div><b>부팀장</b></div>
+      <div><a href="https://github.com/Seung-min-88">이승민</a></div>
+      <div>결제</div>
+      <div>WebSocket 실시간 경매</div>
+      <div>스케줄링 서버</div>
+    </td>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/b6d4c66c-17f3-403b-a7fe-367bb6c7140e" width="200" height="200"><br>
+      <div><b>팀원</b></div>
+      <div><a href="https://github.com/pathfinder357">최유준</a></div>
+      <div>애플리케이션 준비 및 컨테이너화</div>
+      <div> Terraform 코드 작성 (IaC)</div>
+      <div>배포 환경 검증 및 트러블슈팅</div>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/user-attachments/assets/5dddceb2-e3c2-451e-99fe-a8783e3ce9f9" width="200" height="200"><br>
+      <div><b>팀원</b></div>
+      <div><a href="https://github.com/uyr83157">정의용</a></div>
+      <div>BigQuery + GA4 활용한 통계 API</div>
+      <div>BigQuery ETL 파이프라인 구축</div>
+      <div>ELK 스택 로깅 + WAF 도입</div>
+      <div>메트릭 모니터링</div>
+      <div>Docker image 최적화</div>
+      <td align="center">
+      <img src="https://github.com/user-attachments/assets/d7487536-590f-45f5-93e1-e26300690192" width="200" height="200"><br>
+      <div><b>팀원</b></div>
+      <div><a href="https://github.com/pathfinder357">송윤정</a></div>
+      <div>쿠폰</div>
+      <div>AWS EventBridge</div>
+      <div>RestDocs API 자동화</div>
+      <div>분산락을 이용한 쿠폰 대량 발급</div>
+        <td align="center">
+      <img src="https://github.com/user-attachments/assets/4bf16cb2-efd6-48fd-9d45-1d27a518fc85" width="200" height="200"><br>
+      <div><b>팀원</b></div>
+      <div><a href="https://github.com/pathfinder357">박현승</a></div>
+      <div>물품</div>
+      <div>물품 이미지 업로드</div>
+      <div>AWS S3 기반 이미지 저장 구조 구현</div>
+      <div>CloudFront 연동으로 로딩 속도 개선</div>
+  </tr>
+</table>
+</div>
+
 <br>
 
 ## 📄프로젝트 소개
 **개발 기간**: 2025.04.02 ~ 2025.05.06
 
 `C2C 경매 서비스`는 사용자가 물품을 경매에 올리고 사용자가 실시간으로 물품을 경매할 수 있는 C2C 경매 사이트입니다.
-이건 같이 생각해보자...
 <br>
 
 ## 🛠 기술 스택 
@@ -55,8 +110,9 @@
 
 
 ## 🎲 주요 기능
+### 경매 생성 로직
 
-이미지 파일 github에 저장 후 사용
+### 경매 입찰 로직
 
 <br>
 
@@ -67,11 +123,120 @@
 <br>
 
 ## 🔑Key Summary
-## 최적화 전략 이부분을 🔑Key Summary 이걸로 해서 밑에 적은 4문항을 이미지 파일과 함께 채워넣기 -> 성능 비교가 가능한 인원이 적어주면 좋음
-문제원인<br>
-기술도입<br>
-도입전후비교<br>
-성능개선요약<br>
+### 1. 이미지 응답 속도 최적화
+**1-1. 문제 원인** <br>
+- 동시에 많은 사용자가 제품 이미지를 조회할 경우 지연이 발생
+- AWS S3을 사용할 경우 사용자와 이미지가 저장되어 있는 서버의 물리적 거리 멀수록 지연 시간 증가
+
+**1-2. 기술 도입** <br>
+- AWS CloudFront를 도입하여 사용자와 가까운 엣지 서버에서 데이터를 가져옴으로써 응답 속도 개선
+  
+**1-3. 성능 비교** <br>
+<table>
+  <tr>
+    <td align="center">
+      <dev><b> </b></dev>
+    </td>
+    <td align="center">
+      <dev><b>AWS S3</b></dev>
+    </td>
+    <td align="center">
+      <dev><b>AWS CloudFront</b></dev>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <dev><b>Samples</b></dev>
+    </td>
+    <td align="center">
+      <dev><b>3000</b></dev>
+    </td>
+    <td align="center">
+      <dev><b>3000</b></dev>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <dev><b>Avg(ms)</b></dev>
+    </td>
+    <td align="center">
+      <dev><b>6262</b></dev>
+    </td>
+    <td align="center">
+      <dev><b>2903</b></dev>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <dev><b>Min(ms)</b></dev>
+    </td>
+    <td align="center">
+      <dev><b>119</b></dev>
+    </td>
+    <td align="center">
+      <dev><b>98</b></dev>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <dev><b>Max(ms)</b></dev>
+    </td>
+    <td align="center">
+      <dev><b>32614</b></dev>
+    </td>
+    <td align="center">
+      <dev><b>31935</b></dev>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <dev><b>Error(%)</b></dev>
+    </td>
+    <td align="center">
+      <dev><b>0</b></dev>
+    </td>
+    <td align="center">
+      <dev><b>0</b></dev>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <dev><b>Throughput(req/s)</b></dev>
+    </td>
+    <td align="center">
+      <dev><b>72.2</b></dev>
+    </td>
+    <td align="center">
+      <dev><b>76.5</b></dev>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <dev><b>Received KB/s</b></dev>
+    </td>
+    <td align="center">
+      <dev><b>36185.1</b></dev>
+    </td>
+    <td align="center">
+      <dev><b>38330.6</b></dev>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <dev><b>Sent KB/s</b></dev>
+    </td>
+    <td align="center">
+      <dev><b>14.8</b></dev>
+    </td>
+    <td align="center">
+      <dev><b>14.0</b></dev>
+    </td>
+  </tr>
+</table>
+
+**1-4. 성능개선요약** <br>
+- **평균 응답 시간**: 6262ms → 2903ms (약 54% 개선)
+- **처리량**: 72.2 req/s -> 76.5 req/s (약 6% 개선)
 
 
 
