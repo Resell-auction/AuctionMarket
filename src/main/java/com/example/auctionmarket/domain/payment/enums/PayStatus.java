@@ -20,8 +20,8 @@ public enum PayStatus {
 
     public static PayStatus of(String payStatus) {
         return Arrays.stream(PayStatus.values())
-                .filter(p->p.name().equalsIgnoreCase(payStatus))
+                .filter(p -> p.name().equalsIgnoreCase(payStatus))
                 .findFirst()
-                .orElseThrow(()-> new IllegalArgumentException("현재 결제 상태는 : " + payStatus));
+                .orElseThrow(() -> new IllegalArgumentException("현재 결제 상태는 : " + payStatus));
     }
 }

@@ -12,4 +12,3 @@ public enum PayType {
                 .orElseThrow(()->new IllegalArgumentException("Invalid pay type: " + payType));
     }
 }
-
