@@ -10,4 +10,8 @@ public class ProductImageException extends RuntimeException {
         super(errorCode.getDefaultMessage());
         this.errorCode = errorCode;
     }
+
+    public ErrorCode getErrorCode() {
+        return errorCode;
+    }
 }

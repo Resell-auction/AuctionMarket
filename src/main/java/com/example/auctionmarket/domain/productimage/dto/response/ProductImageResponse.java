@@ -1,18 +1,15 @@
 package com.example.auctionmarket.domain.productimage.dto.response;
 
+import com.example.auctionmarket.domain.productimage.entity.ProductImage;
 import lombok.Getter;
 
 @Getter
 public class ProductImageResponse {
 
     private final Long id;
-
     private final String fileName;
-
     private final String originFileName;
-
     private final String s3ImageUrl;
-
     private final String cloudFrontImageUrl;
 
     public ProductImageResponse(Long id, String fileName, String originFileName, String s3ImageUrl, String cloudFrontImageUrl) {
@@ -21,5 +18,13 @@ public class ProductImageResponse {
         this.originFileName = originFileName;
         this.s3ImageUrl = s3ImageUrl;
         this.cloudFrontImageUrl = cloudFrontImageUrl;
+    }
+
+    public ProductImageResponse(ProductImage image) {
+        this.id = image.getId();
+        this.fileName = image.getFileName();
+        this.originFileName = image.getOriginFileName();
+        this.s3ImageUrl = image.getS3ImageUrl();
+        this.cloudFrontImageUrl = image.getCloudFrontImageUrl();
     }
 }
