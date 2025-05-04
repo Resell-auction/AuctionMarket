@@ -92,27 +92,33 @@
 
 ## ⚙️ System Architecture
 
-이미지 파일 github에 저장 후 사용
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/ef1e0408-423e-4962-9067-0ab77ee5460f">
+</p>
+
 <br>
 
 ## ⛓️ ERD
-이미지 파일 github에 저장 후 사용
- ![AuctionMarket.png](AuctionMarket.png)
+
+<p align="center">
+  <img src="AuctionMarket.png" width="700" height="600">
+</p>
+
 <br>
 
-## 와이어프레임
-이미지 파일 github에 저장 후 사용
-[와이어프레임](https://docs.google.com/presentation/d/1J85rLEqN8q-g5gu4F7oyU-kvXNy68qDt/edit#slide=id.p6)
+## 🧱[와이어프레임](https://docs.google.com/presentation/d/1J85rLEqN8q-g5gu4F7oyU-kvXNy68qDt/edit#slide=id.p6)
 <br>
 
-## [API 명세서](https://www.notion.so/API-1e73dcf2500780479a9dd06e715e0f33?pvs=4)
+## 📰[API 명세서](https://www.notion.so/API-1e73dcf2500780479a9dd06e715e0f33?pvs=4)
 <br>
 
 
 ## 🎲 주요 기능
 ### 경매 생성 로직
-
+![image](https://github.com/user-attachments/assets/1a3a0c4f-06c8-4b06-a069-d7b96a4d767f)
+<br>
 ### 경매 입찰 로직
+![image](https://github.com/user-attachments/assets/ff628d93-aeed-43d4-9c85-39cc78ef44a0)
 
 <br>
 
@@ -233,6 +239,10 @@
     </td>
   </tr>
 </table>
+
+<br>
+
+<img src="https://github.com/user-attachments/assets/cda7905c-cb9b-4f76-ad55-fee47826dd0a" width="400" height="250"><br>
 
 **1-4. 성능개선요약** <br>
 - **평균 응답 시간**: 6262ms → 2903ms (약 54% 개선)
