@@ -1,0 +1,5 @@
+|===
+| HTTP Status | Error Code | Message
+| 404 Not Found | PRODUCT_ALREADY_SOLD | 이미 판매된 제품입니다.
+| 401 Unauthorized | NOT_MY_PRODUCT | 본인 제품이 아닙니다.
+|===

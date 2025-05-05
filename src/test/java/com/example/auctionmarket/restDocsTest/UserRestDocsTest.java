@@ -11,19 +11,16 @@ import com.example.auctionmarket.domain.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.Collections;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
@@ -33,7 +30,6 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.headerWit
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -42,11 +38,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(UserController.class)
 public class UserRestDocsTest extends BaseRestDocsTest{
 
-    @MockBean
+    @MockitoBean
     private UserService userService;
 
     @BeforeEach
     void setUp() {
+
         AuthUser mockUser = new AuthUser(1L,"abc@gmail.com", Role.ADMIN,"testuser");
         UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(mockUser, null, Collections.emptyList());
@@ -56,6 +53,7 @@ public class UserRestDocsTest extends BaseRestDocsTest{
 
     @Test
     void 프로필_확인_RestDocsAPI() throws Exception{
+
         AuthUser mockUser = mock(AuthUser.class);
         when(mockUser.getId()).thenReturn(1L);
 
@@ -63,11 +61,13 @@ public class UserRestDocsTest extends BaseRestDocsTest{
                 .willReturn(new MyPageResponse(1L,"abc@gmail.com","르탄이","ADMIN","010-0000-0000","2025-05-05 00:00","2025-05-05 00:00"));
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/v1/users/my")
+                        .header("Authorization", "Bearer token")
+                        .header("Refresh-Token", "Refresh token")
                         .principal(new UsernamePasswordAuthenticationToken(mockUser, null, List.of(new SimpleGrantedAuthority("ADMIN"))))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("get-profile",
+                .andDo(document("user/get-profile",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         responseFields(
@@ -78,12 +78,17 @@ public class UserRestDocsTest extends BaseRestDocsTest{
                                 fieldWithPath("data.phoneNumber").description("회원 번호"),
                                 fieldWithPath("data.createdAt").description("회원 가입일시"),
                                 fieldWithPath("data.modifiedAt").description("회원 정보 수정일시")
+                        ),
+                        requestHeaders(
+                                headerWithName("Authorization").description("Bearer 인증 토큰"),
+                                headerWithName("Refresh-Token").description("토큰 발급 시간 연장")
                         )
                 ));
     }
 
     @Test
     void 유저정보_수정_RestDocsAPI() throws Exception{
+
         AuthUser mockUser = mock(AuthUser.class);
         when(mockUser.getId()).thenReturn(1L);
         UpdateUserRequest updateUserRequest = new UpdateUserRequest("수정된 르탄이","010-0000-0000");
@@ -97,7 +102,7 @@ public class UserRestDocsTest extends BaseRestDocsTest{
                 .content(objectMapper.writeValueAsString(updateUserRequest)))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("update-profile",
+                .andDo(document("user/update-profile",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         responseFields(
@@ -124,7 +129,7 @@ public class UserRestDocsTest extends BaseRestDocsTest{
                         .content(objectMapper.writeValueAsString(updatePasswordRequest)))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("update-password",
+                .andDo(document("user/update-password",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint())
                 ));
@@ -132,13 +137,14 @@ public class UserRestDocsTest extends BaseRestDocsTest{
 
     @Test
     void 유저_삭제_RestDocsAPI() throws Exception{
+
         willDoNothing().given(userService).deleteUser(anyLong());
 
         mockMvc.perform(RestDocumentationRequestBuilders.delete("/v1/users/my")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("delete-user",
+                .andDo(document("user/delete-user",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint())
                 ));

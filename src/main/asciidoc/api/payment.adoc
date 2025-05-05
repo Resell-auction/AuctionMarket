@@ -2,7 +2,7 @@
 경매 낙찰 후 상품을 결제/환불하는 기능을 제공합니다.
 
 === Header 인증
-include::{snippets}/confirm-payment/request-headers.adoc[]
+include::{snippets}/payment/confirm-payment/request-headers.adoc[]
 
 
 === 결제
@@ -24,10 +24,10 @@ include::{snippets}/confirm-payment/request-headers.adoc[]
 
 ==== 요청 예시
 
-include::{snippets}/confirm-payment/http-request.adoc[]
+include::{snippets}/payment/confirm-payment/http-request.adoc[]
 ==== 응답 예시
 
-include::{snippets}/confirm-payment/http-response.adoc[]
+include::{snippets}/payment/confirm-payment/http-response.adoc[]
 
 
 === 결제 실패
@@ -46,8 +46,14 @@ include::{snippets}/confirm-payment/http-response.adoc[]
 |===
 
 ==== 요청 예시
-include::{snippets}/refund-payment/http-request.adoc[]
+include::{snippets}/payment/refund-payment/http-request.adoc[]
 
 ==== 응답 예시
 
-include::{snippets}/refund-payment/http-response.adoc[]
+include::{snippets}/payment/refund-payment/http-response.adoc[]
+
+
+
+=== 결제 에러코드
+
+include::errorcode/payment-errorcode.adoc[]

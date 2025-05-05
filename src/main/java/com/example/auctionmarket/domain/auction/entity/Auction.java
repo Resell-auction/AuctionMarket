@@ -24,6 +24,7 @@ import jakarta.persistence.TemporalType;
 import lombok.*;
 
 @Getter
+@Setter
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor

@@ -7,27 +7,24 @@ import com.example.auctionmarket.domain.payment.dto.request.RefundRequest;
 import com.example.auctionmarket.domain.payment.service.PaymentService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(PaymentController.class)
 public class PaymentRestDocsTest extends BaseRestDocsTest {
 
-    @MockBean
+    @MockitoBean
     private PaymentService paymentService;
 
     @Test
@@ -44,7 +41,7 @@ public class PaymentRestDocsTest extends BaseRestDocsTest {
                         .content(objectMapper.writeValueAsString(paymentRequest)))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("confirm-payment",
+                .andDo(document("payment/confirm-payment",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestHeaders(
@@ -65,7 +62,7 @@ public class PaymentRestDocsTest extends BaseRestDocsTest {
                         .content(objectMapper.writeValueAsString(refundRequest)))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("refund-payment",
+                .andDo(document("payment/refund-payment",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint())
                        ));

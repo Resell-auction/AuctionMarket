@@ -2,7 +2,7 @@
 사용자 프로필 조회/수정/삭제 기능을 제공합니다.
 
 === Header 인증
-include::{snippets}/post-product/request-headers.adoc[]
+include::{snippets}/user/get-profile/request-headers.adoc[]
 
 
 === 프로필 조회
@@ -25,13 +25,13 @@ include::{snippets}/post-product/request-headers.adoc[]
 
 ==== 요청 예시
 
-include::{snippets}/get-profile/http-request.adoc[]
+include::{snippets}/user/get-profile/http-request.adoc[]
 ==== 응답 예시
 
-include::{snippets}/get-profile/http-response.adoc[]
+include::{snippets}/user/get-profile/http-response.adoc[]
 ==== 응답 필드 설명
 
-include::{snippets}/get-profile/response-fields.adoc[]
+include::{snippets}/user/get-profile/response-fields.adoc[]
 
 === 사용자 정보 수정
 
@@ -49,15 +49,15 @@ include::{snippets}/get-profile/response-fields.adoc[]
 |===
 
 ==== 요청 예시
-include::{snippets}/update-profile/http-request.adoc[]
+include::{snippets}/user/update-profile/http-request.adoc[]
 
 ==== 응답 예시
 
-include::{snippets}/update-profile/http-response.adoc[]
+include::{snippets}/user/update-profile/http-response.adoc[]
 
 ==== 응답 필드 설명
 
-include::{snippets}/update-profile/response-fields.adoc[]
+include::{snippets}/user/update-profile/response-fields.adoc[]
 
 
 
@@ -78,11 +78,11 @@ include::{snippets}/update-profile/response-fields.adoc[]
 |===
 
 ==== 요청 예시
-include::{snippets}/update-password/http-request.adoc[]
+include::{snippets}/user/update-password/http-request.adoc[]
 
 ==== 응답 예시
 
-include::{snippets}/update-password/http-response.adoc[]
+include::{snippets}/user/update-password/http-response.adoc[]
 
 
 
@@ -104,9 +104,12 @@ include::{snippets}/update-password/http-response.adoc[]
 |===
 
 ==== 요청 예시
-include::{snippets}/delete-user/http-request.adoc[]
+include::{snippets}/user/delete-user/http-request.adoc[]
 
 ==== 응답 예시
 
-include::{snippets}/delete-user/http-response.adoc[]
+include::{snippets}/user/delete-user/http-response.adoc[]
 
+=== 사용자 에러코드
+
+include::errorcode/user-errorcode.adoc[]

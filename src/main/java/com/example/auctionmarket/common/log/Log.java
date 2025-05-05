@@ -3,11 +3,13 @@ package com.example.auctionmarket.common.log;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@NoArgsConstructor
 @Table(name = "log")
 public class Log {
 
@@ -30,7 +32,4 @@ public class Log {
         this.createdAt = LocalDateTime.now();
     }
 
-    public Log() {
-
-    }
 }

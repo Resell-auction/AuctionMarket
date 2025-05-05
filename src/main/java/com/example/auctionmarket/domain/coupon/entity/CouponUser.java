@@ -1,5 +1,6 @@
 package com.example.auctionmarket.domain.coupon.entity;
 
+import com.example.auctionmarket.common.entity.BaseEntity;
 import com.example.auctionmarket.domain.coupon.enums.CouponType;
 import com.example.auctionmarket.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -13,7 +14,7 @@ import lombok.Setter;
 @Entity
 @NoArgsConstructor
 @Table(name="couponusers")
-public class CouponUser {
+public class CouponUser extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,8 +31,5 @@ public class CouponUser {
     @Enumerated(EnumType.STRING)
     private CouponType couponType;
 
-    private boolean used = false;//couponstatus로도 충분?
-
+    private boolean used = false;
 }
-
-//

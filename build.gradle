@@ -15,6 +15,10 @@ java {
 	}
 }
 
+ext {
+	set('testcontainers.version', "1.19.8")
+}
+
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
@@ -125,14 +129,15 @@ dependencies {
 	implementation 'software.amazon.awssdk:eventbridge:2.20.0'
 	implementation 'com.amazonaws:aws-lambda-java-core:1.2.1'
 
-	// BigQuery 연동을 위한 의존성
+	// BigQuery 연동을 위한 의존성 => BigQuery 클라이언트 API 사용 시 필요
 	implementation 'com.google.cloud:google-cloud-bigquery'
 
 	// Spring Cloud GCP BigQuery Starter
 	implementation 'com.google.cloud:spring-cloud-gcp-starter-bigquery'
 
 	// Logstash
-	implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+	implementation 'net.logstash.logback:logstash-logback-encoder:7.4' // 애플리케이션 로그를 JSON 형식으로 변환
+
 }
 
 //docker
@@ -155,6 +160,7 @@ tasks.register("restDocsTest", Test) {
 
 	useJUnitPlatform()
 	include("com.example.auctionmarket.restDocsTest.CouponRestDocsTest")
+	// filter { includeTestsMatching("com.example.**.RestDocs*") } // 클래스명 필터도 가능
 	outputs.dir snippetsDir
 }
 
@@ -176,4 +182,3 @@ asciidoctor {
 		include("index.adoc")
 	}
 }
-

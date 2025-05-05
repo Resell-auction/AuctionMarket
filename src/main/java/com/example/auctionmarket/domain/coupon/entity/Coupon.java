@@ -20,8 +20,10 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @Entity
 @NoArgsConstructor
 @Table(name="coupons")
@@ -44,15 +46,13 @@ public class Coupon extends BaseEntity {
     private CouponStatus couponStatus;
 
     @Version
-    private Long version; // 낙관적 락을 위한 필드
+    private Long version; // 낙관적 락
 
     @Enumerated(EnumType.STRING)
     private CouponType couponType;
 
     @OneToMany(mappedBy = "coupons", cascade = CascadeType.ALL)
     private List<CouponUser> couponUserList = new ArrayList<>();
-
-    //   private String condition;
 
     public Coupon(String couponName, String description, Long discountAmount, LocalDateTime expiredAt, int amount, CouponType couponType) {
         this.couponName=couponName;
@@ -80,6 +80,9 @@ public class Coupon extends BaseEntity {
     }
 
     public void assignUniqueCoupon(){
+        if (this.amount <= 0) {
+            throw new IllegalStateException("쿠폰이 더 이상 남아있지 않습니다.");
+        }
         this.amount--;
     }
 

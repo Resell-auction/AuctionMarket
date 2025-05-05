@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 @Getter
 public class CouponResponse {
+
     private final Long id;
 
     private final String couponName;
