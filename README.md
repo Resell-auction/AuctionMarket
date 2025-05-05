@@ -1,7 +1,7 @@
 # 🛍 C2C 경매 서비스
 
 <p align="center">
-  <img src="img.png">
+  <img src="https://github.com/user-attachments/assets/6ff80ae8-5810-4b33-83de-b2aa207d46e3">
 </p>
 <br>
 
@@ -107,7 +107,7 @@
 ## ⛓️ ERD
 
 <p align="center">
-  <img src="img/AuctionMarket.png" width="700" height="600">
+  <img src="img/erd.png" width="700" height="600">
 </p>
 
 <br>
