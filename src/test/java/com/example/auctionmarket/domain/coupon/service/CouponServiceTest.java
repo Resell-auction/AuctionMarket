@@ -51,16 +51,9 @@ public class CouponServiceTest {
     @Mock
     private RedisTemplate<String, Object> redisTemplate;
 
-
     @Mock
     private ValueOperations<String, Object> valueOperations;
 
-    //    @BeforeEach
-//    void setUp() {
-//        // opsForValue() 호출 시 valueOperations 리턴되게 설정
-//        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-//
-//    }
     @Test
     void 쿠폰_생성_성공(){
         //given
@@ -121,8 +114,6 @@ public class CouponServiceTest {
         // given
         LocalDateTime expiredAt = LocalDateTime.parse("2025-05-05T00:00:00");
         Coupon coupon = new Coupon("coupon1","description1",10L,expiredAt,10,CouponType.PERCENT);
-
-      //  coupon.setId(1L);
 
         given(couponRepository.findById(coupon.getId())).willReturn(Optional.of(coupon));
 
@@ -226,18 +217,7 @@ public class CouponServiceTest {
 
     @Test
     void 설정된_유효시간이_지나면_쿠폰설정이_바뀐다(){
-//        LocalDateTime now = LocalDateTime.now();
-//        LocalDateTime yesterday = now.minusDays(1);
-//        LocalDateTime expiredAt = now.minusHours(1);//now-yesterday사이로 설정
-//        Coupon coupon = new Coupon("가입기념쿠폰", "설명", (long) 20.0, expiredAt, 3, CouponType.FIXED);
-//
-//
-//        given(couponRepository.expireCouponsBetween(yesterday, now)).willReturn(1);
-//
-//        couponService.expireCoupons();
-//
-//        //when&then
-//        assertThat(coupon.getCouponStatus()).isEqualTo(CouponStatus.EXPIRED);
+
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime yesterday = now.minusDays(1);
 

@@ -23,6 +23,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -50,14 +51,13 @@ public class CouponLockServiceTest {
 
         Coupon coupon = new Coupon("이름", "설명", 10L, LocalDateTime.now().plusDays(1), 100, CouponType.PERCENT);
 
-        User user = new User();
-        user.setId(1L);
+        User user = new User("email@email.com","password","nickname","phoneNumber",Role.ADMIN);
 
         CouponGiveRequest request = new CouponGiveRequest(adminUser.getId(), 1);
 
         // stub
         when(couponRepository.findById(100L)).thenReturn(Optional.of(coupon));
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
 
         // when
         couponUserService.giveCouponByUserId(adminUser, 100L, request);
@@ -114,12 +114,11 @@ public class CouponLockServiceTest {
 
         Coupon coupon = new Coupon("이름", "설명", 10L, LocalDateTime.now().plusDays(1), 100, CouponType.PERCENT);
 
-        User user = new User();
-        user.setId(2L);
+        User user = new User("email@email.com","password","nickname","phoneNumber",Role.ADMIN);
 
         //   when(lock.tryLock(anyLong(), anyLong(), any())).thenReturn(true);
         when(couponRepository.findById(100L)).thenReturn(Optional.of(coupon));
-        when(userRepository.findById(2L)).thenReturn(Optional.of(user));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
 
         assertThrows(CouponException.class, () ->
                 couponUserService.giveCouponByUserId(adminUser, 100L, request));

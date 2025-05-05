@@ -64,9 +64,7 @@ class CouponDistributedLockTest {
 
         // 유저 100명 생성
         for (long i = 1; i <= 100; i++) {
-            User user = new User();
-            user.setId(i);
-            user.setEmail("user" + i + "@mail.com");
+            User user = new User(i+"email@email.com","password","nickname","phoneNumber",Role.USER);
             userRepository.save(user);
         }
 

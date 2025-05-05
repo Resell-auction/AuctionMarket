@@ -1,4 +1,4 @@
-package com.example.auctionmarket.common.redis;
+package com.example.auctionmarket.common.config;
 
 import org.redisson.config.Config;
 import org.redisson.Redisson;
