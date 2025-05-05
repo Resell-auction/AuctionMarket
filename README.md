@@ -117,7 +117,6 @@
 
 ## 📰[API 명세서](https://www.notion.so/API-1e73dcf2500780479a9dd06e715e0f33?pvs=4)
 <br>
- 
 [RestDocs API](http://auction-market-restdocs-api-bucket.s3-website.ap-northeast-2.amazonaws.com/)
 
 ## 🎲 주요 기능
@@ -133,15 +132,7 @@
 
 ## 🧭[기술적 의사결정](https://www.notion.so/1e83dcf250078033b6facf83fbd65b47?pvs=4)
 <br>
-<details>
-  <summary>첫번째토글</summary>
-  <!-- 내용 -->
-</details>
 
-<details>
-  <summary><b>두번째토글</b></summary>
-  <!-- 내용 -->
-</details>
 
 ## 🚨 [트러블 슈팅](https://www.notion.so/1e83dcf2500780b5bfb6f714fdc30c23?pvs=4)
 <br>
