@@ -67,7 +67,7 @@
 <br>
 
 ## 📄프로젝트 소개
-**개발 기간**: 2025.04.02 ~ 2025.05.06
+**개발 기간**: 2025.04.01 ~ 2025.05.06
 
 `C2C 경매 서비스`는 사용자가 물품을 경매에 올리고 사용자가 실시간으로 물품을 경매할 수 있는 C2C 경매 사이트입니다.
 <br>
@@ -121,10 +121,12 @@
 
 ## 🎲 주요 기능
 ### 경매 생성 로직
-![image](https://github.com/user-attachments/assets/1a3a0c4f-06c8-4b06-a069-d7b96a4d767f)
+![image](https://github.com/user-attachments/assets/41487f3f-648e-484f-9790-666bc563e031)
+
 <br>
+
 ### 경매 입찰 로직
-![image](https://github.com/user-attachments/assets/ff628d93-aeed-43d4-9c85-39cc78ef44a0)
+![image](https://github.com/user-attachments/assets/eabf19bd-c702-4627-bd78-892bce9a83b6)
 
 <br>
 
