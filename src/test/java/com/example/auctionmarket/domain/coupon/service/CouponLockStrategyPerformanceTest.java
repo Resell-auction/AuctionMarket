@@ -38,11 +38,10 @@ public class CouponLockStrategyPerformanceTest {
 
     private Long couponId; // 클래스 필드로 선언
 
-
     @BeforeEach
     void setupTestCoupon() {
+
         Coupon coupon = new Coupon("쿠폰이름", "설명", 10L, LocalDateTime.now().plusDays(1), 100, CouponType.PERCENT);
-     //   coupon.setAmount(999);
         couponRepository.save(coupon);
         couponRepository.flush(); // 💡 트랜잭션 commit 강제
         entityManager.clear();    // 💡 영속성 컨텍스트 초기화 (옵션)
@@ -64,6 +63,7 @@ public class CouponLockStrategyPerformanceTest {
     }
 
     private void measure(String label, Runnable task) throws InterruptedException {
+
         ExecutorService executor = Executors.newFixedThreadPool(THREAD_COUNT);
         CountDownLatch latch = new CountDownLatch(THREAD_COUNT);
         AtomicInteger success = new AtomicInteger();

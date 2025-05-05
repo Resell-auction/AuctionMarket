@@ -50,8 +50,7 @@ public class CouponLockServiceTest {
 
         Coupon coupon = new Coupon("이름", "설명", 10L, LocalDateTime.now().plusDays(1), 100, CouponType.PERCENT);
 
-        User user = new User();
-        user.setId(1L);
+        User user = new User("email@email.com","password","nickname","phoneNum",Role.USER);
 
         CouponGiveRequest request = new CouponGiveRequest(adminUser.getId(), 1);
 
@@ -82,7 +81,6 @@ public class CouponLockServiceTest {
 
         AuthUser adminUser = new AuthUser(1L, "admin@email.com", Role.ADMIN, "관리자");
 
-
         when(couponRepository.findById(100L)).thenReturn(Optional.empty());
         CouponGiveRequest request = new CouponGiveRequest(200L, 1);
 
@@ -92,12 +90,12 @@ public class CouponLockServiceTest {
 
     @Test
     void 유저_없음_예외() throws Exception {
+
         AuthUser adminUser = new AuthUser(1L, "admin@email.com", Role.ADMIN, "관리자");
         Coupon coupon = new Coupon("이름", "설명", 10L, LocalDateTime.now().plusDays(1), 100, CouponType.PERCENT);
 
         CouponGiveRequest request = new CouponGiveRequest(999L, 1);
 
-        //    when(lock.tryLock(anyLong(), anyLong(), any())).thenReturn(true);
         when(couponRepository.findById(100L)).thenReturn(Optional.of(coupon));
         when(userRepository.findById(999L)).thenReturn(Optional.empty());
 
@@ -114,12 +112,10 @@ public class CouponLockServiceTest {
 
         Coupon coupon = new Coupon("이름", "설명", 10L, LocalDateTime.now().plusDays(1), 100, CouponType.PERCENT);
 
-        User user = new User();
-        user.setId(2L);
+        User user = new User("email@email.com","password","nickname","phoneNum",Role.USER);
 
-        //   when(lock.tryLock(anyLong(), anyLong(), any())).thenReturn(true);
         when(couponRepository.findById(100L)).thenReturn(Optional.of(coupon));
-        when(userRepository.findById(2L)).thenReturn(Optional.of(user));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
 
         assertThrows(CouponException.class, () ->
                 couponUserService.giveCouponByUserId(adminUser, 100L, request));

@@ -50,7 +50,6 @@ class CouponDistributedLockTest {
     @Autowired
     private RedissonClient redissonClient;
 
-
     private Long couponId;
     private AuthUser adminUser;
 
@@ -66,9 +65,7 @@ class CouponDistributedLockTest {
 
         // 유저 100명 생성
         for (long i = 1; i <= 100; i++) {
-            User user = new User();
-            user.setId(i);
-            user.setEmail("user" + i + "@mail.com");
+            User user = new User(i+"email@email.com","password","nickname","phoneNum",Role.USER);
             userRepository.save(user);
         }
 
@@ -78,6 +75,7 @@ class CouponDistributedLockTest {
 
     @Test
     void 동시에_100명이_쿠폰을_신청하면_1명만_성공한다() throws InterruptedException {
+
         int threadCount = 100;
         ExecutorService executor = Executors.newFixedThreadPool(10);
         CountDownLatch latch = new CountDownLatch(threadCount);

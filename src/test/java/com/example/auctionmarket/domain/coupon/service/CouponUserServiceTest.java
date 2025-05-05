@@ -46,6 +46,7 @@ public class CouponUserServiceTest {
 
     @Test
     void 쿠폰_증정_성공(){
+
         LocalDateTime expiredAt = LocalDateTime.parse("2025-05-05T00:00:00");
         CouponGiveRequest couponGiveRequest= new CouponGiveRequest(1L,1);
         AuthUser authUser = new AuthUser(1L,"abc@naver.com", Role.ADMIN,"nickname");
@@ -64,6 +65,7 @@ public class CouponUserServiceTest {
 
     @Test
     void admin이_유저가_증정을_시도하면_에러가_발생한다(){
+
         AuthUser authUser = new AuthUser(1L,"abc@naver.com", Role.USER,"nickname");
         CouponGiveRequest couponGiveRequest= new CouponGiveRequest(1L,4);
 
@@ -72,6 +74,7 @@ public class CouponUserServiceTest {
 
     @Test
     void 쿠폰증정시_수량이상을_입력하면_에러가_발생한다(){
+
         LocalDateTime expiredAt = LocalDateTime.parse("2025-05-05T00:00:00");
         CouponGiveRequest couponGiveRequest= new CouponGiveRequest(1L,6);
         AuthUser authUser = new AuthUser(1L,"abc@naver.com", Role.ADMIN,"nickname");
@@ -86,6 +89,7 @@ public class CouponUserServiceTest {
 
     @Test
     void 쿠폰증정시_없는_유저아이디를_입력하면_에러가_발생한다(){
+
         LocalDateTime expiredAt = LocalDateTime.parse("2025-05-05T00:00:00");
         AuthUser authUser = new AuthUser(1L,"abc@naver.com", Role.ADMIN,"nickname");
         CouponGiveRequest couponGiveRequest= new CouponGiveRequest(1L,6);
@@ -99,6 +103,7 @@ public class CouponUserServiceTest {
 
     @Test
     void 쿠폰증정시_없는_쿠폰아이디를_입력하면_에러가_발생한다(){
+
         LocalDateTime expiredAt = LocalDateTime.parse("2025-05-05T00:00:00");
         AuthUser authUser = new AuthUser(1L,"abc@naver.com", Role.ADMIN,"nickname");
         CouponGiveRequest couponGiveRequest= new CouponGiveRequest(1L,6);

@@ -168,6 +168,6 @@ include::{snippets}/product/delete-product/http-response.adoc[]
 
 
 
-=== 쿠폰 에러코드
+=== 상품 에러코드
 
 include::errorcode/product-errorcode.adoc[]
