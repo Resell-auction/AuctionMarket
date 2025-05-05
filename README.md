@@ -135,10 +135,10 @@
 <br>
 
 
-## 🚨 [트러블 슈팅](https://www.notion.so/1e83dcf2500780b5bfb6f714fdc30c23?pvs=4)
+## 🚨[트러블 슈팅](https://www.notion.so/1e83dcf2500780b5bfb6f714fdc30c23?pvs=4)
 <br>
 
-## 🔑Key Summary
+## 🔑 [Key Summary](https://www.notion.so/teamsparta/2-ReSell-C2C-1e22dc3ef51480c8ae7cef082afa5911?pvs=4#1e72dc3ef51480e188a5d2021849e048)
 ### 1. 이미지 응답 속도 최적화
 **1-1. 문제 원인** <br>
 - 동시에 많은 사용자가 제품 이미지를 조회할 경우 지연이 발생
