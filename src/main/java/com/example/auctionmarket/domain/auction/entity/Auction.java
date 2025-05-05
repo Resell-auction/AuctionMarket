@@ -2,6 +2,7 @@ package com.example.auctionmarket.domain.auction.entity;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.function.LongConsumer;
 
 import com.example.auctionmarket.common.entity.BaseEntity;
 import com.example.auctionmarket.domain.auction.enums.AuctionStatus;
@@ -24,7 +25,6 @@ import jakarta.persistence.TemporalType;
 import lombok.*;
 
 @Getter
-@Setter
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -36,7 +36,7 @@ public class Auction extends BaseEntity {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "products_id")
     private Product product;
 
     //낙찰자 ID
@@ -104,5 +104,11 @@ public class Auction extends BaseEntity {
 
     public void updateStatus(AuctionStatus status) {
         this.status = status;
+    }
+
+    public void end(Long consumerId, Long amount) {
+        this.consumerId = consumerId;
+        this.maxPrice = amount;
+        this.status = AuctionStatus.ENDED;
     }
 }

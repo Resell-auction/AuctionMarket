@@ -10,6 +10,7 @@ import com.example.auctionmarket.domain.coupon.repository.CouponRepository;
 import com.example.auctionmarket.domain.coupon.repository.CouponUserRepository;
 import com.example.auctionmarket.domain.payment.dto.request.PaymentRequest;
 import com.example.auctionmarket.domain.payment.entity.Payment;
+import com.example.auctionmarket.domain.payment.entity.Refund;
 import com.example.auctionmarket.domain.payment.enums.PayStatus;
 import com.example.auctionmarket.domain.payment.enums.PayType;
 import com.example.auctionmarket.domain.payment.repository.PaymentRepository;
@@ -62,9 +63,9 @@ class PaymentServiceTest {
         Long maxPrice = 10000L;
 
         Auction auction = new Auction();
-        auction.setId(auctionId);
-        auction.setConsumerId(consumerId);
-        auction.setMaxPrice(maxPrice);
+        ReflectionTestUtils.setField(auction, "id", auctionId);
+        ReflectionTestUtils.setField(auction, "consumerId", consumerId);
+        ReflectionTestUtils.setField(auction, "maxPrice", maxPrice);
 
         given(auctionRepository.findById(auctionId)).willReturn(Optional.of(auction));
         // when
@@ -102,9 +103,10 @@ class PaymentServiceTest {
 
         // 경매 객체 생성
         Auction auction = new Auction();
-        auction.setId(auctionId);
-        auction.setConsumerId(consumerId);
-        auction.setMaxPrice(amount);
+        ReflectionTestUtils.setField(auction, "id", auctionId);
+        ReflectionTestUtils.setField(auction, "consumerId", consumerId);
+        ReflectionTestUtils.setField(auction, "maxPrice", amount);
+
         ReflectionTestUtils.setField(auction, "product", product);
 
         // 결제 객체 생성
@@ -154,10 +156,5 @@ class PaymentServiceTest {
         assertThat(couponUser.isUsed()).isTrue();
         assertThat(payment.getCouponUserId()).isEqualTo(couponUser.getId());
         assertThat(payment.getPayType()).isEqualTo(PayType.POINT);
-    }
-
-    @Test
-    void 환불을_정상적으로_진행한다() {
-
     }
 }

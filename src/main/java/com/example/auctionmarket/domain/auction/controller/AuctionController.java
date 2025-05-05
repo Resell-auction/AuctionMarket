@@ -87,6 +87,11 @@ public class AuctionController {
 
     @PostMapping("/end")
     public void handleAuctionEnd(@RequestBody AuctionEndRequest request) {
-        auctionService.endAuction(request.getAuctionId());
+        System.out.println("경매 종료 수신");
+        System.out.println("요청 내용:" +
+                "auctionId=" + request.auctionId()
+                + ", consumerId=" + request.consumerId()
+                + ", amount=" + request.amount());
+        auctionService.endAuction(request);
     }
 }
