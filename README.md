@@ -107,7 +107,7 @@
 ## ⛓️ ERD
 
 <p align="center">
-  <img src="AuctionMarket.png" width="700" height="600">
+  <img src="img/AuctionMarket.png" width="700" height="600">
 </p>
 
 <br>
