@@ -117,7 +117,8 @@
 
 ## 📰[API 명세서](https://www.notion.so/API-1e73dcf2500780479a9dd06e715e0f33?pvs=4)
 <br>
- [RestDocs API](http://auction-market-restdocs-api-bucket.s3-website.ap-northeast-2.amazonaws.com/)
+
+[RestDocs API](http://auction-market-restdocs-api-bucket.s3-website.ap-northeast-2.amazonaws.com/)
 
 ## 🎲 주요 기능
 ### 경매 생성 로직
