@@ -304,7 +304,33 @@
 </details>
 
 ## 🚨[트러블 슈팅](https://www.notion.so/1e83dcf2500780b5bfb6f714fdc30c23?pvs=4)
-<br>
+<details>
+<summary>🔎 <strong>트랜잭션 커밋 전 실시간 경매방이 생성되는 문제</strong></summary>
+
+### 문제 상황
+
+- 경매 생성 과정에서 유효성 검증 실패 등으로 인해 **DB에 저장되지 않았음**
+- 그러나 DB 트랜잭션 커밋 이전에 **WebSocket 서버에 경매방 생성 요청이 전달되어 방이 생성됨**
+- 이후 재시도 시 `auctionId`가 달라지면서 **DB와 실시간 서버 간 auctionId 불일치 문제** 발생
+
+---
+
+### 원인 분석
+
+- `@Transactional` 메서드 내에서 DB 커밋 이전에 실시간 서버로 **외부 요청(WebSocket 경매방 생성 요청)**이 전송됨
+- 결과적으로 DB 트랜잭션이 실패하거나 롤백되는 경우에도 WebSocket 서버에는 **유령 경매방이 생성**되어 버림
+- 이는 시스템 상태 불일치로 이어져 실시간 경매 기능에 오류를 유발
+
+---
+
+### 해결 방법
+
+- **Spring의 `@TransactionalEventListener` 기능 활용**
+  - 트랜잭션이 **정상적으로 커밋된 후에만** 이벤트 리스너가 실행되도록 구조 변경
+- DB에 경매 정보가 **정상 저장 완료된 이후에만 WebSocket 서버에 방 생성 요청**을 보냄
+
+</details>
+
 
 ## 🔑 [Key Summary](https://www.notion.so/teamsparta/2-ReSell-C2C-1e22dc3ef51480c8ae7cef082afa5911?pvs=4#1e72dc3ef51480e188a5d2021849e048)
 ### 1. 이미지 응답 속도 최적화
