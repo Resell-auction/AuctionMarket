@@ -1,19 +1,14 @@
 package com.example.auctionmarket.domain.auction.service;
 
-import com.example.auctionmarket.domain.auction.document.AuctionDocument;
-import com.example.auctionmarket.domain.auction.dto.response.AuctionOpenSearchPageResponse;
-import com.example.auctionmarket.domain.auction.dto.response.AuctionPageResponse;
-import com.example.auctionmarket.domain.auction.dto.response.AuctionResponse;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.opensearch.action.index.IndexRequest;
 import org.opensearch.action.search.SearchRequest;
 import org.opensearch.action.search.SearchResponse;
 import org.opensearch.client.RequestOptions;
 import org.opensearch.client.RestHighLevelClient;
-
 import org.opensearch.common.unit.Fuzziness;
 import org.opensearch.common.xcontent.XContentType;
 import org.opensearch.index.query.BoolQueryBuilder;
@@ -22,9 +17,13 @@ import org.opensearch.search.SearchHit;
 import org.opensearch.search.builder.SearchSourceBuilder;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import com.example.auctionmarket.domain.auction.document.AuctionDocument;
+import com.example.auctionmarket.domain.auction.dto.response.AuctionOpenSearchPageResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service

@@ -1,5 +1,16 @@
 package com.example.auctionmarket.domain.coupon.service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.example.auctionmarket.common.auth.AuthUser;
 import com.example.auctionmarket.domain.coupon.dto.CouponRequest;
 import com.example.auctionmarket.domain.coupon.dto.CouponResponse;
@@ -9,20 +20,9 @@ import com.example.auctionmarket.domain.coupon.enums.CouponStatus;
 import com.example.auctionmarket.domain.coupon.exception.CouponErrorCode;
 import com.example.auctionmarket.domain.coupon.exception.CouponException;
 import com.example.auctionmarket.domain.coupon.repository.CouponRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import static java.time.LocalTime.now;
 
 @Slf4j
 @Service
@@ -158,5 +158,4 @@ public class CouponService {
 
         log.info("만료된 쿠폰 수: {}", updatedCount);
     }
-
 }

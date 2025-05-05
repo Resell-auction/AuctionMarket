@@ -4,9 +4,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.Setter;
-import org.apache.logging.log4j.message.ParameterizedMessage;
-
 import com.example.auctionmarket.common.entity.BaseEntity;
 import com.example.auctionmarket.domain.coupon.entity.CouponUser;
 import com.example.auctionmarket.domain.user.enums.Role;
@@ -23,6 +20,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Getter

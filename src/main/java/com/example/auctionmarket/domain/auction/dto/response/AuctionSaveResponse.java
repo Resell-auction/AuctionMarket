@@ -1,10 +1,11 @@
 package com.example.auctionmarket.domain.auction.dto.response;
 
+import java.time.LocalDateTime;
+
 import com.example.auctionmarket.domain.auction.enums.AuctionStatus;
 import com.example.auctionmarket.domain.product.enums.ProductCategory;
-import lombok.Getter;
 
-import java.time.LocalDateTime;
+import lombok.Getter;
 
 @Getter
 public class AuctionSaveResponse {

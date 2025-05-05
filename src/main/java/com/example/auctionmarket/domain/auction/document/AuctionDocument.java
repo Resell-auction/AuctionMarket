@@ -1,11 +1,13 @@
 package com.example.auctionmarket.domain.auction.document;
 
-import jakarta.persistence.Id;
-import lombok.*;
-import org.springframework.context.annotation.Bean;
 import org.springframework.data.elasticsearch.annotations.Document;
 
-import java.time.LocalDateTime;
+import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Document(indexName = "auctions")
 @Getter

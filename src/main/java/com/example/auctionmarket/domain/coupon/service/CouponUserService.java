@@ -1,5 +1,14 @@
 package com.example.auctionmarket.domain.coupon.service;
 
+import org.redisson.api.RedissonClient;
+import org.springframework.dao.CannotAcquireLockException;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.example.auctionmarket.common.aop.DistributedLock;
 import com.example.auctionmarket.common.auth.AuthUser;
 import com.example.auctionmarket.domain.coupon.dto.CouponGiveRequest;
@@ -11,16 +20,9 @@ import com.example.auctionmarket.domain.coupon.repository.CouponRepository;
 import com.example.auctionmarket.domain.coupon.repository.CouponUserRepository;
 import com.example.auctionmarket.domain.user.entity.User;
 import com.example.auctionmarket.domain.user.repository.UserRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RedissonClient;
-import org.springframework.dao.CannotAcquireLockException;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -59,9 +61,10 @@ public class CouponUserService {
             throw new CouponException(CouponErrorCode.DUPLICATE_COUPON);
         }
 
-        CouponUser couponUser = new CouponUser();
-        couponUser.setUsers(users);
-        couponUser.setCoupons(coupon);
+        CouponUser couponUser = CouponUser.builder()
+            .users(users)
+            .coupons(coupon)
+            .build();
         couponUserRepository.save(couponUser);
 
         coupon.assignUniqueCoupon(); // 이게 version 충돌 원인

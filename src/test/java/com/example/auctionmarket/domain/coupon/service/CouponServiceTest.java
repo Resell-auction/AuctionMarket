@@ -1,15 +1,17 @@
 package com.example.auctionmarket.domain.coupon.service;
 
-import com.example.auctionmarket.common.auth.AuthUser;
-import com.example.auctionmarket.domain.coupon.dto.CouponRequest;
-import com.example.auctionmarket.domain.coupon.dto.CouponResponse;
-import com.example.auctionmarket.domain.coupon.dto.CouponUpdateRequest;
-import com.example.auctionmarket.domain.coupon.entity.Coupon;
-import com.example.auctionmarket.domain.coupon.enums.CouponStatus;
-import com.example.auctionmarket.domain.coupon.enums.CouponType;
-import com.example.auctionmarket.domain.coupon.exception.CouponException;
-import com.example.auctionmarket.domain.coupon.repository.CouponRepository;
-import com.example.auctionmarket.domain.user.enums.Role;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.*;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -23,18 +25,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import com.example.auctionmarket.common.auth.AuthUser;
+import com.example.auctionmarket.domain.coupon.dto.CouponRequest;
+import com.example.auctionmarket.domain.coupon.dto.CouponResponse;
+import com.example.auctionmarket.domain.coupon.dto.CouponUpdateRequest;
+import com.example.auctionmarket.domain.coupon.entity.Coupon;
+import com.example.auctionmarket.domain.coupon.enums.CouponStatus;
+import com.example.auctionmarket.domain.coupon.enums.CouponType;
+import com.example.auctionmarket.domain.coupon.exception.CouponException;
+import com.example.auctionmarket.domain.coupon.repository.CouponRepository;
+import com.example.auctionmarket.domain.user.enums.Role;
 
 @ExtendWith(MockitoExtension.class)
 public class CouponServiceTest {

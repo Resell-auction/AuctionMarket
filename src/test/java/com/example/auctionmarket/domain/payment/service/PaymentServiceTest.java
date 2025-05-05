@@ -1,12 +1,26 @@
 package com.example.auctionmarket.domain.payment.service;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.*;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
+
 import com.example.auctionmarket.common.auth.AuthUser;
 import com.example.auctionmarket.domain.auction.entity.Auction;
 import com.example.auctionmarket.domain.auction.repository.AuctionRepository;
 import com.example.auctionmarket.domain.coupon.entity.Coupon;
 import com.example.auctionmarket.domain.coupon.entity.CouponUser;
 import com.example.auctionmarket.domain.coupon.enums.CouponType;
-import com.example.auctionmarket.domain.coupon.repository.CouponRepository;
 import com.example.auctionmarket.domain.coupon.repository.CouponUserRepository;
 import com.example.auctionmarket.domain.payment.dto.request.PaymentRequest;
 import com.example.auctionmarket.domain.payment.entity.Payment;
@@ -19,23 +33,6 @@ import com.example.auctionmarket.domain.product.enums.SoldStatus;
 import com.example.auctionmarket.domain.product.repository.ProductRepository;
 import com.example.auctionmarket.domain.user.entity.User;
 import com.example.auctionmarket.domain.user.enums.Role;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
-
-import java.time.LocalDateTime;
-import java.util.Objects;
-import java.util.Optional;
-import static org.assertj.core.api.Assertions.assertThat;
-
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class PaymentServiceTest {
@@ -61,10 +58,11 @@ class PaymentServiceTest {
         Long consumerId = 2L;
         Long maxPrice = 10000L;
 
-        Auction auction = new Auction();
-        auction.setId(auctionId);
-        auction.setConsumerId(consumerId);
-        auction.setMaxPrice(maxPrice);
+        Auction auction = Auction.builder()
+            .id(auctionId)
+            .consumerId(consumerId)
+            .maxPrice(maxPrice)
+            .build();
 
         given(auctionRepository.findById(auctionId)).willReturn(Optional.of(auction));
         // when
@@ -101,10 +99,11 @@ class PaymentServiceTest {
         ReflectionTestUtils.setField(product, "id", productId);
 
         // 경매 객체 생성
-        Auction auction = new Auction();
-        auction.setId(auctionId);
-        auction.setConsumerId(consumerId);
-        auction.setMaxPrice(amount);
+        Auction auction = Auction.builder()
+            .id(auctionId)
+            .consumerId(consumerId)
+            .maxPrice(amount)
+            .build();
         ReflectionTestUtils.setField(auction, "product", product);
 
         // 결제 객체 생성

@@ -1,6 +1,7 @@
 package com.example.auctionmarket.domain.product.exception;
 
 import com.example.auctionmarket.common.exception.ErrorCode;
+
 import lombok.Getter;
 
 @Getter

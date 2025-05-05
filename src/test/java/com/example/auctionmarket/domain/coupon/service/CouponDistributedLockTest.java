@@ -1,5 +1,20 @@
 package com.example.auctionmarket.domain.coupon.service;
 
+import static org.assertj.core.api.Assertions.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+
 import com.example.auctionmarket.common.auth.AuthUser;
 import com.example.auctionmarket.domain.coupon.dto.CouponGiveRequest;
 import com.example.auctionmarket.domain.coupon.entity.Coupon;
@@ -10,21 +25,8 @@ import com.example.auctionmarket.domain.coupon.repository.CouponUserRepository;
 import com.example.auctionmarket.domain.user.entity.User;
 import com.example.auctionmarket.domain.user.enums.Role;
 import com.example.auctionmarket.domain.user.repository.UserRepository;
+
 import jakarta.persistence.EntityManager;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.redisson.api.RedissonClient;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @ActiveProfiles("test")

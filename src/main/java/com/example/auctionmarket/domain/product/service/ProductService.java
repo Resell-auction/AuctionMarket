@@ -1,5 +1,14 @@
 package com.example.auctionmarket.domain.product.service;
 
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.example.auctionmarket.common.auth.AuthUser;
 import com.example.auctionmarket.domain.auction.exception.AuctionErrorCode;
 import com.example.auctionmarket.domain.auction.exception.AuctionException;
@@ -15,12 +24,8 @@ import com.example.auctionmarket.domain.product.repository.ProductRepository;
 import com.example.auctionmarket.domain.user.entity.User;
 import com.example.auctionmarket.domain.user.exception.UserNotFoundException;
 import com.example.auctionmarket.domain.user.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.*;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor

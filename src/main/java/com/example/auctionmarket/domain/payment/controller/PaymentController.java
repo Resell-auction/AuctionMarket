@@ -1,14 +1,19 @@
 package com.example.auctionmarket.domain.payment.controller;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.example.auctionmarket.common.auth.AuthUser;
 import com.example.auctionmarket.common.response.Response;
 import com.example.auctionmarket.domain.payment.dto.request.PaymentRequest;
 import com.example.auctionmarket.domain.payment.dto.request.RefundRequest;
 import com.example.auctionmarket.domain.payment.service.PaymentService;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/v1/payments/{paymentId}")

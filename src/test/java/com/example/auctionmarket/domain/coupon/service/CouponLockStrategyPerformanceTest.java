@@ -1,24 +1,25 @@
 package com.example.auctionmarket.domain.coupon.service;
 
-import com.example.auctionmarket.AuctionMarketApplication;
-import com.example.auctionmarket.common.auth.AuthUser;
-import com.example.auctionmarket.domain.coupon.dto.CouponGiveRequest;
-import com.example.auctionmarket.domain.coupon.entity.Coupon;
-import com.example.auctionmarket.domain.coupon.enums.CouponType;
-import com.example.auctionmarket.domain.coupon.repository.CouponRepository;
-import com.example.auctionmarket.domain.user.enums.Role;
-import jakarta.persistence.EntityManager;
+import java.time.LocalDateTime;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.time.LocalDateTime;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
+import com.example.auctionmarket.AuctionMarketApplication;
+import com.example.auctionmarket.common.auth.AuthUser;
+import com.example.auctionmarket.domain.coupon.entity.Coupon;
+import com.example.auctionmarket.domain.coupon.enums.CouponType;
+import com.example.auctionmarket.domain.coupon.repository.CouponRepository;
+import com.example.auctionmarket.domain.user.enums.Role;
+
+import jakarta.persistence.EntityManager;
 
 @ActiveProfiles("test")
 @SpringBootTest(classes = AuctionMarketApplication.class)

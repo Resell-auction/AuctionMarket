@@ -1,8 +1,8 @@
 package com.example.auctionmarket.domain.payment.dto.response;
 
-import lombok.Getter;
-
 import java.time.LocalDateTime;
+
+import lombok.Getter;
 
 @Getter
 public class PaymentResponse {

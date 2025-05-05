@@ -16,5 +16,4 @@ public class CouponUpdateRequest {
     private Long discountAmount;
 
     private LocalDateTime expiredAt;
-
 }

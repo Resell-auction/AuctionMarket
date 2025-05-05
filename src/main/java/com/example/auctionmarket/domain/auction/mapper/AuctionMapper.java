@@ -1,10 +1,9 @@
 package com.example.auctionmarket.domain.auction.mapper;
 
+import java.time.format.DateTimeFormatter;
+
 import com.example.auctionmarket.domain.auction.document.AuctionDocument;
 import com.example.auctionmarket.domain.auction.entity.Auction;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import java.time.format.DateTimeFormatter;
 
 public class AuctionMapper {
     public static AuctionDocument toDucument(Auction auction) {

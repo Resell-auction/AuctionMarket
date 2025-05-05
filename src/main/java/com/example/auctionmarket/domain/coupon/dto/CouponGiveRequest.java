@@ -13,5 +13,4 @@ public class CouponGiveRequest {
 
     @NotNull
     private Integer amount;
-
 }

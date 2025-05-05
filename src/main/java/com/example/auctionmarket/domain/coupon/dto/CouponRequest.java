@@ -21,5 +21,4 @@ public class CouponRequest {
     private int amount;
 
     private CouponType couponType;
-
 }

@@ -1,7 +1,9 @@
 package com.example.auctionmarket.domain.user.enums;
 
 import java.util.Arrays;
+
 import com.example.auctionmarket.domain.user.exception.InvalidUserRoleException;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

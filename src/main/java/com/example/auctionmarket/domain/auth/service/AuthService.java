@@ -2,18 +2,21 @@ package com.example.auctionmarket.domain.auth.service;
 
 import java.util.Objects;
 import java.util.Optional;
-import com.example.auctionmarket.domain.user.enums.Role;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import com.example.auctionmarket.common.jwt.JwtUtil;
 import com.example.auctionmarket.domain.auth.dto.LoginResponse;
 import com.example.auctionmarket.domain.auth.dto.SignupResponse;
 import com.example.auctionmarket.domain.user.entity.User;
+import com.example.auctionmarket.domain.user.enums.Role;
 import com.example.auctionmarket.domain.user.exception.AlreadyExistsEmailException;
 import com.example.auctionmarket.domain.user.exception.EmailAccessDeniedException;
+import com.example.auctionmarket.domain.user.exception.EmailNotFoundException;
 import com.example.auctionmarket.domain.user.exception.InvalidPasswordException;
 import com.example.auctionmarket.domain.user.repository.UserRepository;
-import com.example.auctionmarket.common.jwt.JwtUtil;
-import com.example.auctionmarket.domain.user.exception.EmailNotFoundException;
+
 import lombok.RequiredArgsConstructor;
 
 @Service

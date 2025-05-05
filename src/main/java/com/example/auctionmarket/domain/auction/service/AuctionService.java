@@ -6,9 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import com.example.auctionmarket.common.event.AuctionCreatedEvent;
-import com.example.auctionmarket.domain.auction.mapper.AuctionMapper;
-import com.example.auctionmarket.domain.payment.repository.PaymentRepository;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -18,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.auctionmarket.common.auth.AuthUser;
+import com.example.auctionmarket.common.event.AuctionCreatedEvent;
 import com.example.auctionmarket.common.websocket.WebSocketAuctionJoinRequest;
 import com.example.auctionmarket.common.websocket.WebSocketClient;
 import com.example.auctionmarket.domain.auction.document.AuctionDocument;
@@ -32,7 +30,9 @@ import com.example.auctionmarket.domain.auction.entity.Auction;
 import com.example.auctionmarket.domain.auction.enums.AuctionStatus;
 import com.example.auctionmarket.domain.auction.exception.AuctionErrorCode;
 import com.example.auctionmarket.domain.auction.exception.AuctionException;
+import com.example.auctionmarket.domain.auction.mapper.AuctionMapper;
 import com.example.auctionmarket.domain.auction.repository.AuctionRepository;
+import com.example.auctionmarket.domain.payment.repository.PaymentRepository;
 import com.example.auctionmarket.domain.payment.service.PaymentService;
 import com.example.auctionmarket.domain.product.entity.Product;
 import com.example.auctionmarket.domain.product.repository.ProductRepository;

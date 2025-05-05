@@ -1,9 +1,13 @@
 package com.example.auctionmarket.common.auth;
+
 import java.util.Collection;
 import java.util.List;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
 import com.example.auctionmarket.domain.user.enums.Role;
+
 import lombok.Getter;
 
 @Getter

@@ -1,10 +1,11 @@
 package com.example.auctionmarket.domain.product.dto.response;
 
+import java.util.List;
+
 import com.example.auctionmarket.domain.product.entity.Product;
 import com.example.auctionmarket.domain.productimage.dto.response.ProductImageResponse;
-import lombok.Getter;
 
-import java.util.List;
+import lombok.Getter;
 
 @Getter
 public class ProductResponse {

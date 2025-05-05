@@ -1,5 +1,16 @@
 package com.example.auctionmarket.domain.productimage.service;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.example.auctionmarket.common.auth.AuthUser;
 import com.example.auctionmarket.domain.auction.exception.AuctionErrorCode;
 import com.example.auctionmarket.domain.auction.exception.AuctionException;
@@ -15,22 +26,12 @@ import com.example.auctionmarket.domain.productimage.repository.ProductImageRepo
 import com.example.auctionmarket.domain.user.entity.User;
 import com.example.auctionmarket.domain.user.exception.UserNotFoundException;
 import com.example.auctionmarket.domain.user.repository.UserRepository;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-
-import java.io.IOException;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor

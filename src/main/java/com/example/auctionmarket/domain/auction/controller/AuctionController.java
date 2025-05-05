@@ -1,21 +1,30 @@
 package com.example.auctionmarket.domain.auction.controller;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.example.auctionmarket.common.auth.AuthUser;
 import com.example.auctionmarket.common.response.Response;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionEndRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionSaveRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateMinPriceRequest;
 import com.example.auctionmarket.domain.auction.dto.request.AuctionUpdateTimeRequest;
-import com.example.auctionmarket.domain.auction.dto.response.AuctionPageResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionJoinResponse;
+import com.example.auctionmarket.domain.auction.dto.response.AuctionPageResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionResponse;
 import com.example.auctionmarket.domain.auction.dto.response.AuctionSaveResponse;
 import com.example.auctionmarket.domain.auction.service.AuctionService;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
