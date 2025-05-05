@@ -6,8 +6,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import com.example.auctionmarket.common.event.AuctionCreatedEvent;
 import com.example.auctionmarket.domain.auction.mapper.AuctionMapper;
+import com.example.auctionmarket.domain.payment.repository.PaymentRepository;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.auctionmarket.common.auth.AuthUser;
-import com.example.auctionmarket.common.websocket.WebSocketAuctionCreateRequest;
 import com.example.auctionmarket.common.websocket.WebSocketAuctionJoinRequest;
 import com.example.auctionmarket.common.websocket.WebSocketClient;
 import com.example.auctionmarket.domain.auction.document.AuctionDocument;
@@ -50,19 +52,21 @@ public class AuctionService {
     private final ProductRepository productRepository;
     private final PaymentService paymentService;
     private final WebSocketClient webSocketClient;
+    private final ApplicationEventPublisher eventPublisher;
+    private final PaymentRepository paymentRepository;
 
     @Transactional
-    public AuctionSaveResponse createAuction(AuthUser authUser, AuctionSaveRequest request){
+    public AuctionSaveResponse createAuction(AuthUser authUser, AuctionSaveRequest request) {
         //유저 예외처리
         User user = userRepository.findById(authUser.getId())
-                .orElseThrow(()->new UserNotFoundException());
+                .orElseThrow(() -> new UserNotFoundException());
 
         //입력한 상품이 없는 경우 예외처리
         Product product = productRepository.findById(request.getProductId())
-                .orElseThrow(()->new AuctionException(AuctionErrorCode.PRODUCT_NOT_FOUND));
+                .orElseThrow(() -> new AuctionException(AuctionErrorCode.PRODUCT_NOT_FOUND));
 
         //물품을 올린 사용자가 아닌 경우 불가
-        if(!Objects.equals(authUser.getId(), product.getUser().getId())){
+        if (!Objects.equals(authUser.getId(), product.getUser().getId())) {
             throw new AuctionException(AuctionErrorCode.NOT_AUCTION_OWNER);
         }
 
@@ -78,27 +82,19 @@ public class AuctionService {
 
         //OpenSearch 인덱싱 추가
         AuctionDocument document = AuctionDocument.builder()
-                        .id(auction.getId())
-                                .productName(auction.getProduct().getProductName())
-                                        .category(auction.getProduct().getCategory().name())
-                                                .minPrice(auction.getMinPrice())
-                                                        .startTime(auction.getStartTime().toString())
-                                                                .endTime(auction.getEndTime().toString())
-                                                                        .build();
+                .id(auction.getId())
+                .productName(auction.getProduct().getProductName())
+                .category(auction.getProduct().getCategory().name())
+                .minPrice(auction.getMinPrice())
+                .startTime(auction.getStartTime().toString())
+                .endTime(auction.getEndTime().toString())
+                .build();
 
         auctionOpenSearchService.save(document);
 
-        webSocketClient.createAuctionRoom(
-                new WebSocketAuctionCreateRequest(
-                        saveAuction.getId(),
-                        saveAuction.getProduct().getProductName(),
-                        saveAuction.getMinPrice(),
-                        saveAuction.getStartTime(),
-                        saveAuction.getEndTime()
-                )
+        eventPublisher.publishEvent(
+                new AuctionCreatedEvent(saveAuction)
         );
-
-        Duration ttl = Duration.between(LocalDateTime.now(), saveAuction.getEndTime());
 
         //저장한 경매 출력
         return new AuctionSaveResponse(
@@ -112,15 +108,14 @@ public class AuctionService {
                 saveAuction.getEndTime(),
                 saveAuction.getStatus(),
                 "http://localhost:8081/auction.html?auctionId=" + saveAuction.getId()
-
         );
     }
 
     //경매 전체 조회(redis)
     @Transactional(readOnly = true)
     @Cacheable(value = "auctions::list", key = "'page:'+#page+':size:'+#size", cacheManager = "redisCacheManager")
-    public AuctionPageResponse getAuctionsRedis(int page, int size){
-        Pageable pageable = PageRequest.of(page-1, size);
+    public AuctionPageResponse getAuctionsRedis(int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
         Page<Auction> auctions = auctionRepository.findAll(pageable);
 
         Page<AuctionResponse> responses = mapToAuctionResponsePage(auctions);
@@ -134,20 +129,18 @@ public class AuctionService {
         );
     }
 
-    //경매 입찰
+    //경매 참여
     @Transactional
-    public AuctionJoinResponse join(AuthUser authUser, Long auctionId){
+    public AuctionJoinResponse join(AuthUser authUser, Long auctionId) {
         User user = userRepository.findById(authUser.getId())
-                .orElseThrow(()->new UserNotFoundException());
-
-        String websocketUrl = "http://localhost:8081/internal/auction/join";
+                .orElseThrow(() -> new UserNotFoundException());
 
         Map<String, Object> request = new HashMap<>();
         request.put("auctionId", auctionId);
         request.put("nickname", authUser.getNickname());
 
         Auction auction = auctionRepository.findById(auctionId)
-                .orElseThrow(()->new AuctionException(AuctionErrorCode.AUCTION_NOT_FOUND));
+                .orElseThrow(() -> new AuctionException(AuctionErrorCode.AUCTION_NOT_FOUND));
 
         webSocketClient.joinAuctionRoom(
                 new WebSocketAuctionJoinRequest(
@@ -168,25 +161,25 @@ public class AuctionService {
 
     //경매 수정(시작 시간)
     @Transactional
-    public AuctionResponse updateAuctionStartTime(AuthUser authUser, Long auctionId, AuctionUpdateTimeRequest request){
+    public AuctionResponse updateAuctionStartTime(AuthUser authUser, Long auctionId, AuctionUpdateTimeRequest request) {
         //유저 예외처리
         User user = userRepository.findById(authUser.getId())
-                .orElseThrow(()->new UserNotFoundException());
+                .orElseThrow(() -> new UserNotFoundException());
 
         //경매 예외처리
         Auction auction = auctionRepository.findById(auctionId)
-                .orElseThrow(()->new AuctionException(AuctionErrorCode.AUCTION_NOT_FOUND));
+                .orElseThrow(() -> new AuctionException(AuctionErrorCode.AUCTION_NOT_FOUND));
 
         //경매를 올린 사용자가 아닌 경우 불가
-        if(!Objects.equals(authUser.getId(), auction.getProduct().getUser().getId())){
+        if (!Objects.equals(authUser.getId(), auction.getProduct().getUser().getId())) {
             throw new AuctionException(AuctionErrorCode.NOT_AUCTION_OWNER);
         }
 
-        if(auction.getStatus() == AuctionStatus.ONGOING){
+        if (auction.getStatus() == AuctionStatus.ONGOING) {
             throw new AuctionException(AuctionErrorCode.AUCTION_ALREADY_STARTED);
         }
 
-        if(auction.getStatus() == AuctionStatus.ENDED){
+        if (auction.getStatus() == AuctionStatus.ENDED) {
             throw new AuctionException(AuctionErrorCode.AUCTION_ALREADY_ENDED);
         }
 
@@ -216,24 +209,24 @@ public class AuctionService {
 
     //경매 수정(초기 가격)
     @Transactional
-    public AuctionResponse updateMinPrice(AuthUser authUser, Long auctionId, AuctionUpdateMinPriceRequest request){
+    public AuctionResponse updateMinPrice(AuthUser authUser, Long auctionId, AuctionUpdateMinPriceRequest request) {
         User user = userRepository.findById(authUser.getId())
-                .orElseThrow(()->new UserNotFoundException());
+                .orElseThrow(() -> new UserNotFoundException());
 
         //경매 예외처리
         Auction auction = auctionRepository.findById(auctionId)
-                .orElseThrow(()->new AuctionException(AuctionErrorCode.AUCTION_NOT_FOUND));
+                .orElseThrow(() -> new AuctionException(AuctionErrorCode.AUCTION_NOT_FOUND));
 
         //경매를 올린 사용자가 아닌 경우 불가
-        if(!Objects.equals(authUser.getId(), auction.getProduct().getUser().getId())){
+        if (!Objects.equals(authUser.getId(), auction.getProduct().getUser().getId())) {
             throw new AuctionException(AuctionErrorCode.NOT_AUCTION_OWNER);
         }
 
-        if(auction.getStatus() == AuctionStatus.ONGOING){
+        if (auction.getStatus() == AuctionStatus.ONGOING) {
             throw new AuctionException(AuctionErrorCode.AUCTION_ALREADY_STARTED);
         }
 
-        if(auction.getStatus() == AuctionStatus.ENDED){
+        if (auction.getStatus() == AuctionStatus.ENDED) {
             throw new AuctionException(AuctionErrorCode.AUCTION_ALREADY_ENDED);
         }
 
@@ -263,21 +256,21 @@ public class AuctionService {
 
     //경매 삭제
     @Transactional
-    public void deleteAuction(AuthUser authUser, Long auctionId){
+    public void deleteAuction(AuthUser authUser, Long auctionId) {
         User user = userRepository.findById(authUser.getId())
-                .orElseThrow(()->new UserNotFoundException());
+                .orElseThrow(() -> new UserNotFoundException());
 
         //경매 예외처리
         Auction auction = auctionRepository.findById(auctionId)
-                .orElseThrow(()->new AuctionException(AuctionErrorCode.AUCTION_NOT_FOUND));
+                .orElseThrow(() -> new AuctionException(AuctionErrorCode.AUCTION_NOT_FOUND));
 
         //경매를 올린 사용자가 아닌 경우 불가
-        if(!Objects.equals(authUser.getId(), auction.getProduct().getUser().getId())){
+        if (!Objects.equals(authUser.getId(), auction.getProduct().getUser().getId())) {
             throw new AuctionException(AuctionErrorCode.NOT_AUCTION_OWNER);
         }
 
         //경매 상태 확인
-        if(auction.getStatus() == AuctionStatus.ONGOING){
+        if (auction.getStatus() == AuctionStatus.ONGOING) {
             throw new AuctionException(AuctionErrorCode.AUCTION_ALREADY_STARTED);
         }
 
@@ -289,21 +282,21 @@ public class AuctionService {
 
     //경매 상태에 따른 시간 출력 함수
     @Transactional
-    public String remainingTimeOfAuctionStatus(AuctionStatus auctionStatus, LocalDateTime auctionEndTime){
+    public String remainingTimeOfAuctionStatus(AuctionStatus auctionStatus, LocalDateTime auctionEndTime) {
         String auctionMessage = new String();
 
         //경매 상태에 따른 출력 값 변경
-        if(auctionStatus == AuctionStatus.ONGOING){
+        if (auctionStatus == AuctionStatus.ONGOING) {
             //경매 남은 시간 계산
             Duration remaining = Duration.between(LocalDateTime.now(), auctionEndTime);
             auctionMessage = formatDuration(remaining);
         }
 
-        if(auctionStatus == AuctionStatus.PENDING){
+        if (auctionStatus == AuctionStatus.PENDING) {
             auctionMessage = "경매 진행 전입니다.";
         }
 
-        if(auctionStatus == AuctionStatus.ENDED){
+        if (auctionStatus == AuctionStatus.ENDED) {
             auctionMessage = "종료된 경매입니다.";
         }
 
@@ -312,20 +305,20 @@ public class AuctionService {
 
     //경매 남은 시간 출력 함수
     @Transactional
-    public String formatDuration(Duration duration){
+    public String formatDuration(Duration duration) {
         return String.format("%d일 %d시간 %d분",
                 duration.toDays(),
                 duration.toHoursPart(),
                 duration.toMinutesPart());
     }
 
-    public void endAuction (Long auctionId) {
+    public void endAuction(Long auctionId) {
         Auction auction = auctionRepository.findById(auctionId)
-                .orElseThrow(()->new AuctionException(AuctionErrorCode.AUCTION_NOT_FOUND));
+                .orElseThrow(() -> new AuctionException(AuctionErrorCode.AUCTION_NOT_FOUND));
         if (LocalDateTime.now().isAfter(auction.getEndTime())) {
             auction.updateStatus(AuctionStatus.ENDED);
 
-            if (auction.getConsumerId() != null && paymentService.shouldCreatePayment(auction.getId())) {
+            if (auction.getConsumerId() != null && !paymentRepository.existsByAuctionId(auction.getId())) {
                 paymentService.createPayment(auction.getId());
             }
 
@@ -334,8 +327,8 @@ public class AuctionService {
     }
 
     //조회 응답 공통 로직
-    private Page<AuctionResponse> mapToAuctionResponsePage(Page<Auction> auctions){
-        return auctions.map(auction ->{
+    private Page<AuctionResponse> mapToAuctionResponsePage(Page<Auction> auctions) {
+        return auctions.map(auction -> {
             String auctionMessage = remainingTimeOfAuctionStatus(auction.getStatus(), auction.getEndTime());
             return new AuctionResponse(
                     auction.getId(),
