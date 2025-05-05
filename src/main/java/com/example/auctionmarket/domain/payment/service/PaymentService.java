@@ -37,8 +37,8 @@ public class PaymentService {
 
     @Transactional
     public void createPayment(Long auctionId) {
-        Auction auction = auctionRepository.findById(auctionId).orElseThrow(
-                ()-> new PaymentException(PaymentErrorCode.NOT_FOUND_AUCTION)
+        Auction auction = auctionRepository.findById(auctionId)
+                .orElseThrow(() -> new PaymentException(PaymentErrorCode.NOT_FOUND_AUCTION)
         );
 
         Payment payment = Payment.builder()
@@ -48,12 +48,12 @@ public class PaymentService {
                 .amount(auction.getMaxPrice())
                 .deadline(LocalDateTime.now().plusDays(1))
                 .build();
-        paymentRepository.save(payment);
 
+        paymentRepository.save(payment);
     }
 
     @Transactional
-    public void confirmPayment (Long paymentId, PaymentRequest paymentRequest, AuthUser authUser) {
+    public void confirmPayment(Long paymentId, PaymentRequest paymentRequest, AuthUser authUser) {
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new PaymentException(PaymentErrorCode.NOT_FOUND_PAYMENT));
 
@@ -76,7 +76,7 @@ public class PaymentService {
         // 쿠폰 로직
         if (paymentRequest.getCouponId() != null) {
             CouponUser couponUser = couponUserRepository.findById(paymentRequest.getCouponId())
-                    .orElseThrow(()-> new PaymentException(PaymentErrorCode.NOT_FOUND_COUPON));
+                    .orElseThrow(() -> new PaymentException(PaymentErrorCode.NOT_FOUND_COUPON));
 
             // 쿠폰을 가지고 있는 지 확인
             if (!Objects.equals(couponUser.getUsers().getId(), authUser.getId())) {
@@ -100,37 +100,41 @@ public class PaymentService {
         payment.completePayment(payType);
 
         Auction auction = auctionRepository.findById(payment.getAuctionId())
-                .orElseThrow(()-> new PaymentException(PaymentErrorCode.NOT_FOUND_AUCTION));
+                .orElseThrow(() -> new PaymentException(PaymentErrorCode.NOT_FOUND_AUCTION));
 
         Product product = productRepository.findById(auction.getProduct().getId())
-                .orElseThrow(()-> new PaymentException(PaymentErrorCode.NOT_FOUND_PRODUCT));
+                .orElseThrow(() -> new PaymentException(PaymentErrorCode.NOT_FOUND_PRODUCT));
 
         product.updateSoldStatus(SoldStatus.SOLD);
     }
 
     @Transactional
-    public void refundPayment (Long paymentId, RefundRequest refundRequest, AuthUser authUser) {
+    public void refundPayment(Long paymentId, RefundRequest refundRequest, AuthUser authUser) {
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow(() -> new PaymentException(PaymentErrorCode.NOT_FOUND_PAYMENT));
+
+        Auction auction = auctionRepository.findById(payment.getAuctionId())
+                .orElseThrow(() -> new PaymentException(PaymentErrorCode.NOT_FOUND_AUCTION));
+
+        Product product = productRepository.findById(auction.getProduct().getId())
+                .orElseThrow(() -> new PaymentException(PaymentErrorCode.NOT_FOUND_PRODUCT));
 
         if (!Objects.equals(authUser.getId(), payment.getUserId())) {
             throw new PaymentException(PaymentErrorCode.NOT_REFUND_OWNER);
         }
+
+        // 환불가능 여부 확인
+        payment.canRefund();
 
         PayType refundType = PayType.of(refundRequest.getPayType());
         // 결제수단 불일치 확인
         if (payment.getPayType() != refundType) {
             throw new PaymentException(PaymentErrorCode.INVALID_PAY_TYPE);
         }
-        // 환불가능 여부 확인
-        payment.canRefund();
-
-        // 환불 처리
-        payment.refund();
 
         if (payment.isCouponUsed() && payment.getCouponUserId() != null) {
             CouponUser couponUser = couponUserRepository.findById(payment.getCouponUserId())
-                    .orElseThrow(()-> new PaymentException(PaymentErrorCode.NOT_FOUND_COUPON));
+                    .orElseThrow(() -> new PaymentException(PaymentErrorCode.NOT_FOUND_COUPON));
             couponUser.setUsed(false);
         }
 
@@ -144,16 +148,9 @@ public class PaymentService {
         refund.completeRefund(refundType, refundRequest.getDescription());
         refundRepository.save(refund);
 
-        Auction auction = auctionRepository.findById(payment.getAuctionId())
-                .orElseThrow(()-> new PaymentException(PaymentErrorCode.NOT_FOUND_AUCTION));
-
-        Product product = productRepository.findById(auction.getProduct().getId())
-                .orElseThrow(()-> new PaymentException(PaymentErrorCode.NOT_FOUND_PRODUCT));
-
         product.updateSoldStatus(SoldStatus.UNSOLD);
-    }
 
-    public boolean shouldCreatePayment(Long auctionId) {
-        return paymentRepository.findByAuctionId(auctionId).isEmpty();
+        // 환불 처리
+        payment.refund();
     }
 }

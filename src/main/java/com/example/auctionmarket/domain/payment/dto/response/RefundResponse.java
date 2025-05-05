@@ -4,6 +4,5 @@ import lombok.Getter;
 
 @Getter
 public class RefundResponse {
-
     private Long refundAmount;
 }

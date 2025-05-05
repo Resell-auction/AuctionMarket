@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 
 @Getter
 public class PaymentResponse {
-
     private Long amount;
     private LocalDateTime refundDeadline;
 }

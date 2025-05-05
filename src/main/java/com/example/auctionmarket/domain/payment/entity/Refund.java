@@ -11,17 +11,15 @@ import java.time.LocalDateTime;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-
 public class Refund {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private Long paymentId;
     private Long userId;
-
     private PayType payType;
     private String description;
-
     private LocalDateTime refundedAt;
 
     @Builder
@@ -38,5 +36,4 @@ public class Refund {
         this.description = description;
         this.payType = payType;
     }
-
 }
