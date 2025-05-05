@@ -20,8 +20,10 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @Entity
 @NoArgsConstructor
 @Table(name="coupons")
@@ -44,7 +46,7 @@ public class Coupon extends BaseEntity {
     private CouponStatus couponStatus;
 
     @Version
-    private Long version; // 낙관적 락을 위한 필드
+    private Long version; // 낙관적 락
 
     @Enumerated(EnumType.STRING)
     private CouponType couponType;

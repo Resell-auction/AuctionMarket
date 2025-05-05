@@ -1,0 +1,64 @@
+== 💳 빅쿼리(Bigquery)
+경매 빅데이터를 분석합니다.
+
+=== 시간별 평균 낙찰가
+
+//==== 🔗 GET `/v1/analytics/bigquery/hourly-average-bid`
+
+경매 시간별 평균 낙찰가의 빅데이터를 분석합니다.
+
+[.api-meta]
+|===
+| 메서드 | 경로 | 설명
+
+| GET
+| `/v1/analytics/bigquery/hourly-average-bid`
+| 경매 시간별 평균 낙찰가의 빅데이터 분석
+|===
+
+
+
+==== 요청 예시
+
+include::{snippets}/hourly-average-bid/http-request.adoc[]
+==== 응답 예시
+
+include::{snippets}/hourly-average-bid/http-response.adoc[]
+
+==== 응답 필드 설명
+
+include::{snippets}/hourly-average-bid/response-fields.adoc[]
+
+
+=== 일자별 평균 낙찰가
+
+//==== 🔗 GET `/v1/analytics/bigquery/daily-average-bid`
+
+경매 일자별 평균 낙찰가 빅데이터를 분석합니다.
+
+[.api-meta]
+|===
+| 메서드 | 경로 | 설명
+
+| GET
+| `/v1/analytics/bigquery/daily-average-bid`
+| 경매 일자별 평균 낙찰가 빅데이터를 분석
+|===
+
+==== 요청 예시
+include::{snippets}/daily-average-bid/http-request.adoc[]
+
+==== 응답 예시
+
+include::{snippets}/daily-average-bid/http-response.adoc[]
+
+==== 응답 필드 설명
+
+include::{snippets}/daily-average-bid/response-fields.adoc[]
+
+
+
+
+=== 빅쿼리 에러코드
+
+include::errorcode/bigquery-errorcode.adoc[]

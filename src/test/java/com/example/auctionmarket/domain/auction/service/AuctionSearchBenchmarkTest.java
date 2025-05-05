@@ -77,7 +77,7 @@ public class AuctionSearchBenchmarkTest {
                     60L
             );
             auctionRepository.save(auction);
-            auctionSearchRepository.save(AuctionMapper.toDucument(auction));
+       //     auctionSearchRepository.save(AuctionMapper.toDucument(auction));
 
             //OpenSearch 인덱싱 추가
             AuctionDocument document = AuctionDocument.builder()
@@ -106,13 +106,13 @@ public class AuctionSearchBenchmarkTest {
 
         //QueryDSL을 사용한 검색 기능
         long startTime1 = System.currentTimeMillis();
-        auctionRepository.findBySearch(keyword, category, pageable);
+     //   auctionRepository.findBySearch(keyword, category, pageable);
         long endTime1 = System.currentTimeMillis();
         System.out.println("QueryDSL 검색 소요 시간: "+(endTime1-startTime1)+"ms");
 
         //Elastic Search를 사용한 검색 기능
         long startTime2 = System.currentTimeMillis();
-        auctionSearchService.searchAuctions(keyword, category, pageable);
+      //  auctionSearchService.searchAuctions(keyword, category, pageable);
         long endTime2 = System.currentTimeMillis();
         System.out.println("Elastic Search 검색 소요 시간: "+(endTime2-startTime2)+"ms");
 

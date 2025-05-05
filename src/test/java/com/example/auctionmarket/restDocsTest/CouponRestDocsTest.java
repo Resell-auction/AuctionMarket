@@ -47,6 +47,7 @@ public class CouponRestDocsTest extends BaseRestDocsTest {
 
     @Test
     void 쿠폰_생성_RestDocsAPI() throws Exception {
+
         LocalDateTime expiredAt = LocalDateTime.parse("2025-05-05T00:00:00");
         CouponRequest couponRequest = new CouponRequest("couponName", "description", (long) 15.0, expiredAt, 100, CouponType.PERCENT);
 
@@ -64,7 +65,7 @@ public class CouponRestDocsTest extends BaseRestDocsTest {
                         .content(objectMapper.writeValueAsString(couponRequest)))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("post-coupon",
+                .andDo(document("coupon/post-coupon",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         responseFields(
@@ -84,6 +85,7 @@ public class CouponRestDocsTest extends BaseRestDocsTest {
 
     @Test
     void 쿠폰_단건_조회_RestDocsAPI() throws Exception {
+
         Long couponId = 1L;
         LocalDateTime expiredAt = LocalDateTime.parse("2025-05-05T00:00:00");
         given(couponService.findById(couponId))
@@ -95,7 +97,7 @@ public class CouponRestDocsTest extends BaseRestDocsTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("get-couponId",
+                .andDo(document("coupon/get-couponId",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         pathParameters(
@@ -115,6 +117,7 @@ public class CouponRestDocsTest extends BaseRestDocsTest {
 
     @Test
     void 쿠폰_목록_조회_RestDocsAPI() throws Exception {
+
         Long couponId = 1L;
         CouponResponse couponResponse = new CouponResponse(couponId, "couponName1", "회원가입 기념 쿠폰입니다.", 10.0, LocalDateTime.parse("2025-05-05T00:00:00"), 100);
         CouponResponse couponResponse2 = new CouponResponse(2L, "couponName2", "VIP회원 전용 쿠폰입니다.", 25.0, LocalDateTime.parse("2025-05-05T00:00:00"), 100);
@@ -127,7 +130,7 @@ public class CouponRestDocsTest extends BaseRestDocsTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("get-coupons",
+                .andDo(document("coupon/get-coupons",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         responseFields(
@@ -145,6 +148,7 @@ public class CouponRestDocsTest extends BaseRestDocsTest {
 
     @Test
     void 쿠폰_수정_RestDocsAPI() throws Exception {
+
         Long couponId = 1L;
         LocalDateTime expiredAt = LocalDateTime.parse("2025-05-05T00:00:00");
         CouponUpdateRequest couponUpdateRequest = new CouponUpdateRequest("couponName", "description", (long) 15.0, expiredAt);
@@ -161,7 +165,7 @@ public class CouponRestDocsTest extends BaseRestDocsTest {
                         .content(objectMapper.writeValueAsString(couponUpdateRequest)))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("update-coupon",
+                .andDo(document("coupon/update-coupon",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         responseFields(
@@ -177,6 +181,7 @@ public class CouponRestDocsTest extends BaseRestDocsTest {
 
     @Test
     void 쿠폰_삭제_RestDocsAPI() throws Exception {
+
         Long couponId = 1L;
 
         willDoNothing().given(couponService).deleteById(any(), anyLong());
@@ -185,13 +190,14 @@ public class CouponRestDocsTest extends BaseRestDocsTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("delete-coupon",
+                .andDo(document("coupon/delete-coupon",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint())));
     }
 
     @Test
     void 특정_유저에게_쿠폰_증정_RestDocsAPI() throws Exception {
+
         Long couponId = 1L;
 
         CouponGiveRequest couponGiveRequest = new CouponGiveRequest(1L, 100);
@@ -204,9 +210,26 @@ public class CouponRestDocsTest extends BaseRestDocsTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("give-coupons",
+                .andDo(document("coupon/give-coupons",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint())
                 ));
+    }
+
+    @Test
+    void 쿠폰_만료_RestDocsAPI() throws Exception {
+
+        Long couponId = 1L;
+
+        willDoNothing().given(couponService).expireCoupons();
+
+        mockMvc.perform(RestDocumentationRequestBuilders.post("/v1/coupons/expire")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andDo(document("coupon/expire-coupons",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint())));
+
     }
 }

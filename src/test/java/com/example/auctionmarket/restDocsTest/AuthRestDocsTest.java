@@ -41,7 +41,7 @@ public class AuthRestDocsTest extends BaseRestDocsTest{
                         .content(objectMapper.writeValueAsString(signupRequest)))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("signup-auth",
+                .andDo(document("auth/signup-auth",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         responseFields(
@@ -53,6 +53,7 @@ public class AuthRestDocsTest extends BaseRestDocsTest{
 
     @Test
     void 로그인_RestDocsAPI() throws Exception{
+
         SigninRequest signinRequest = new SigninRequest("abc@gmail.com","123asdQWE!@#");
 
         given(authService.signin(any(),any()))
@@ -64,7 +65,7 @@ public class AuthRestDocsTest extends BaseRestDocsTest{
                         .content(objectMapper.writeValueAsString(signinRequest)))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("signin-auth",
+                .andDo(document("auth/signin-auth",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         responseFields(

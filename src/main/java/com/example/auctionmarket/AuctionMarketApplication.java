@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 
 @SpringBootApplication
-@EnableJpaAuditing
+//@EnableJpaAuditing
 @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO)
 @EnableElasticsearchRepositories(basePackages = "com.example.auctionmarket.domain.auction.repository")
 public class AuctionMarketApplication {

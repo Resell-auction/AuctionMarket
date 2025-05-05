@@ -84,7 +84,7 @@ public class AuctionController {
         auctionService.deleteAuction(authUser, auctionId);
     }
 
-    @PostMapping("end")
+    @PostMapping("/end")
     public void handleAuctionEnd(@RequestBody AuctionEndRequest request) {
         auctionService.endAuction(request.auctionId);
     }

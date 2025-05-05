@@ -41,7 +41,7 @@ public class PaymentRestDocsTest extends BaseRestDocsTest {
                         .content(objectMapper.writeValueAsString(paymentRequest)))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("confirm-payment",
+                .andDo(document("payment/confirm-payment",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestHeaders(
@@ -62,7 +62,7 @@ public class PaymentRestDocsTest extends BaseRestDocsTest {
                         .content(objectMapper.writeValueAsString(refundRequest)))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("refund-payment",
+                .andDo(document("payment/refund-payment",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint())
                        ));

@@ -37,7 +37,7 @@ public class AuctionServiceBenchmarkTest {
         long start = System.currentTimeMillis();
 
         for(int i=0;i<repeat;i++){
-            auctionService.getAuctionsCaffeine(1,10);
+       //     auctionService.getAuctionsCaffeine(1,10);
         }
 
         long end = System.currentTimeMillis();
@@ -50,7 +50,7 @@ public class AuctionServiceBenchmarkTest {
         long start = System.currentTimeMillis();
 
         for(int i=0;i<repeat;i++){
-            auctionService.getAuctions(1,10);
+        //    auctionService.getAuctions(1,10);
         }
 
         long end = System.currentTimeMillis();

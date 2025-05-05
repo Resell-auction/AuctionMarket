@@ -12,7 +12,6 @@ import org.springframework.web.client.RestTemplate;
 
 @Component
 @RequiredArgsConstructor
-@Profile("prod")
 public class WebSocketClient {
 
     private final RestTemplate restTemplate;

@@ -4,7 +4,8 @@ import org.springframework.http.HttpStatus;
 
 import com.example.auctionmarket.common.exception.ErrorCode;
 
-enum AuthErrorCode implements ErrorCode {
+public enum AuthErrorCode implements ErrorCode {
+
 	TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "TOKEN_EXPIRED", "만료된 JWT 토큰 입니다."),
 	INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "INVALID_TOKEN", "유효하지 않은 JWT 토큰 입니다."),
 	INVALID_JWT_SIGNATURE(HttpStatus.UNAUTHORIZED, "INVALID_JWT_SIGNATURE", "유효하지 않는 JWT 서명입니다."),

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Setter;
 import org.apache.logging.log4j.message.ParameterizedMessage;
 
 import com.example.auctionmarket.common.entity.BaseEntity;
@@ -25,6 +26,7 @@ import lombok.Getter;
 
 @Entity
 @Getter
+@Setter
 @Table(name = "users")
 public class User extends BaseEntity {
 	@Id
