@@ -1,40 +1,37 @@
 package com.example.auctionmarket.common.websocket;
 
 import com.example.auctionmarket.domain.auction.dto.response.AuctionJoinResponse;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Component
 @RequiredArgsConstructor
 public class WebSocketClient {
 
-    private final RestTemplate restTemplate;
-
-    @Value("${WEBSOCKET.SERVER.URL}")
-    private String websocketUrl;
-
-    @PostConstruct
-    public void init() {
-        System.out.println("💡 WebSocket URL: " + websocketUrl);
-    }
+    private final WebClient webClient;
 
     public String createAuctionRoom(WebSocketAuctionCreateRequest request) {
-        String url = websocketUrl + "/internal/auction/start";
-        ResponseEntity<com.example.auctionmarket.common.websocket.WebSocketAuctionCreateResponse> response = restTemplate.postForEntity(url, request, com.example.auctionmarket.common.websocket.WebSocketAuctionCreateResponse.class);
-
-        return response.getBody().getWebsocketUrl();
+        return webClient.post()
+                .uri("/internal/auction/start")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(WebSocketAuctionCreateResponse.class)
+                .map(WebSocketAuctionCreateResponse::getWebsocketUrl)
+                .block();
     }
 
     public String joinAuctionRoom(WebSocketAuctionJoinRequest request) {
-        String url = websocketUrl + "/internal/auction/join";
-        ResponseEntity<AuctionJoinResponse> response = restTemplate.postForEntity(url, request, AuctionJoinResponse.class);
-
-        return response.getBody().getWebsocketUrl();
+        return webClient.post()
+                .uri("/internal/auction/join")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(AuctionJoinResponse.class)
+                .map(AuctionJoinResponse::getWebsocketUrl)
+                .block();
     }
 }

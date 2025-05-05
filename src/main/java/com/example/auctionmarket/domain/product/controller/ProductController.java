@@ -9,7 +9,6 @@ import com.example.auctionmarket.domain.product.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,8 +25,6 @@ public class ProductController {
             @AuthenticationPrincipal AuthUser authUser,
             @Valid @RequestBody ProductSaveRequest request
     ) {
-        System.out.println(authUser);
-
         return Response.of(productService.createProduct(authUser, request));
     }
 

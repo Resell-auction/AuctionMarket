@@ -14,10 +14,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Payment {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // 결제 아이디
 
-//    private Long orderId; // 결제 요청 아이디
     private Long userId; // 유저 아이디
     private Long auctionId; // 경매 아이디
     private Long couponUserId;
