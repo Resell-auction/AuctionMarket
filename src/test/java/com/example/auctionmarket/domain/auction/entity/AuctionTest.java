@@ -31,8 +31,7 @@ public class AuctionTest {
     }
 
     @Test
-    @DisplayName("생성자 테스트")
-    public void auctionTest(){
+    public void 생성자_테스트(){
         assertThat(auction).isNotNull();
         assertThat(auction.getProduct()).isEqualTo(testProduct);
         assertThat(auction.getMinPrice()).isEqualTo(10000L);
@@ -45,72 +44,67 @@ public class AuctionTest {
     }
 
     @Test
-    @DisplayName("입찰 가격 증가")
-    public void increaseMaxPrice_Success(){
-        //given
+    public void 입찰_가격_증가(){
+        // given
         Long consumerId = 1L;
         Long newBidPrice = 15000L;
 
-        //when
+        // when
         auction.increaseMaxPrice(consumerId, newBidPrice);
 
-        //then
+        // then
         assertThat(auction.getMaxPrice()).isEqualTo(newBidPrice);
         assertThat(auction.getConsumerId()).isEqualTo(consumerId);
     }
 
     @Test
-    @DisplayName("입찰 가격 증가 예외처리")
-    public void increaseMaxPrice_Fail(){
-        //given
+    public void 입찰_가격_증가_예외처리(){
+        // iven
         Long consumerId = 1L;
         Long initialMaxPrice = auction.getMaxPrice();
         Long invalidBidPrice = initialMaxPrice-1000L;
 
-        //when & then
+        // when & then
         assertThatThrownBy(()->auction.increaseMaxPrice(consumerId, invalidBidPrice))
                 .isInstanceOf(AuctionException.class)
                 .hasMessageContaining(AuctionErrorCode.INVALID_BID_PRICE.getDefaultMessage());
     }
 
     @Test
-    @DisplayName("시작 시간 수정")
-    public void updateStartTime_Success(){
-        //given
+    public void 시작_시간_수정(){
+        // given
         LocalDateTime newStartTime = LocalDateTime.now().plusHours(2);
 
-        //when
+        // when
         auction.updateStartTime(newStartTime);
 
-        //then
+        // then
         assertThat(auction.getStartTime()).isEqualTo(newStartTime);
         assertThat(auction.getEndTime()).isEqualTo(newStartTime.plusMinutes(30));
     }
 
     @Test
-    @DisplayName("최소 가격 수정")
-    public void updateMinPrice_Success(){
-        //given
+    public void 최소_가격_수정(){
+        // given
         Long newMinPrice = 20000L;
 
-        //when
+        // when
         auction.updateMinPrice(newMinPrice);
 
-        //then
+        // then
         assertThat(auction.getMinPrice()).isEqualTo(newMinPrice);
         assertThat(auction.getMaxPrice()).isEqualTo(newMinPrice);
     }
 
     @Test
-    @DisplayName("상태 변화")
-    public void updateStatus_Success(){
-        //given
+    public void 상태_변화(){
+        // given
         AuctionStatus newStatus = AuctionStatus.ONGOING;
 
-        //when
+        // when
         auction.updateStatus(newStatus);
 
-        //then
+        // then
         assertThat(auction.getStatus()).isEqualTo(newStatus);
     }
 }
