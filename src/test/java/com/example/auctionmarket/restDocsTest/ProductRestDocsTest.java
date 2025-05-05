@@ -5,15 +5,14 @@ import com.example.auctionmarket.domain.product.dto.request.ProductSaveRequest;
 import com.example.auctionmarket.domain.product.dto.request.ProductUpdateRequest;
 import com.example.auctionmarket.domain.product.dto.response.ProductResponse;
 import com.example.auctionmarket.domain.product.service.ProductService;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.List;
 
@@ -24,7 +23,6 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.headerWit
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -33,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(ProductController.class)
 public class ProductRestDocsTest extends BaseRestDocsTest {
 
-    @MockBean
+    @MockitoBean
     private ProductService productService;
 
     @Test
@@ -51,7 +49,7 @@ public class ProductRestDocsTest extends BaseRestDocsTest {
                         .content(objectMapper.writeValueAsString(productSaveRequest)))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("post-product",
+                .andDo(document("product/post-product",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         responseFields(
@@ -77,7 +75,7 @@ public class ProductRestDocsTest extends BaseRestDocsTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("get-product",
+                .andDo(document("product/get-product",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         responseFields(
@@ -85,15 +83,17 @@ public class ProductRestDocsTest extends BaseRestDocsTest {
                                 fieldWithPath("data.productName").description("상품명"),
                                 fieldWithPath("data.productContent").description("상품 상세 설명"),
                                 fieldWithPath("data.category").description("상품 카테고리"),
-                                fieldWithPath("data.soldStatus").description("상품 판매 상태 (예: 판매중, 판매완료)")
+                                fieldWithPath("data.soldStatus").description("상품 판매 상태")
                         )));
-
     }
 
     @Test
     void 상품_전체_조회_RestDocsAPI() throws Exception {
-        ProductResponse productResponse = new ProductResponse(1L, "신발1", "설명1", "CLOTHES", "UNSOLD");
-        Page<ProductResponse> result = new PageImpl<>(List.of(productResponse, productResponse),  PageRequest.of(1, 10), 2);
+
+        ProductResponse productResponse = new ProductResponse(1L, "신발1", "설명1", "SHOSE", "UNSOLD");
+        ProductResponse productResponse2 = new ProductResponse(2L, "상의1", "설명1", "CLOTHES", "UNSOLD");
+
+        Page<ProductResponse> result = new PageImpl<>(List.of(productResponse, productResponse2),  PageRequest.of(1, 10), 2);
 
         given(productService.getAllProducts(any(),anyInt(),anyInt()))
                 .willReturn(result);
@@ -102,7 +102,7 @@ public class ProductRestDocsTest extends BaseRestDocsTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("get-allproducts",
+                .andDo(document("product/get-allproducts",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         responseFields(
@@ -120,6 +120,39 @@ public class ProductRestDocsTest extends BaseRestDocsTest {
     }
 
     @Test
+    void 상품_검색_RestDocsAPI() throws Exception {
+
+        ProductResponse productResponse = new ProductResponse(1L, "신발1", "설명1", "SHOSE", "UNSOLD");
+        ProductResponse productResponse2 = new ProductResponse(2L, "상의1", "설명1", "CLOTHES", "UNSOLD");
+
+        Page<ProductResponse> result = new PageImpl<>(List.of(productResponse, productResponse2),  PageRequest.of(1, 10), 2);
+
+        given(productService.searchProducts(any(),any(), anyInt(), anyInt(), any()))
+                .willReturn(result);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/v1/products/search")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andDo(document("product/search-products",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("data[].id").description("상품의 고유 ID"),
+                                fieldWithPath("data[].productName").description("상품명"),
+                                fieldWithPath("data[].productContent").description("상품 상세 설명"),
+                                fieldWithPath("data[].category").description("상품 카테고리"),
+                                fieldWithPath("data[].soldStatus").description("상품 판매 상태"),
+                                fieldWithPath("totalPages").description("전체 페이지 수"),
+                                fieldWithPath("totalElements").description("전체 데이터 수"),
+                                fieldWithPath("pageSize").description("페이지당 데이터 수"),
+                                fieldWithPath("pageNumber").description("현재 페이지 번호")
+                        )
+                ));
+    }
+
+    @Test
     void 상품_정보_수정_RestDocsAPI() throws Exception {
 
         ProductUpdateRequest productUpdateRequest = new ProductUpdateRequest("수정된 상품","수정된 상품설명","BAG");
@@ -133,7 +166,7 @@ public class ProductRestDocsTest extends BaseRestDocsTest {
                         .content(objectMapper.writeValueAsString(productUpdateRequest)))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("update-product",
+                .andDo(document("product/update-product",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         responseFields(
@@ -141,7 +174,7 @@ public class ProductRestDocsTest extends BaseRestDocsTest {
                                 fieldWithPath("data.productName").description("상품명"),
                                 fieldWithPath("data.productContent").description("상품 상세 설명"),
                                 fieldWithPath("data.category").description("상품 카테고리"),
-                                fieldWithPath("data.soldStatus").description("상품 판매 상태 (예: 판매중, 판매완료)")
+                                fieldWithPath("data.soldStatus").description("상품 판매 상태")
                         )));
     }
 
@@ -154,7 +187,7 @@ public class ProductRestDocsTest extends BaseRestDocsTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("delete-product"));
+                .andDo(document("product/delete-product"));
 
     }
 }

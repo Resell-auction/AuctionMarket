@@ -12,8 +12,4 @@ import java.util.Optional;
 
 public interface CouponUserRepository extends JpaRepository<CouponUser, Long> {
 
-//    @Lock(LockModeType.PESSIMISTIC_WRITE)
-//    @Query("SELECT c FROM Coupon c WHERE c.id = :id")
-//    Optional<Coupon> findByIdWithPessimisticLock(@Param("id") Long id);
-
 }

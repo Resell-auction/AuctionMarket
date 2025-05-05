@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 public class CouponRequest {
+
     private String couponName;
 
     private String description;
@@ -20,8 +21,5 @@ public class CouponRequest {
     private int amount;
 
     private CouponType couponType;
-
-    public CouponRequest() {} // ✅ 기본 생성자 추가
-
 
 }

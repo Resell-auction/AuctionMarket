@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
 public class CouponUpdateRequest {
+    
     private String couponName;
 
     private String description;
@@ -16,5 +17,4 @@ public class CouponUpdateRequest {
 
     private LocalDateTime expiredAt;
 
-    public CouponUpdateRequest() {}
 }

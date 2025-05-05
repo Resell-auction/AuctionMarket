@@ -23,13 +23,13 @@ Security Filter로 인증/인가 기능이 제외됩니다.
 
 ==== 요청 예시
 
-include::{snippets}/signup-auth/http-request.adoc[]
+include::{snippets}/auth/signup-auth/http-request.adoc[]
 ==== 응답 예시
 
-include::{snippets}/signup-auth/http-response.adoc[]
+include::{snippets}/auth/signup-auth/http-response.adoc[]
 ==== 응답 필드 설명
 
-include::{snippets}/signup-auth/response-fields.adoc[]
+include::{snippets}/auth/signup-auth/response-fields.adoc[]
 
 === 로그인
 
@@ -47,12 +47,19 @@ include::{snippets}/signup-auth/response-fields.adoc[]
 |===
 
 ==== 요청 예시
-include::{snippets}/signin-auth/http-request.adoc[]
+include::{snippets}/auth/signin-auth/http-request.adoc[]
 
 ==== 응답 예시
 
-include::{snippets}/signin-auth/http-response.adoc[]
+include::{snippets}/auth/signin-auth/http-response.adoc[]
 
 ==== 응답 필드 설명
 
-include::{snippets}/signin-auth/response-fields.adoc[]
+include::{snippets}/auth/signin-auth/response-fields.adoc[]
+
+
+
+
+=== 인증 에러코드
+
+include::errorcode/auth-errorcode.adoc[]

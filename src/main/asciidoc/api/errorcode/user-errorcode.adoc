@@ -1,0 +1,11 @@
+|===
+| HTTP Status | Error Code | Message
+| 404 Not Found | USER_NOT_FOUND | User를 찾을 수 없습니다.
+| 400 Bad Request | ALREADY_DEACTIVATED | 이미 탈퇴한 회원 입니다.
+| 400 Bad Request | SAME_PASSWORD_CHANGE | 동일한 비밀번호로 변경할 수 없습니다.
+| 400 Bad Request | INVALID_USER_ROLE | 유효하지 않은 Role 입니다.
+| 400 Bad Request | INVALID_PASSWORD | 유효하지 않은 비밀번호 입니다.
+| 400 Bad Request | EMAIL_NOT_FOUND | 존재하지 않는 이메일 입니다.
+| 400 Bad Request | EMAIL_ACCESS_DENIED | 접근할 수 없는 이메일 입니다.
+| 400 Bad Request | ALREADY_EXISTS_EMAIL | 이미 사용 중인 이메일 입니다.
+|===

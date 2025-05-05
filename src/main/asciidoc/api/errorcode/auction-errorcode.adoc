@@ -1,0 +1,11 @@
+|===
+| HTTP Status | Error Code | Message
+| 404 Not Found | AUCTION_NOT_FOUND | 경매를 찾을 수 없습니다.
+| 404 Not Found | PRODUCT_NOT_FOUND | 상품을 찾을 수 없습니다.
+| 400 Bad Request | NOT_AUCTION_OWNER | 경매 소유자만 접근할 수 있습니다.
+| 400 Bad Request | AUCTION_NOT_STARTED | 경매가 시작되지 않았습니다.
+| 400 Bad Request | AUCTION_ALREADY_STARTED | 이미 시작된 경매는 수정할 수 없습니다.
+| 400 Bad Request | AUCTION_ALREADY_ENDED | 이미 종료된 경매입니다.
+| 400 Bad Request | INVALID_BID_PRICE | 유효하지 않은 입찰 가격입니다.
+| 400 Bad Request | SELF_BID_NOT_ALLOWED | 자신의 상품에는 입찰할 수 없습니다.
+|===

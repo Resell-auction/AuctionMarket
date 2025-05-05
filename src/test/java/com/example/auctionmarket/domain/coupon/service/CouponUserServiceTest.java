@@ -1,12 +1,17 @@
-package com.example.auctionmarket.domain.coupon.service;
+
+
+
+package com.example.auctionmarket.coupons;
 
 import com.example.auctionmarket.common.auth.AuthUser;
 import com.example.auctionmarket.domain.coupon.dto.CouponGiveRequest;
 import com.example.auctionmarket.domain.coupon.entity.Coupon;
+import com.example.auctionmarket.domain.coupon.entity.CouponUser;
 import com.example.auctionmarket.domain.coupon.enums.CouponType;
 import com.example.auctionmarket.domain.coupon.exception.CouponException;
 import com.example.auctionmarket.domain.coupon.repository.CouponRepository;
 import com.example.auctionmarket.domain.coupon.repository.CouponUserRepository;
+import com.example.auctionmarket.domain.coupon.service.CouponUserService;
 import com.example.auctionmarket.domain.user.entity.User;
 import com.example.auctionmarket.domain.user.enums.Role;
 import com.example.auctionmarket.domain.user.repository.UserRepository;
@@ -46,19 +51,19 @@ public class CouponUserServiceTest {
     @Test
     void 쿠폰_증정_성공(){
         LocalDateTime expiredAt = LocalDateTime.parse("2025-05-05T00:00:00");
-        CouponGiveRequest couponGiveRequest= new CouponGiveRequest(1L,4);
+        CouponGiveRequest couponGiveRequest= new CouponGiveRequest(1L,1);
         AuthUser authUser = new AuthUser(1L,"abc@naver.com", Role.ADMIN,"nickname");
         Coupon coupon = new Coupon("coupon1","description1",10L,expiredAt,10, CouponType.PERCENT);
         User user = Mockito.mock(User.class);
-    //    CouponUser couponUser = new CouponUser(1L, user, coupon, CouponType.PERCENT, false);
+        //    CouponUser couponUser = new CouponUser(1L, user, coupon, CouponType.PERCENT, false);
 
         given(couponRepository.findById(1L)).willReturn(Optional.of(coupon));
         given(userRepository.findById(1L)).willReturn(Optional.of(user));
 
         couponUserService.giveCouponByUserId(authUser, 1L, couponGiveRequest);
 
-        assertThat(coupon.getAmount()).isEqualTo(6);
-    //    assertThat(couponUser).isNotNull();
+        assertThat(coupon.getAmount()).isEqualTo(9);
+        //    assertThat(couponUser).isNotNull();
     }
 
     @Test

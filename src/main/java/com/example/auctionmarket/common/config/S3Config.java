@@ -7,10 +7,10 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
 public class S3Config {
-
     // @Value: application.properties 에 있는 값을 주입
     @Value("${cloud.aws.credentials.access-key}")
     private String accessKey;
