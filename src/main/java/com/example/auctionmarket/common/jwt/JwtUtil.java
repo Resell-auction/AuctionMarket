@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.example.auctionmarket.domain.user.enums.Role;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -15,6 +14,7 @@ import org.springframework.util.StringUtils;
 import com.example.auctionmarket.domain.auth.exception.InvalidTokenException;
 import com.example.auctionmarket.domain.auth.exception.TokenNotFoundException;
 import com.example.auctionmarket.domain.user.entity.User;
+import com.example.auctionmarket.domain.user.enums.Role;
 import com.example.auctionmarket.domain.user.exception.UserNotFoundException;
 import com.example.auctionmarket.domain.user.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,7 +24,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +36,6 @@ public class JwtUtil {
 	private static final String BEARER_PREFIX = "Bearer ";
 	private static final long ACCESS_TOKEN_TIME = 60 * 60 * 1000L; // 60분
 	private static final long REFRESH_TOKEN_TIME = 60 * 60 * 24 * 1000L; // 1일
-//	private static final long REFRESH_TOKEN_TIME = 30 * 1000L;
 
 	@Value("${jwt.secret.key}")
 	private String secretKey;
@@ -121,8 +119,6 @@ public class JwtUtil {
 			throw new InvalidTokenException();
 		}
 	}
-
-
 
 	public void reissueRefreshToken(String accessToken, HttpServletResponse response) throws IOException {
 		// 새로 생성하여 재발급

@@ -1,20 +1,12 @@
+package com.example.auctionmarket.domain.coupon.service;
 
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.*;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
 
-package com.example.auctionmarket.coupons;
-
-import com.example.auctionmarket.common.auth.AuthUser;
-import com.example.auctionmarket.domain.coupon.dto.CouponGiveRequest;
-import com.example.auctionmarket.domain.coupon.entity.Coupon;
-import com.example.auctionmarket.domain.coupon.entity.CouponUser;
-import com.example.auctionmarket.domain.coupon.enums.CouponType;
-import com.example.auctionmarket.domain.coupon.exception.CouponException;
-import com.example.auctionmarket.domain.coupon.repository.CouponRepository;
-import com.example.auctionmarket.domain.coupon.repository.CouponUserRepository;
-import com.example.auctionmarket.domain.coupon.service.CouponUserService;
-import com.example.auctionmarket.domain.user.entity.User;
-import com.example.auctionmarket.domain.user.enums.Role;
-import com.example.auctionmarket.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,12 +15,16 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.BDDMockito.given;
+import com.example.auctionmarket.common.auth.AuthUser;
+import com.example.auctionmarket.domain.coupon.dto.CouponGiveRequest;
+import com.example.auctionmarket.domain.coupon.entity.Coupon;
+import com.example.auctionmarket.domain.coupon.enums.CouponType;
+import com.example.auctionmarket.domain.coupon.exception.CouponException;
+import com.example.auctionmarket.domain.coupon.repository.CouponRepository;
+import com.example.auctionmarket.domain.coupon.repository.CouponUserRepository;
+import com.example.auctionmarket.domain.user.entity.User;
+import com.example.auctionmarket.domain.user.enums.Role;
+import com.example.auctionmarket.domain.user.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class CouponUserServiceTest {

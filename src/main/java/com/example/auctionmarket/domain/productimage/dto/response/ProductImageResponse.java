@@ -1,6 +1,7 @@
 package com.example.auctionmarket.domain.productimage.dto.response;
 
 import com.example.auctionmarket.domain.productimage.entity.ProductImage;
+
 import lombok.Getter;
 
 @Getter

@@ -20,10 +20,8 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
-@Setter
 @Entity
 @NoArgsConstructor
 @Table(name="coupons")
@@ -73,10 +71,6 @@ public class Coupon extends BaseEntity {
 
     public void expiredCoupon(){
         this.couponStatus=CouponStatus.EXPIRED;
-    }
-
-    public void setUsers(CouponUser couponUser){
-        couponUserList.add(couponUser);
     }
 
     public void assignUniqueCoupon(){

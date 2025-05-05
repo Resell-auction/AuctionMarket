@@ -3,6 +3,7 @@ package com.example.auctionmarket.domain.user.service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
 import com.example.auctionmarket.domain.user.dto.MyPageResponse;
 import com.example.auctionmarket.domain.user.dto.UserResponse;
 import com.example.auctionmarket.domain.user.entity.User;
@@ -11,6 +12,7 @@ import com.example.auctionmarket.domain.user.exception.SamePasswordChangeExcepti
 import com.example.auctionmarket.domain.user.exception.UserAlreadyDeactivatedException;
 import com.example.auctionmarket.domain.user.exception.UserNotFoundException;
 import com.example.auctionmarket.domain.user.repository.UserRepository;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 

@@ -5,15 +5,17 @@ import com.example.auctionmarket.domain.coupon.enums.CouponType;
 import com.example.auctionmarket.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
-@Setter
 @Entity
 @NoArgsConstructor
 @Table(name="couponusers")
+@Builder
+@AllArgsConstructor
 public class CouponUser extends BaseEntity {
 
     @Id
@@ -32,4 +34,12 @@ public class CouponUser extends BaseEntity {
     private CouponType couponType;
 
     private boolean used = false;
+
+    public void markAsUsed() {
+        this.used = true;
+    }
+
+    public void markAsUnused() {
+        this.used = false;
+    }
 }

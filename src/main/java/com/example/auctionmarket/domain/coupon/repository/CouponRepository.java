@@ -1,8 +1,9 @@
 package com.example.auctionmarket.domain.coupon.repository;
 
-import com.example.auctionmarket.domain.coupon.entity.Coupon;
-import com.example.auctionmarket.domain.coupon.enums.CouponStatus;
-import jakarta.persistence.LockModeType;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
@@ -10,9 +11,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import com.example.auctionmarket.domain.coupon.entity.Coupon;
+import com.example.auctionmarket.domain.coupon.enums.CouponStatus;
+
+import jakarta.persistence.LockModeType;
 
 public interface CouponRepository extends JpaRepository<Coupon, Long> {
 
@@ -28,5 +30,4 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT c FROM Coupon c WHERE c.id = :id")
     Optional<Coupon> findByIdWithPessimisticLock(@Param("id") Long id);
-
 }

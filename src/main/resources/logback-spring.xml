@@ -1,48 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <!--    application.properties/yml 에 정의된 속성 값을 Logback 설정에서 사용할 수 있게 해줌-->
-    <!--    로그 파일이 저장될 경로(LOG_PATH)와 로그 파일의 기본 이름(LOG_FILE)을 설정-->
     <springProperty scope="context" name="LOG_PATH" source="logging.file.path" defaultValue="./logs"/>
     <springProperty scope="context" name="LOG_FILE" source="logging.file.name" defaultValue="auction-market"/>
     <springProperty scope="context" name="springAppName" source="spring.application.name" defaultValue="auction-market"/>
 
-    <!--    appender: 로그를 어디에, 어떤 형식으로 출력할지를 정의하는 컴포넌트-->
-    <!--    CONSOLE: 지정된 패턴 형식으로 로그를 콘솔 화면에 출력-->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
-    <!--    FILE_JSON: 로그를 지정된 경로에 JSON 형식으로 기록-->
     <appender name="FILE_JSON" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_PATH}/${LOG_FILE}.json.log</file>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!--            .gz 파일(gzip)로 압축-->
             <fileNamePattern>${LOG_PATH}/${LOG_FILE}.json.log.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>100MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
-            <!--            전체 용량을 3GB 으로 제한 => 3GB 초과시, 옛날 로그 부터 삭제-->
             <maxHistory>30</maxHistory>
             <totalSizeCap>3GB</totalSizeCap>
         </rollingPolicy>
 
-        <!--        JSON 로그 형식을 상세하게 정의-->
-        <!--        <timeZone>Asia/Seoul</timeZone>: 시간대를 서울로 설정 => KST-->
-        <!--        level: 로그 레벨 (심각도) => DEBUG, INFO, WARN, ERROR 등-->
-        <!--        :- => 없으면 빈 문자열 넣으라는 뜻-->
-        <!--        service: 로그를 발생시킨 스프링 부트 애플리케이션 이름-->
-        <!--        pid: 프로세스 id-->
-        <!--        thread: 스레드 이름-->
-        <!--        logger: 로거 이름 => 보통 로그를 호출한 클래스의 이름-->
-        <!--        message: 개발자가 기록한 실제 로그 메시지 내용-->
-        <!--        stack_trace: Exception 발생 시 스택 트레이스 정보 => 최대 10줄-->
-        <!--        mdc/: MDC(Mapped Diagnostic Context) 정보를 JSON 에 포함-->
-        <!--        => 요청 처리와 같이 특정 작업 단위별로 컨텍스트 정보(사용자 ID, 요청 고유 ID, 세션 ID 등)를-->
-        <!--        로그에 쉽게 추가할 수 있게 해주는 Logback 기능-->
         <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
             <providers>
                 <timestamp>
@@ -95,18 +75,10 @@
         </encoder>
     </appender>
 
-    <!--    어떤 패키지, 클래스에서 발생하는 로그를 어떤 레벨 이상으로, 어떤 Appender 를 통해 출력할지 결정-->
-
-    <!--    <root>: 루트 로거 => 모든 로거의 최상위 로거, 별도로 설정되지 않은 모든 클래스의 로그-->
-    <!--    level="INFO": INFO 레벨 이상의 로그(INFO, WARN, ERROR)만 처리하도록 설정-->
-    <!--    => DEBUG 레벨은 처리 X-->
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE_JSON"/> </root>
 
-    <!--    logger: 해당 패키지 및 그 하위 패키지에 속한 클래스들의 로그-->
-    <!--    => com.example.auctionmarket 패키지 관련 로그를 DEBUG 레벨까지 상세하게 기록-->
-    <!--    additivity="false": 이 로거에서 처리된 로그가 상위 로거(루트 로거)에게 전파되지 않게 설정-->
     <logger name="com.example.auctionmarket" level="DEBUG" additivity="false">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE_JSON"/>

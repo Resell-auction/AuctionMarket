@@ -3,9 +3,6 @@ package com.example.auctionmarket.common.exception;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.auctionmarket.domain.auction.exception.AuctionException;
-import com.example.auctionmarket.domain.product.exception.ProductException;
-import com.example.auctionmarket.domain.productimage.exception.ProductImageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -16,6 +13,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.example.auctionmarket.common.response.ErrorResponse;
 import com.example.auctionmarket.common.response.ValidResponse;
+import com.example.auctionmarket.domain.auction.exception.AuctionException;
+import com.example.auctionmarket.domain.product.exception.ProductException;
+import com.example.auctionmarket.domain.productimage.exception.ProductImageException;
 
 import lombok.extern.slf4j.Slf4j;
 

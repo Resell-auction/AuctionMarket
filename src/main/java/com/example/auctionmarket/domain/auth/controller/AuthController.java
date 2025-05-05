@@ -3,12 +3,14 @@ package com.example.auctionmarket.domain.auth.controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.example.auctionmarket.common.response.Response;
 import com.example.auctionmarket.domain.auth.dto.LoginResponse;
 import com.example.auctionmarket.domain.auth.dto.SigninRequest;
 import com.example.auctionmarket.domain.auth.dto.SignupRequest;
 import com.example.auctionmarket.domain.auth.dto.SignupResponse;
 import com.example.auctionmarket.domain.auth.service.AuthService;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 

@@ -1,7 +1,6 @@
 package com.example.auctionmarket.domain.auction.exception;
 
 import com.example.auctionmarket.common.exception.ErrorCode;
-import org.springframework.http.HttpStatus;
 
 public class AuctionException extends RuntimeException{
 

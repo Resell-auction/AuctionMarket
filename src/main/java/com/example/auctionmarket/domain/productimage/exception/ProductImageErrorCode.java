@@ -1,7 +1,8 @@
 package com.example.auctionmarket.domain.productimage.exception;
 
-import com.example.auctionmarket.common.exception.ErrorCode;
 import org.springframework.http.HttpStatus;
+
+import com.example.auctionmarket.common.exception.ErrorCode;
 
 public enum ProductImageErrorCode implements ErrorCode {
 
