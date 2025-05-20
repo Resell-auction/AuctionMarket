@@ -115,7 +115,7 @@
 ## 🧱[와이어프레임](https://docs.google.com/presentation/d/1J85rLEqN8q-g5gu4F7oyU-kvXNy68qDt/edit#slide=id.p6)
 <br>
 
-## 📰[API 명세서](https://www.notion.so/API-1e73dcf2500780479a9dd06e715e0f33?pvs=4)
+## 📰[API 명세서](https://sixth-hexagon-629.notion.site/API-1e73dcf2500780479a9dd06e715e0f33?pvs=4)
 <br>
 
 [RestDocs API](http://auction-market-restdocs-api-bucket.s3-website.ap-northeast-2.amazonaws.com/)
@@ -131,7 +131,7 @@
 
 <br>
 
-## 🧭[기술적 의사결정](https://www.notion.so/1e83dcf250078033b6facf83fbd65b47?pvs=4)
+## 🧭[기술적 의사결정](https://sixth-hexagon-629.notion.site/1e83dcf250078033b6facf83fbd65b47?pvs=4)
 <details>
 <summary>💎 <strong>Terraform 도입 이유</strong></summary>
 
@@ -303,7 +303,7 @@
 | 수평 확장 고려                       | 상태 공유 + 브로드캐스트 확장성 보장     |
 </details>
 
-## 🚨[트러블 슈팅](https://www.notion.so/1e83dcf2500780b5bfb6f714fdc30c23?pvs=4)
+## 🚨[트러블 슈팅](https://sixth-hexagon-629.notion.site/1e83dcf2500780b5bfb6f714fdc30c23?pvs=4)
 <details>
 <summary>🔎 <strong>트랜잭션 커밋 전 실시간 경매방이 생성되는 문제</strong></summary>
 
