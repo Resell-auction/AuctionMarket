@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.example.auctionmarket.common.event.AuctionCreatedEvent;
+import com.example.auctionmarket.domain.auction.dto.request.AuctionEndRequest;
 import com.example.auctionmarket.domain.auction.mapper.AuctionMapper;
 import com.example.auctionmarket.domain.payment.repository.PaymentRepository;
 import org.springframework.cache.annotation.Cacheable;
@@ -145,6 +146,7 @@ public class AuctionService {
         webSocketClient.joinAuctionRoom(
                 new WebSocketAuctionJoinRequest(
                         auction.getId(),
+                        user.getId(),
                         user.getNickname()
                 )
         );
@@ -312,11 +314,11 @@ public class AuctionService {
                 duration.toMinutesPart());
     }
 
-    public void endAuction(Long auctionId) {
-        Auction auction = auctionRepository.findById(auctionId)
+    public void endAuction(AuctionEndRequest request) {
+        Auction auction = auctionRepository.findById(request.auctionId())
                 .orElseThrow(() -> new AuctionException(AuctionErrorCode.AUCTION_NOT_FOUND));
         if (LocalDateTime.now().isAfter(auction.getEndTime())) {
-            auction.updateStatus(AuctionStatus.ENDED);
+            auction.end(request.consumerId(), request.amount());
 
             if (auction.getConsumerId() != null && !paymentRepository.existsByAuctionId(auction.getId())) {
                 paymentService.createPayment(auction.getId());

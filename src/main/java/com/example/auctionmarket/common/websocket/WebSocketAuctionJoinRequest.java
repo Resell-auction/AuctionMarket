@@ -9,5 +9,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class WebSocketAuctionJoinRequest {
     private Long auctionId;
+    private Long consumerId;
     private String nickname;
 }

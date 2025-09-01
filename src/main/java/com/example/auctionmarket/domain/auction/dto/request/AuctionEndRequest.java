@@ -1,10 +1,4 @@
 package com.example.auctionmarket.domain.auction.dto.request;
 
-import lombok.Getter;
+public record AuctionEndRequest(Long auctionId, Long consumerId, Long amount) {}
 
-@Getter
-public class AuctionEndRequest {
-    private Long auctionId;
-    private Long consumerId;
-    private Long amount;
-}
