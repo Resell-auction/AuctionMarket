@@ -1,0 +1,138 @@
+name: AuctionMarketApp CI/CD Pipeline
+
+on:
+  push:
+    branches: [ feat/deploy ]
+env:
+  AWS_REGION: ap-northeast-2 # 사용할 AWS 리전
+  ECR_REPOSITORY: my-auction-app # 이 앱의 ECR 리포지토리 이름 (Terraform과 일치)
+  ECS_CLUSTER_NAME: my-spring-infra-cluster # Terraform으로 생성한 ECS 클러스터 이름
+  ECS_SERVICE_NAME: my-spring-infra-service # Terraform으로 생성한 ECS 서비스 이름
+  ECS_TASK_DEFINITION_FAMILY: my-spring-infra-app-task # Terraform Task Definition의 family 이름
+  CONTAINER_NAME: auction-market-app # Task Definition 내 이 앱 컨테이너의 이름
+
+jobs:
+  # --- Job 1: CI 단계 - 빌드 및 테스트 ---
+  build:
+    name: Build & Test Application # Job 이름
+    runs-on: ubuntu-latest # 실행 환경 지정
+    steps:
+      - name: Checkout Code # 1. GitHub 리포지토리 코드 가져오기
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17 # 2. Java (JDK 17) 환경 설정
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle # 3. Gradle 환경 설정 (캐싱 포함 가능)
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Grant execute permission for gradlew # 4. gradlew 실행 권한 부여
+        run: chmod +x ./gradlew
+
+      - name: Run Gradle build & test # 5. Gradle 빌드 실행 (test 포함)
+        run: ./gradlew build # test 결과가 실패하면 Job 실패 및 워크플로우 중단
+
+  # --- Job 2: CD 단계 1 - Docker 이미지 빌드 및 ECR 푸시 ---
+  push-image:
+    name: Build and Push Docker Image
+    needs: build # build Job 성공 시에만 실행
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code # 1. 코드 다시 가져오기 (Docker build context 위해)
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials (Access Keys) # 2. AWS 자격 증명 설정 (Access Key 방식)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }} # GitHub Secret 참조
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }} # GitHub Secret 참조
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR # 3. ECR 로그인
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up Docker Buildx # 4. Docker Buildx 설정
+        uses: docker/setup-buildx-action@v3
+
+      - name: Generate Image Tag (Git SHA) # 5. 고유 태그 생성 (Git 커밋 해시 이용)
+        id: image-tag
+        run: echo "tag=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Build and push Docker image to ECR # 6. 이미지 빌드, 태그, 푸시
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }} # 로그인 결과에서 레지스트리 주소 가져옴
+          IMAGE_TAG: ${{ env.tag }} # 위에서 생성한 태그 사용
+        run: |
+          # 전체 이미지 이름 변수 설정 (고유 태그, latest 태그)
+          FULL_ECR_IMAGE_NAME=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          LATEST_ECR_IMAGE_NAME=$ECR_REGISTRY/$ECR_REPOSITORY:latest
+          # Docker 이미지 빌드 (두 개의 태그 동시 지정)
+          docker build -t $FULL_ECR_IMAGE_NAME -t $LATEST_ECR_IMAGE_NAME .
+          # ECR로 푸시 (두 개의 태그 모두)
+          docker push $FULL_ECR_IMAGE_NAME
+          docker push $LATEST_ECR_IMAGE_NAME
+          # 다음 Job에서 사용할 고유 태그 포함 이미지 URI를 출력(output)으로 설정
+          echo "image_uri=$FULL_ECR_IMAGE_NAME" >> $GITHUB_OUTPUT
+
+  # --- Job 3: CD 단계 2 - ECS 서비스 업데이트 (Fargate 배포) ---
+  deploy-ecs:
+    name: Deploy to ECS Fargate
+    needs: push-image # push-image Job 성공 시 실행
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure AWS Credentials (Access Keys) # 1. AWS 자격 증명 다시 설정
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Install jq # 2. JSON 처리 도구 jq 설치
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Download current Task Definition # 3. 현재 활성 Task Definition 내용 다운로드
+        id: task-def-current
+        run: |
+          aws ecs describe-task-definition --task-definition ${{ env.ECS_TASK_DEFINITION_FAMILY }} --query taskDefinition > task-definition-current.json
+          # 등록 시 불필요한/오류 유발 필드 제거하여 새 리비전 등록용 기본 파일 생성
+          jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)' task-definition-current.json > task-definition-base.json
+
+      - name: Update image URI in Task Definition # 4. 다운로드한 JSON 파일에서 이미지 URI 변경
+        id: task-def-new
+        env:
+          NEW_IMAGE_URI: ${{ needs.push-image.outputs.image_uri }} # 이전 Job에서 전달받은 새 이미지 URI (고유 태그 포함)
+        run: |
+          echo "Updating container $CONTAINER_NAME image to $NEW_IMAGE_URI"
+          # jq를 사용하여 containerDefinitions 배열에서 이름이 일치하는 컨테이너의 image 값을 NEW_IMAGE_URI로 변경하고 새 파일로 저장
+          jq --arg CN "$CONTAINER_NAME" --arg IMG "$NEW_IMAGE_URI" '.containerDefinitions |= map(if .name == $CN then .image = $IMG else . end)' task-definition-base.json > task-definition-new.json
+          echo "New task definition template created: task-definition-new.json"
+
+      - name: Register new Task Definition revision # 5. 수정된 JSON 파일로 새 Task Definition 리비전 등록
+        id: register-task-def
+        run: |
+          echo "Registering new task definition revision..."
+          # register-task-definition 명령어 실행 및 결과 저장
+          NEW_TASK_DEF_OUTPUT=$(aws ecs register-task-definition --cli-input-json file://task-definition-new.json)
+          # 명령어 성공 여부 확인
+          if [ $? -ne 0 ]; then echo "Failed to register new task definition"; exit 1; fi
+          # 결과 JSON에서 새로 등록된 리비전의 ARN 추출
+          NEW_TASK_DEF_ARN=$(echo $NEW_TASK_DEF_OUTPUT | jq -r .taskDefinition.taskDefinitionArn)
+          echo "New Task Definition ARN: $NEW_TASK_DEF_ARN"
+          # 다음 스텝에서 사용할 수 있도록 ARN을 GitHub Actions 출력으로 설정
+          echo "task_def_arn=$NEW_TASK_DEF_ARN" >> $GITHUB_OUTPUT
+
+      - name: Update ECS Service # 6. ECS 서비스가 새 Task Definition 리비전을 사용하도록 업데이트 (배포 시작)
+        run: |
+          echo "Updating ECS Service ${{ env.ECS_SERVICE_NAME }} in cluster ${{ env.ECS_CLUSTER_NAME }} to use Task Definition ${{ steps.register-task-def.outputs.task_def_arn }}"
+          # update-service 명령어 실행 (새 Task Definition ARN 사용, --force-new-deployment 로 즉시 배포)
+          aws ecs update-service --cluster ${{ env.ECS_CLUSTER_NAME }} --service ${{ env.ECS_SERVICE_NAME }} --task-definition ${{ steps.register-task-def.outputs.task_def_arn }} --force-new-deployment
+          # 명령어 성공 여부 확인
+          if [ $? -ne 0 ]; then echo "Failed to update ECS service"; exit 1; fi
+          echo "ECS Service update initiated."
